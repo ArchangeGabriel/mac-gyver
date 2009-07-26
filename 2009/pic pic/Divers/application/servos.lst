@@ -1,0 +1,790 @@
+gpasm-0.13.4 beta               servos.asm  5-19-2009  21:44:04          PAGE  1
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+               00001 ;--------------------------------------------------------
+               00002 ; File Created by SDCC : FreeWare ANSI-C Compiler
+               00003 ; Version 2.6.1 #4482 (Mar 15 2009)
+               00004 ; This file generated Tue May 19 21:44:04 2009
+               00005 ;--------------------------------------------------------
+               00006 ; PIC16 port for the Microchip 16-bit core micros
+               00007 ;--------------------------------------------------------
+               00008         list    p=18f4550
+               00009 
+               00010         radix dec
+               00011 
+               00012 ;--------------------------------------------------------
+               00013 ; public variables in this module
+               00014 ;--------------------------------------------------------
+               00015         global _svo_order
+               00016         global _next_event_svo
+               00017         global _init_servos
+               00018         global _set_servo
+               00019         global _gestionservos_tmr2
+               00020         global _gestionservos_tmr1
+               00021         global _positions
+               00022         global _change_svocmd
+               00023         global _event_count
+               00024         global _svo_event
+               00025 
+               00026 ;--------------------------------------------------------
+               00027 ; extern variables in this module
+               00028 ;--------------------------------------------------------
+               00029         extern _SPPDATAbits
+               00030         extern _SPPCFGbits
+               00031         extern _SPPEPSbits
+               00032         extern _SPPCONbits
+               00033         extern _UFRMLbits
+               00034         extern _UFRMHbits
+               00035         extern _UIRbits
+               00036         extern _UIEbits
+               00037         extern _UEIRbits
+               00038         extern _UEIEbits
+               00039         extern _USTATbits
+               00040         extern _UCONbits
+               00041         extern _UADDRbits
+               00042         extern _UCFGbits
+               00043         extern _UEP0bits
+               00044         extern _UEP1bits
+               00045         extern _UEP2bits
+               00046         extern _UEP3bits
+               00047         extern _UEP4bits
+               00048         extern _UEP5bits
+               00049         extern _UEP6bits
+               00050         extern _UEP7bits
+               00051         extern _UEP8bits
+               00052         extern _UEP9bits
+               00053         extern _UEP10bits
+               00054         extern _UEP11bits
+gpasm-0.13.4 beta               servos.asm  5-19-2009  21:44:04          PAGE  2
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+               00055         extern _UEP12bits
+               00056         extern _UEP13bits
+               00057         extern _UEP14bits
+               00058         extern _UEP15bits
+               00059         extern _PORTAbits
+               00060         extern _PORTBbits
+               00061         extern _PORTCbits
+               00062         extern _PORTDbits
+               00063         extern _PORTEbits
+               00064         extern _LATAbits
+               00065         extern _LATBbits
+               00066         extern _LATCbits
+               00067         extern _LATDbits
+               00068         extern _LATEbits
+               00069         extern _TRISAbits
+               00070         extern _TRISBbits
+               00071         extern _TRISCbits
+               00072         extern _TRISDbits
+               00073         extern _TRISEbits
+               00074         extern _OSCTUNEbits
+               00075         extern _PIE1bits
+               00076         extern _PIR1bits
+               00077         extern _IPR1bits
+               00078         extern _PIE2bits
+               00079         extern _PIR2bits
+               00080         extern _IPR2bits
+               00081         extern _EECON1bits
+               00082         extern _RCSTAbits
+               00083         extern _TXSTAbits
+               00084         extern _T3CONbits
+               00085         extern _CMCONbits
+               00086         extern _CVRCONbits
+               00087         extern _ECCP1ASbits
+               00088         extern _ECCP1DELbits
+               00089         extern _BAUDCONbits
+               00090         extern _CCP2CONbits
+               00091         extern _CCP1CONbits
+               00092         extern _ADCON2bits
+               00093         extern _ADCON1bits
+               00094         extern _ADCON0bits
+               00095         extern _SSPCON2bits
+               00096         extern _SSPCON1bits
+               00097         extern _SSPSTATbits
+               00098         extern _T2CONbits
+               00099         extern _T1CONbits
+               00100         extern _RCONbits
+               00101         extern _WDTCONbits
+               00102         extern _HLVDCONbits
+               00103         extern _OSCCONbits
+               00104         extern _T0CONbits
+               00105         extern _STATUSbits
+               00106         extern _FSR2Hbits
+               00107         extern _BSRbits
+               00108         extern _FSR1Hbits
+gpasm-0.13.4 beta               servos.asm  5-19-2009  21:44:04          PAGE  3
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+               00109         extern _FSR0Hbits
+               00110         extern _INTCON3bits
+               00111         extern _INTCON2bits
+               00112         extern _INTCONbits
+               00113         extern _TBLPTRUbits
+               00114         extern _PCLATHbits
+               00115         extern _PCLATUbits
+               00116         extern _STKPTRbits
+               00117         extern _TOSUbits
+               00118         extern _SPPDATA
+               00119         extern _SPPCFG
+               00120         extern _SPPEPS
+               00121         extern _SPPCON
+               00122         extern _UFRML
+               00123         extern _UFRMH
+               00124         extern _UIR
+               00125         extern _UIE
+               00126         extern _UEIR
+               00127         extern _UEIE
+               00128         extern _USTAT
+               00129         extern _UCON
+               00130         extern _UADDR
+               00131         extern _UCFG
+               00132         extern _UEP0
+               00133         extern _UEP1
+               00134         extern _UEP2
+               00135         extern _UEP3
+               00136         extern _UEP4
+               00137         extern _UEP5
+               00138         extern _UEP6
+               00139         extern _UEP7
+               00140         extern _UEP8
+               00141         extern _UEP9
+               00142         extern _UEP10
+               00143         extern _UEP11
+               00144         extern _UEP12
+               00145         extern _UEP13
+               00146         extern _UEP14
+               00147         extern _UEP15
+               00148         extern _PORTA
+               00149         extern _PORTB
+               00150         extern _PORTC
+               00151         extern _PORTD
+               00152         extern _PORTE
+               00153         extern _LATA
+               00154         extern _LATB
+               00155         extern _LATC
+               00156         extern _LATD
+               00157         extern _LATE
+               00158         extern _TRISA
+               00159         extern _TRISB
+               00160         extern _TRISC
+               00161         extern _TRISD
+               00162         extern _TRISE
+gpasm-0.13.4 beta               servos.asm  5-19-2009  21:44:04          PAGE  4
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+               00163         extern _OSCTUNE
+               00164         extern _PIE1
+               00165         extern _PIR1
+               00166         extern _IPR1
+               00167         extern _PIE2
+               00168         extern _PIR2
+               00169         extern _IPR2
+               00170         extern _EECON1
+               00171         extern _EECON2
+               00172         extern _EEDATA
+               00173         extern _EEADR
+               00174         extern _RCSTA
+               00175         extern _TXSTA
+               00176         extern _TXREG
+               00177         extern _RCREG
+               00178         extern _SPBRG
+               00179         extern _SPBRGH
+               00180         extern _T3CON
+               00181         extern _TMR3L
+               00182         extern _TMR3H
+               00183         extern _CMCON
+               00184         extern _CVRCON
+               00185         extern _ECCP1AS
+               00186         extern _ECCP1DEL
+               00187         extern _BAUDCON
+               00188         extern _CCP2CON
+               00189         extern _CCPR2L
+               00190         extern _CCPR2H
+               00191         extern _CCP1CON
+               00192         extern _CCPR1L
+               00193         extern _CCPR1H
+               00194         extern _ADCON2
+               00195         extern _ADCON1
+               00196         extern _ADCON0
+               00197         extern _ADRESL
+               00198         extern _ADRESH
+               00199         extern _SSPCON2
+               00200         extern _SSPCON1
+               00201         extern _SSPSTAT
+               00202         extern _SSPADD
+               00203         extern _SSPBUF
+               00204         extern _T2CON
+               00205         extern _PR2
+               00206         extern _TMR2
+               00207         extern _T1CON
+               00208         extern _TMR1L
+               00209         extern _TMR1H
+               00210         extern _RCON
+               00211         extern _WDTCON
+               00212         extern _HLVDCON
+               00213         extern _OSCCON
+               00214         extern _T0CON
+               00215         extern _TMR0L
+               00216         extern _TMR0H
+gpasm-0.13.4 beta               servos.asm  5-19-2009  21:44:04          PAGE  5
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+               00217         extern _STATUS
+               00218         extern _FSR2L
+               00219         extern _FSR2H
+               00220         extern _PLUSW2
+               00221         extern _PREINC2
+               00222         extern _POSTDEC2
+               00223         extern _POSTINC2
+               00224         extern _INDF2
+               00225         extern _BSR
+               00226         extern _FSR1L
+               00227         extern _FSR1H
+               00228         extern _PLUSW1
+               00229         extern _PREINC1
+               00230         extern _POSTDEC1
+               00231         extern _POSTINC1
+               00232         extern _INDF1
+               00233         extern _WREG
+               00234         extern _FSR0L
+               00235         extern _FSR0H
+               00236         extern _PLUSW0
+               00237         extern _PREINC0
+               00238         extern _POSTDEC0
+               00239         extern _POSTINC0
+               00240         extern _INDF0
+               00241         extern _INTCON3
+               00242         extern _INTCON2
+               00243         extern _INTCON
+               00244         extern _PRODL
+               00245         extern _PRODH
+               00246         extern _TABLAT
+               00247         extern _TBLPTRL
+               00248         extern _TBLPTRH
+               00249         extern _TBLPTRU
+               00250         extern _PCL
+               00251         extern _PCLATH
+               00252         extern _PCLATU
+               00253         extern _STKPTR
+               00254         extern _TOSL
+               00255         extern _TOSH
+               00256         extern _TOSU
+               00257 ;--------------------------------------------------------
+               00258 ;       Equates to used internal registers
+               00259 ;--------------------------------------------------------
+  00000FD8     00260 STATUS  equ     0xfd8
+  00000FE8     00261 WREG    equ     0xfe8
+  00000FE9     00262 FSR0L   equ     0xfe9
+  00000FEA     00263 FSR0H   equ     0xfea
+  00000FE1     00264 FSR1L   equ     0xfe1
+  00000FD9     00265 FSR2L   equ     0xfd9
+  00000FEF     00266 INDF0   equ     0xfef
+  00000FE5     00267 POSTDEC1        equ     0xfe5
+  00000FE4     00268 PREINC1 equ     0xfe4
+  00000FDB     00269 PLUSW2  equ     0xfdb
+               00270 
+gpasm-0.13.4 beta               servos.asm  5-19-2009  21:44:04          PAGE  6
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+               00271 
+               00272 ; Internal registers
+               00273 .registers      udata_ovr       0x0000
+               00274 r0x00   res     1
+               00275 r0x01   res     1
+               00276 r0x02   res     1
+               00277 
+               00278 udata_servos_0  udata
+               00279 _next_event_svo res     1
+               00280 
+               00281 udata_servos_1  udata
+               00282 _svo_order      res     1
+               00283 
+               00284 udata_servos_2  udata
+               00285 _change_svocmd  res     1
+               00286 
+               00287 udata_servos_3  udata
+               00288 _positions      res     1
+               00289 
+               00290 udata_servos_4  udata
+               00291 _event_count    res     1
+               00292 
+               00293 udata_servos_5  udata
+               00294 _svo_event      res     1
+               00295 
+               00296 ;--------------------------------------------------------
+               00297 ; global & static initialisations
+               00298 ;--------------------------------------------------------
+               00299 ; I code from now on!
+               00300 ; ; Starting pCode block
+               00301 S_servos__gestionservos_tmr1    code
+0000           00302 _gestionservos_tmr1:
+0000 0000      00303         BANKSEL _change_svocmd
+               00304 ;       .line   51; servos.c    if(change_svocmd) // si Flag = 1 (ie si on a ordonne un changement de position)
+0002 5100      00305         MOVF    _change_svocmd, W, B
+0004 E000      00306         BZ      _00124_DS_
+0006 0000      00307         BANKSEL _positions
+               00308 ;       .line   53; servos.c    svo_event[0] = positions[0];
+0008 5100      00309         MOVF    _positions, W, B
+000A 0000      00310         BANKSEL _svo_event
+000C 6F00      00311         MOVWF   _svo_event, B
+000E 0000      00312         BANKSEL _change_svocmd
+               00313 ;       .line   54; servos.c    change_svocmd = 0; // Flag a 0
+0010 6B00      00314         CLRF    _change_svocmd, B
+0012           00315 _00124_DS_:
+0012 0000      00316         BANKSEL _event_count
+               00317 ;       .line   56; servos.c    event_count=0;
+0014 6B00      00318         CLRF    _event_count, B
+               00319 ;       .line   57; servos.c    PIN_SVO0=1; // Mise a 1 des sorties
+0016 8E00      00320         BSF     _PORTDbits, 7
+               00321 ;       .line   59; servos.c    PR2 = svo_event[0];
+0018 C000 F000 00322         MOVFF   _svo_event, _PR2
+               00323 ;       .line   60; servos.c    TMR2 = 0;
+001C 6A00      00324         CLRF    _TMR2
+gpasm-0.13.4 beta               servos.asm  5-19-2009  21:44:04          PAGE  7
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+001E 0012      00325         RETURN  
+               00326 
+               00327 ; ; Starting pCode block
+               00328 S_servos__gestionservos_tmr2    code
+0000           00329 _gestionservos_tmr2:
+               00330 ;       .line   36; servos.c    void gestionservos_tmr2(void) // 1 avant
+0000 C000 FFE5 00331         MOVFF   r0x00, POSTDEC1
+0004 C000 FFE5 00332         MOVFF   r0x01, POSTDEC1
+               00333 ;       .line   38; servos.c    PIN_SVO0 = 0;
+0008 9E00      00334         BCF     _PORTDbits, 7
+000A 0000      00335         BANKSEL _event_count
+               00336 ;       .line   40; servos.c    event_count++;  // On passe au prochain evenement
+000C 2B00      00337         INCF    _event_count, F, B
+               00338 ;       .line   42; servos.c    if(event_count<NB_SERVO)
+000E 0E01      00339         MOVLW   0x01
+               00340 ; removed redundant BANKSEL
+0010 5D00      00341         SUBWF   _event_count, W, B
+0012 E200      00342         BC      _00118_DS_
+               00343 ;       .line   44; servos.c    PR2 = svo_event[event_count];
+0014 0E00      00344         MOVLW   LOW(_svo_event)
+               00345 ; removed redundant BANKSEL
+0016 2500      00346         ADDWF   _event_count, W, B
+0018 6E00      00347         MOVWF   r0x00
+001A 6A00      00348         CLRF    r0x01
+001C 0E00      00349         MOVLW   HIGH(_svo_event)
+001E 2200      00350         ADDWFC  r0x01, F
+0020 C000 FFE9 00351         MOVFF   r0x00, FSR0L
+0024 C000 FFEA 00352         MOVFF   r0x01, FSR0H
+0028 CFEF F000 00353         MOVFF   INDF0, _PR2
+               00354 ;       .line   45; servos.c    TMR2 = 0;
+002C 6A00      00355         CLRF    _TMR2
+002E           00356 _00118_DS_:
+002E CFE4 F000 00357         MOVFF   PREINC1, r0x01
+0032 CFE4 F000 00358         MOVFF   PREINC1, r0x00
+0036 0012      00359         RETURN  
+               00360 
+               00361 ; ; Starting pCode block
+               00362 S_servos__set_servo     code
+0000           00363 _set_servo:
+               00364 ;       .line   25; servos.c    unsigned char set_servo(unsigned char servo_id, unsigned /*int*/ char position)
+0000 CFD9 FFE5 00365         MOVFF   FSR2L, POSTDEC1
+0004 CFE1 FFD9 00366         MOVFF   FSR1L, FSR2L
+0008 C000 FFE5 00367         MOVFF   r0x00, POSTDEC1
+000C C000 FFE5 00368         MOVFF   r0x01, POSTDEC1
+0010 C000 FFE5 00369         MOVFF   r0x02, POSTDEC1
+0014 0E02      00370         MOVLW   0x02
+0016 CFDB F000 00371         MOVFF   PLUSW2, r0x00
+001A 0E03      00372         MOVLW   0x03
+001C CFDB F000 00373         MOVFF   PLUSW2, r0x01
+               00374 ;       .line   27; servos.c    if(servo_id<NB_SERVO)
+0020 0E01      00375         MOVLW   0x01
+0022 5C00      00376         SUBWF   r0x00, W
+0024 E200      00377         BC      _00110_DS_
+               00378 ;       .line   29; servos.c    positions[servo_id]=position; // changer position
+gpasm-0.13.4 beta               servos.asm  5-19-2009  21:44:04          PAGE  8
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+0026 0E00      00379         MOVLW   LOW(_positions)
+0028 2600      00380         ADDWF   r0x00, F
+002A 0E00      00381         MOVLW   HIGH(_positions)
+002C 6A00      00382         CLRF    r0x02
+002E 2200      00383         ADDWFC  r0x02, F
+0030 C000 FFE9 00384         MOVFF   r0x00, FSR0L
+0034 C000 FFEA 00385         MOVFF   r0x02, FSR0H
+0038 C000 FFEF 00386         MOVFF   r0x01, INDF0
+               00387 ; #     MOVLW   0x01
+               00388 ; #     MOVWF   _change_svocmd, B
+               00389 ; #     MOVLW   0x01
+               00390 ; ;     peep 5 - Removed redundant move
+               00391 ;       .line   30; servos.c    change_svocmd = 1; // mise du Flag a 1
+003C 0E01      00392         MOVLW   0x01
+003E 0000      00393         BANKSEL _change_svocmd
+               00394 ;       .line   31; servos.c    return 1;
+0040 6F00      00395         MOVWF   _change_svocmd, B
+0042 D000      00396         BRA     _00111_DS_
+0044           00397 _00110_DS_:
+               00398 ;       .line   33; servos.c    return 0;
+0044 6AE8      00399         CLRF    WREG
+0046           00400 _00111_DS_:
+0046 CFE4 F000 00401         MOVFF   PREINC1, r0x02
+004A CFE4 F000 00402         MOVFF   PREINC1, r0x01
+004E CFE4 F000 00403         MOVFF   PREINC1, r0x00
+0052 CFE4 FFD9 00404         MOVFF   PREINC1, FSR2L
+0056 0012      00405         RETURN  
+               00406 
+               00407 ; ; Starting pCode block
+               00408 S_servos__init_servos   code
+0000           00409 _init_servos:
+               00410 ;       .line   14; servos.c    PR2 = 0xFF; //periode overflow Timer2 = 256
+0000 6800      00411         SETF    _PR2
+               00412 ;       .line   15; servos.c    T2CON = 0x3F; // timer2 conf = 0 0111 1 11 : nU, postscaler 1:8, on, prescaler 1:16
+0002 0E3F      00413         MOVLW   0x3f
+0004 6E00      00414         MOVWF   _T2CON
+               00415 ;       .line   16; servos.c    T1CON = 0xA1; // timer1 conf = 1 0 10 0 0 0 1 : 16bits, vers proc = off, prescaler 1:4, oscillator off, Extclk input nU, internal clock, on
+0006 0EA1      00416         MOVLW   0xa1
+0008 6E00      00417         MOVWF   _T1CON
+               00418 ;       .line   17; servos.c    PIE1bits.TMR1IE = 1; //Interrupt Timer1
+000A 8000      00419         BSF     _PIE1bits, 0
+               00420 ;       .line   18; servos.c    PIE1bits.TMR2IE = 1; //Interrupt Timer2
+000C 8200      00421         BSF     _PIE1bits, 1
+               00422 ;       .line   19; servos.c    positions[0]=POS_DEFAULT0;                // Positions par defaut
+000E 0E40      00423         MOVLW   0x40
+0010 0000      00424         BANKSEL _positions
+0012 6F00      00425         MOVWF   _positions, B
+               00426 ;       .line   20; servos.c    TRIS_SVO0 = 0;
+0014 9E00      00427         BCF     _TRISDbits, 7
+               00428 ;       .line   21; servos.c    change_svocmd = 1; // Flag de changement de position a 1
+0016 0E01      00429         MOVLW   0x01
+0018 0000      00430         BANKSEL _change_svocmd
+001A 6F00      00431         MOVWF   _change_svocmd, B
+               00432 ;       .line   22; servos.c    TMR2 = 0;
+gpasm-0.13.4 beta               servos.asm  5-19-2009  21:44:04          PAGE  9
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+001C 6A00      00433         CLRF    _TMR2
+001E 0012      00434         RETURN  
+               00435 
+               00436 
+               00437 
+               00438 ; Statistics:
+               00439 ; code size:      208 (0x00d0) bytes ( 0.16%)
+               00440 ;                 104 (0x0068) words
+               00441 ; udata size:       6 (0x0006) bytes ( 0.33%)
+               00442 ; access size:      3 (0x0003) bytes
+               00443 
+               00444 
+gpasm-0.13.4 beta               servos.asm  5-19-2009  21:44:04          PAGE 10
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+FSR0H                             00000FEA
+FSR0L                             00000FE9
+FSR1L                             00000FE1
+FSR2L                             00000FD9
+INDF0                             00000FEF
+PLUSW2                            00000FDB
+POSTDEC1                          00000FE5
+PREINC1                           00000FE4
+STATUS                            00000FD8
+WREG                              00000FE8
+_00110_DS_                        00000044
+_00111_DS_                        00000046
+_00118_DS_                        0000002E
+_00124_DS_                        00000012
+_ADCON0                           00000000
+_ADCON0bits                       00000000
+_ADCON1                           00000000
+_ADCON1bits                       00000000
+_ADCON2                           00000000
+_ADCON2bits                       00000000
+_ADRESH                           00000000
+_ADRESL                           00000000
+_BAUDCON                          00000000
+_BAUDCONbits                      00000000
+_BSR                              00000000
+_BSRbits                          00000000
+_CCP1CON                          00000000
+_CCP1CONbits                      00000000
+_CCP2CON                          00000000
+_CCP2CONbits                      00000000
+_CCPR1H                           00000000
+_CCPR1L                           00000000
+_CCPR2H                           00000000
+_CCPR2L                           00000000
+_CMCON                            00000000
+_CMCONbits                        00000000
+_CVRCON                           00000000
+_CVRCONbits                       00000000
+_ECCP1AS                          00000000
+_ECCP1ASbits                      00000000
+_ECCP1DEL                         00000000
+_ECCP1DELbits                     00000000
+_EEADR                            00000000
+_EECON1                           00000000
+_EECON1bits                       00000000
+_EECON2                           00000000
+_EEDATA                           00000000
+_FSR0H                            00000000
+_FSR0Hbits                        00000000
+_FSR0L                            00000000
+_FSR1H                            00000000
+_FSR1Hbits                        00000000
+_FSR1L                            00000000
+gpasm-0.13.4 beta               servos.asm  5-19-2009  21:44:04          PAGE 11
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+_FSR2H                            00000000
+_FSR2Hbits                        00000000
+_FSR2L                            00000000
+_HLVDCON                          00000000
+_HLVDCONbits                      00000000
+_INDF0                            00000000
+_INDF1                            00000000
+_INDF2                            00000000
+_INTCON                           00000000
+_INTCON2                          00000000
+_INTCON2bits                      00000000
+_INTCON3                          00000000
+_INTCON3bits                      00000000
+_INTCONbits                       00000000
+_IPR1                             00000000
+_IPR1bits                         00000000
+_IPR2                             00000000
+_IPR2bits                         00000000
+_LATA                             00000000
+_LATAbits                         00000000
+_LATB                             00000000
+_LATBbits                         00000000
+_LATC                             00000000
+_LATCbits                         00000000
+_LATD                             00000000
+_LATDbits                         00000000
+_LATE                             00000000
+_LATEbits                         00000000
+_OSCCON                           00000000
+_OSCCONbits                       00000000
+_OSCTUNE                          00000000
+_OSCTUNEbits                      00000000
+_PCL                              00000000
+_PCLATH                           00000000
+_PCLATHbits                       00000000
+_PCLATU                           00000000
+_PCLATUbits                       00000000
+_PIE1                             00000000
+_PIE1bits                         00000000
+_PIE2                             00000000
+_PIE2bits                         00000000
+_PIR1                             00000000
+_PIR1bits                         00000000
+_PIR2                             00000000
+_PIR2bits                         00000000
+_PLUSW0                           00000000
+_PLUSW1                           00000000
+_PLUSW2                           00000000
+_PORTA                            00000000
+_PORTAbits                        00000000
+_PORTB                            00000000
+_PORTBbits                        00000000
+_PORTC                            00000000
+_PORTCbits                        00000000
+gpasm-0.13.4 beta               servos.asm  5-19-2009  21:44:04          PAGE 12
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+_PORTD                            00000000
+_PORTDbits                        00000000
+_PORTE                            00000000
+_PORTEbits                        00000000
+_POSTDEC0                         00000000
+_POSTDEC1                         00000000
+_POSTDEC2                         00000000
+_POSTINC0                         00000000
+_POSTINC1                         00000000
+_POSTINC2                         00000000
+_PR2                              00000000
+_PREINC0                          00000000
+_PREINC1                          00000000
+_PREINC2                          00000000
+_PRODH                            00000000
+_PRODL                            00000000
+_RCON                             00000000
+_RCONbits                         00000000
+_RCREG                            00000000
+_RCSTA                            00000000
+_RCSTAbits                        00000000
+_SPBRG                            00000000
+_SPBRGH                           00000000
+_SPPCFG                           00000000
+_SPPCFGbits                       00000000
+_SPPCON                           00000000
+_SPPCONbits                       00000000
+_SPPDATA                          00000000
+_SPPDATAbits                      00000000
+_SPPEPS                           00000000
+_SPPEPSbits                       00000000
+_SSPADD                           00000000
+_SSPBUF                           00000000
+_SSPCON1                          00000000
+_SSPCON1bits                      00000000
+_SSPCON2                          00000000
+_SSPCON2bits                      00000000
+_SSPSTAT                          00000000
+_SSPSTATbits                      00000000
+_STATUS                           00000000
+_STATUSbits                       00000000
+_STKPTR                           00000000
+_STKPTRbits                       00000000
+_T0CON                            00000000
+_T0CONbits                        00000000
+_T1CON                            00000000
+_T1CONbits                        00000000
+_T2CON                            00000000
+_T2CONbits                        00000000
+_T3CON                            00000000
+_T3CONbits                        00000000
+_TABLAT                           00000000
+_TBLPTRH                          00000000
+_TBLPTRL                          00000000
+gpasm-0.13.4 beta               servos.asm  5-19-2009  21:44:04          PAGE 13
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+_TBLPTRU                          00000000
+_TBLPTRUbits                      00000000
+_TMR0H                            00000000
+_TMR0L                            00000000
+_TMR1H                            00000000
+_TMR1L                            00000000
+_TMR2                             00000000
+_TMR3H                            00000000
+_TMR3L                            00000000
+_TOSH                             00000000
+_TOSL                             00000000
+_TOSU                             00000000
+_TOSUbits                         00000000
+_TRISA                            00000000
+_TRISAbits                        00000000
+_TRISB                            00000000
+_TRISBbits                        00000000
+_TRISC                            00000000
+_TRISCbits                        00000000
+_TRISD                            00000000
+_TRISDbits                        00000000
+_TRISE                            00000000
+_TRISEbits                        00000000
+_TXREG                            00000000
+_TXSTA                            00000000
+_TXSTAbits                        00000000
+_UADDR                            00000000
+_UADDRbits                        00000000
+_UCFG                             00000000
+_UCFGbits                         00000000
+_UCON                             00000000
+_UCONbits                         00000000
+_UEIE                             00000000
+_UEIEbits                         00000000
+_UEIR                             00000000
+_UEIRbits                         00000000
+_UEP0                             00000000
+_UEP0bits                         00000000
+_UEP1                             00000000
+_UEP10                            00000000
+_UEP10bits                        00000000
+_UEP11                            00000000
+_UEP11bits                        00000000
+_UEP12                            00000000
+_UEP12bits                        00000000
+_UEP13                            00000000
+_UEP13bits                        00000000
+_UEP14                            00000000
+_UEP14bits                        00000000
+_UEP15                            00000000
+_UEP15bits                        00000000
+_UEP1bits                         00000000
+_UEP2                             00000000
+_UEP2bits                         00000000
+gpasm-0.13.4 beta               servos.asm  5-19-2009  21:44:04          PAGE 14
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+_UEP3                             00000000
+_UEP3bits                         00000000
+_UEP4                             00000000
+_UEP4bits                         00000000
+_UEP5                             00000000
+_UEP5bits                         00000000
+_UEP6                             00000000
+_UEP6bits                         00000000
+_UEP7                             00000000
+_UEP7bits                         00000000
+_UEP8                             00000000
+_UEP8bits                         00000000
+_UEP9                             00000000
+_UEP9bits                         00000000
+_UFRMH                            00000000
+_UFRMHbits                        00000000
+_UFRML                            00000000
+_UFRMLbits                        00000000
+_UIE                              00000000
+_UIEbits                          00000000
+_UIR                              00000000
+_UIRbits                          00000000
+_USTAT                            00000000
+_USTATbits                        00000000
+_WDTCON                           00000000
+_WDTCONbits                       00000000
+_WREG                             00000000
+__18F4550                         00000001
+_change_svocmd                    00000000
+_event_count                      00000000
+_gestionservos_tmr1               00000000
+_gestionservos_tmr2               00000000
+_init_servos                      00000000
+_next_event_svo                   00000000
+_positions                        00000000
+_set_servo                        00000000
+_svo_event                        00000000
+_svo_order                        00000000
+r0x00                             00000000
+r0x01                             00000001
+r0x02                             00000002
+
+
+Errors   :       0
+Warnings :       0 reported,       0 suppressed
+Messages :       0 reported,       0 suppressed
+

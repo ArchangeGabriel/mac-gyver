@@ -1,0 +1,203 @@
+// moteursetjack.c //
+
+#include <pic18fregs.h>
+#include "common_types.h"
+#include "my_ep2.h"
+#include "../../../My_usb/src/commandes.h"
+#include "moteursetjack.h"
+
+unsigned char depart;
+unsigned char ticoutac = 0;
+Char mot1_phase; // phase = dernier signal envoyé au moteur1
+unsigned char mot1_sens;
+unsigned char etat_moteur;
+unsigned char mot1_position, mot2_position;
+unsigned char mot1_pos_visee, mot2_pos_visee;
+unsigned int compteur_mot;
+
+void init_moteursetjack(void)
+{
+    T0CON = CONFIG_TMR0_MOTEUR | 0x08; // PSA off
+    etat_moteur = INITIALISATION;
+    INTCONbits.INT0IE = 1;             // INT0 on
+    INTCONbits.INT0IF = 0;             // ..
+    INTCONbits.RBIE = 1;               // RB on
+    INTCONbits.RBIF = 0;               // ..
+    INTCON2 |= 0x71;                   // Rising edge for INT0,1,2. High priority for RB.
+    INTCON3 = 0xC8;                    // INT1,2 on, High priority.
+}
+
+void ordre_moteur(unsigned char ordre)
+{
+    unsigned char dest;
+    if(ordre & ACTIV_MOTEUR_1)
+    {
+        dest = (ordre & POSITION_MOTEUR_1) >> 4;
+        if((dest != mot1_position) || (etat_moteur & ACTIV_MOTEUR_1))
+        {
+            if(etat_moteur & ACTIV_MOTEUR_1)
+            {
+                if(((dest > mot1_position)&&(!mot1_sens))||((dest < mot1_position)&&(mot1_sens))) // ie si on change de sens
+                {
+                    compteur_mot = PAS_PAR_ETAGE - compteur_mot;
+		    depart = -TEMPS_ATTENTE; // Attend TEMPS_ATTENTE interruptions du timer0 avant de repartir dans l'autre sens
+                    if(mot1_sens) mot1_position++;
+                    else mot1_position--;
+                }
+            }
+            else
+            {
+		etat_moteur |= ACTIV_MOTEUR_1;
+                compteur_mot = 0;
+                PIN_MOT1_1 = mot1_phase.b0;
+                PIN_MOT1_2 = !mot1_phase.b0;
+                PIN_MOT1_3 = mot1_phase.b1;
+                PIN_MOT1_4 = !mot1_phase.b1;
+            }
+            T0CON = CONFIG_TMR0_MOTEUR;
+            mot1_sens = (dest > mot1_position);
+            if(PIN_MOT1_1 == PIN_MOT1_3) ticoutac = mot1_sens;
+            else ticoutac = !mot1_sens;
+        }
+    }
+    if(ordre & ACTIV_MOTEUR_2)
+    {
+	dest = (ordre & POSITION_MOTEUR_2) >> 1;
+	if(dest != mot2_position)
+	{
+            mot2_pos_visee = dest;
+            if(dest > mot2_position)
+	    {
+		PIN_MOT2_1 = 1;
+		PIN_MOT2_2 = 0;
+	    }
+	    else
+	    {
+		PIN_MOT2_1 = 0;
+		PIN_MOT2_2 = 1;
+	    }
+	    etat_moteur |= ACTIV_MOTEUR_2;
+	}
+    }
+}
+
+/*void moteursetjack_ints(void)
+{
+    if(INTCONbits.RBIF)
+    {
+        if(FIN_COURSE1_BAS)
+        {
+	    depart = -TEMPS_ATTENTE; // Attend TEMPS_ATTENTE interruptions du timer avant de partir dans l'autre sens
+	    ticoutac = !ticoutac;
+            compteur_mot = PAS_PAR_ETAGE - NB_PAS_FIN_BAS;
+            mot1_pos_visee = 1;
+	    mot1_position = 0;
+        }
+        if(FIN_COURSE1_HAUT)
+        {
+	    depart = -TEMPS_ATTENTE; // Attend TEMPS_ATTENTE interruptions du timer avant de partir dans l'autre sens
+            ticoutac = !ticoutac;
+            compteur_mot = PAS_PAR_ETAGE - NB_PAS_FIN_HAUT;
+	    mot1_pos_visee = POSITION_MAX_1;
+            mot1_position = POSITION_MAX_1 + 1;
+        }
+	INTCONbits.RBIF = 0;
+    }
+    if(INTCONbits.INT0IF) // Fin de course moteur 2-1
+    {
+        PIN_MOT2_1 = 0;
+        PIN_MOT2_2 = 0;
+        mot2_position = 0;
+	etat_moteur &= ~POSITION_MOTEUR_2; // Maj position
+	//etat_moteur |= PM2(0);           // ..
+	etat_moteur &= ~ACTIV_MOTEUR_2;    // Inactif !
+        INTCONbits.INT0IF = 0;
+    }
+    if(INTCON3bits.INT1IF) // Fin de course moteur 2-1
+    {
+	if(mot2_pos_visee == 1)
+	{
+            PIN_MOT2_1 = 0;
+            PIN_MOT2_2 = 0;
+	    etat_moteur &= ~ACTIV_MOTEUR_2;// Inactif !
+	}
+        mot2_position = 1;
+	etat_moteur &= ~POSITION_MOTEUR_2; // Maj position
+	etat_moteur |= 0x02;               // ..
+        INTCON3bits.INT1IF = 0;
+    }
+    if(INTCON3bits.INT2IF) // Fin de course moteur 2-2
+    {
+        PIN_MOT2_1 = 0;
+        PIN_MOT2_2 = 0;
+        mot2_position = 2;
+	etat_moteur &= ~POSITION_MOTEUR_2; // Maj position
+	etat_moteur |= 0x04;               // ..
+	etat_moteur &= ~ACTIV_MOTEUR_2;    // Inactif !
+        INTCON3bits.INT2IF = 0;
+    }
+}*/
+
+void moteursetjack_tmr0(void)
+{
+    if(!depart)
+    {
+	if(ticoutac)
+	{
+            PIN_MOT1_1 = !PIN_MOT1_1;
+            PIN_MOT1_2 = !PIN_MOT1_2;
+	    ticoutac = 0;
+	}
+	else
+	{
+            PIN_MOT1_3 = !PIN_MOT1_3;
+            PIN_MOT1_4 = !PIN_MOT1_4;
+	    ticoutac = 1;
+	}
+	compteur_mot++;
+	if(compteur_mot >= PAS_PAR_ETAGE)
+	{
+            if(mot1_sens) mot1_position++;
+	    else mot1_position--;
+
+	    etat_moteur &= ~POSITION_MOTEUR_1; // Maj position
+	    etat_moteur |= PM1(mot1_position); // ..
+
+	    if(mot1_position == mot1_pos_visee)
+	    {
+                T0CON = CONFIG_TMR0_MOTEUR & 0x7f; // TMR0OFF
+                etat_moteur &= ~ACTIV_MOTEUR_1; // Inactif
+
+                mot1_phase.b0 = PIN_MOT1_1;
+       	        mot1_phase.b1 = PIN_MOT1_3;
+	        PIN_MOT1_1 = 0;
+	        PIN_MOT1_2 = 0;
+	        PIN_MOT1_3 = 0;
+	        PIN_MOT1_4 = 0;
+	    }
+	    compteur_mot = 0;
+	}
+    }
+    else
+    {
+	if(depart < 3)
+	{
+            if(PIN_JACK)
+            {
+                if(depart == 1) depart = 2;
+	        if(depart == 2) 
+                {
+                    T0CON = CONFIG_TMR0_MOTEUR & 0x7f; // TMR0OFF
+                    mydata[0] = GOGOGRINGO;
+                    ep2_num_bytes_to_send = 1;
+	            ep2_source_data = mydata;
+	            my_prepare_ep2_in();
+	            depart = 0;
+	        }
+            }
+            else depart = 1;
+        }
+        else depart++;
+    }
+}
+

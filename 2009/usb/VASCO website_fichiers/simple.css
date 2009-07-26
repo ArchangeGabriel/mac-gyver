@@ -1,0 +1,24 @@
+body {
+  padding: 2em 1em 2em 230px;
+  margin: 0;
+  font-family: sans-serif;
+  color: black;
+  background: white;
+  background-image: url("../picture/logo_side.png");
+  background-position: top left;
+/*  background-attachment: fixed;*/
+  background-repeat: no-repeat;
+}
+
+h1, h2, h3, h4, h5, h6 { text-align: left }
+h1, h2, h3 { color: #005A9C }
+h1 { font: 170% sans-serif }
+h2 { font: 140% sans-serif }
+h3 { font: 120% sans-serif }
+h4 { font: bold 100% sans-serif }
+h5 { font: italic 100% sans-serif }
+h6 { font: small-caps 100% sans-serif }
+
+div.head { margin-bottom: 1em }
+div.head h1 { margin-top: 2em; clear: both }
+div.head table { margin-left: 2em; margin-top: 2em }

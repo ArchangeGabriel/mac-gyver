@@ -1,0 +1,614 @@
+gpasm-0.13.4 beta               application_iface.asm5-19-2009  21:44:03          PAGE  1
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+               00001 ;--------------------------------------------------------
+               00002 ; File Created by SDCC : FreeWare ANSI-C Compiler
+               00003 ; Version 2.6.1 #4482 (Mar 15 2009)
+               00004 ; This file generated Tue May 19 21:44:03 2009
+               00005 ;--------------------------------------------------------
+               00006 ; PIC16 port for the Microchip 16-bit core micros
+               00007 ;--------------------------------------------------------
+               00008         list    p=18f4550
+               00009 
+               00010         radix dec
+               00011 
+               00012 ;--------------------------------------------------------
+               00013 ; public variables in this module
+               00014 ;--------------------------------------------------------
+               00015         global _application_data
+               00016 
+               00017 ;--------------------------------------------------------
+               00018 ; extern variables in this module
+               00019 ;--------------------------------------------------------
+               00020         extern _ep_bdt
+               00021         extern _SPPDATAbits
+               00022         extern _SPPCFGbits
+               00023         extern _SPPEPSbits
+               00024         extern _SPPCONbits
+               00025         extern _UFRMLbits
+               00026         extern _UFRMHbits
+               00027         extern _UIRbits
+               00028         extern _UIEbits
+               00029         extern _UEIRbits
+               00030         extern _UEIEbits
+               00031         extern _USTATbits
+               00032         extern _UCONbits
+               00033         extern _UADDRbits
+               00034         extern _UCFGbits
+               00035         extern _UEP0bits
+               00036         extern _UEP1bits
+               00037         extern _UEP2bits
+               00038         extern _UEP3bits
+               00039         extern _UEP4bits
+               00040         extern _UEP5bits
+               00041         extern _UEP6bits
+               00042         extern _UEP7bits
+               00043         extern _UEP8bits
+               00044         extern _UEP9bits
+               00045         extern _UEP10bits
+               00046         extern _UEP11bits
+               00047         extern _UEP12bits
+               00048         extern _UEP13bits
+               00049         extern _UEP14bits
+               00050         extern _UEP15bits
+               00051         extern _PORTAbits
+               00052         extern _PORTBbits
+               00053         extern _PORTCbits
+               00054         extern _PORTDbits
+gpasm-0.13.4 beta               application_iface.asm5-19-2009  21:44:03          PAGE  2
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+               00055         extern _PORTEbits
+               00056         extern _LATAbits
+               00057         extern _LATBbits
+               00058         extern _LATCbits
+               00059         extern _LATDbits
+               00060         extern _LATEbits
+               00061         extern _TRISAbits
+               00062         extern _TRISBbits
+               00063         extern _TRISCbits
+               00064         extern _TRISDbits
+               00065         extern _TRISEbits
+               00066         extern _OSCTUNEbits
+               00067         extern _PIE1bits
+               00068         extern _PIR1bits
+               00069         extern _IPR1bits
+               00070         extern _PIE2bits
+               00071         extern _PIR2bits
+               00072         extern _IPR2bits
+               00073         extern _EECON1bits
+               00074         extern _RCSTAbits
+               00075         extern _TXSTAbits
+               00076         extern _T3CONbits
+               00077         extern _CMCONbits
+               00078         extern _CVRCONbits
+               00079         extern _ECCP1ASbits
+               00080         extern _ECCP1DELbits
+               00081         extern _BAUDCONbits
+               00082         extern _CCP2CONbits
+               00083         extern _CCP1CONbits
+               00084         extern _ADCON2bits
+               00085         extern _ADCON1bits
+               00086         extern _ADCON0bits
+               00087         extern _SSPCON2bits
+               00088         extern _SSPCON1bits
+               00089         extern _SSPSTATbits
+               00090         extern _T2CONbits
+               00091         extern _T1CONbits
+               00092         extern _RCONbits
+               00093         extern _WDTCONbits
+               00094         extern _HLVDCONbits
+               00095         extern _OSCCONbits
+               00096         extern _T0CONbits
+               00097         extern _STATUSbits
+               00098         extern _FSR2Hbits
+               00099         extern _BSRbits
+               00100         extern _FSR1Hbits
+               00101         extern _FSR0Hbits
+               00102         extern _INTCON3bits
+               00103         extern _INTCON2bits
+               00104         extern _INTCONbits
+               00105         extern _TBLPTRUbits
+               00106         extern _PCLATHbits
+               00107         extern _PCLATUbits
+               00108         extern _STKPTRbits
+gpasm-0.13.4 beta               application_iface.asm5-19-2009  21:44:03          PAGE  3
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+               00109         extern _TOSUbits
+               00110         extern _usb_device_state
+               00111         extern _usb_active_cfg
+               00112         extern _usb_active_alt_setting
+               00113         extern _ep2_num_bytes_to_send
+               00114         extern _ep2_source_data
+               00115         extern _an_data
+               00116         extern _mydata
+               00117         extern _SPPDATA
+               00118         extern _SPPCFG
+               00119         extern _SPPEPS
+               00120         extern _SPPCON
+               00121         extern _UFRML
+               00122         extern _UFRMH
+               00123         extern _UIR
+               00124         extern _UIE
+               00125         extern _UEIR
+               00126         extern _UEIE
+               00127         extern _USTAT
+               00128         extern _UCON
+               00129         extern _UADDR
+               00130         extern _UCFG
+               00131         extern _UEP0
+               00132         extern _UEP1
+               00133         extern _UEP2
+               00134         extern _UEP3
+               00135         extern _UEP4
+               00136         extern _UEP5
+               00137         extern _UEP6
+               00138         extern _UEP7
+               00139         extern _UEP8
+               00140         extern _UEP9
+               00141         extern _UEP10
+               00142         extern _UEP11
+               00143         extern _UEP12
+               00144         extern _UEP13
+               00145         extern _UEP14
+               00146         extern _UEP15
+               00147         extern _PORTA
+               00148         extern _PORTB
+               00149         extern _PORTC
+               00150         extern _PORTD
+               00151         extern _PORTE
+               00152         extern _LATA
+               00153         extern _LATB
+               00154         extern _LATC
+               00155         extern _LATD
+               00156         extern _LATE
+               00157         extern _TRISA
+               00158         extern _TRISB
+               00159         extern _TRISC
+               00160         extern _TRISD
+               00161         extern _TRISE
+               00162         extern _OSCTUNE
+gpasm-0.13.4 beta               application_iface.asm5-19-2009  21:44:03          PAGE  4
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+               00163         extern _PIE1
+               00164         extern _PIR1
+               00165         extern _IPR1
+               00166         extern _PIE2
+               00167         extern _PIR2
+               00168         extern _IPR2
+               00169         extern _EECON1
+               00170         extern _EECON2
+               00171         extern _EEDATA
+               00172         extern _EEADR
+               00173         extern _RCSTA
+               00174         extern _TXSTA
+               00175         extern _TXREG
+               00176         extern _RCREG
+               00177         extern _SPBRG
+               00178         extern _SPBRGH
+               00179         extern _T3CON
+               00180         extern _TMR3L
+               00181         extern _TMR3H
+               00182         extern _CMCON
+               00183         extern _CVRCON
+               00184         extern _ECCP1AS
+               00185         extern _ECCP1DEL
+               00186         extern _BAUDCON
+               00187         extern _CCP2CON
+               00188         extern _CCPR2L
+               00189         extern _CCPR2H
+               00190         extern _CCP1CON
+               00191         extern _CCPR1L
+               00192         extern _CCPR1H
+               00193         extern _ADCON2
+               00194         extern _ADCON1
+               00195         extern _ADCON0
+               00196         extern _ADRESL
+               00197         extern _ADRESH
+               00198         extern _SSPCON2
+               00199         extern _SSPCON1
+               00200         extern _SSPSTAT
+               00201         extern _SSPADD
+               00202         extern _SSPBUF
+               00203         extern _T2CON
+               00204         extern _PR2
+               00205         extern _TMR2
+               00206         extern _T1CON
+               00207         extern _TMR1L
+               00208         extern _TMR1H
+               00209         extern _RCON
+               00210         extern _WDTCON
+               00211         extern _HLVDCON
+               00212         extern _OSCCON
+               00213         extern _T0CON
+               00214         extern _TMR0L
+               00215         extern _TMR0H
+               00216         extern _STATUS
+gpasm-0.13.4 beta               application_iface.asm5-19-2009  21:44:03          PAGE  5
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+               00217         extern _FSR2L
+               00218         extern _FSR2H
+               00219         extern _PLUSW2
+               00220         extern _PREINC2
+               00221         extern _POSTDEC2
+               00222         extern _POSTINC2
+               00223         extern _INDF2
+               00224         extern _BSR
+               00225         extern _FSR1L
+               00226         extern _FSR1H
+               00227         extern _PLUSW1
+               00228         extern _PREINC1
+               00229         extern _POSTDEC1
+               00230         extern _POSTINC1
+               00231         extern _INDF1
+               00232         extern _WREG
+               00233         extern _FSR0L
+               00234         extern _FSR0H
+               00235         extern _PLUSW0
+               00236         extern _PREINC0
+               00237         extern _POSTDEC0
+               00238         extern _POSTINC0
+               00239         extern _INDF0
+               00240         extern _INTCON3
+               00241         extern _INTCON2
+               00242         extern _INTCON
+               00243         extern _PRODL
+               00244         extern _PRODH
+               00245         extern _TABLAT
+               00246         extern _TBLPTRL
+               00247         extern _TBLPTRH
+               00248         extern _TBLPTRU
+               00249         extern _PCL
+               00250         extern _PCLATH
+               00251         extern _PCLATU
+               00252         extern _STKPTR
+               00253         extern _TOSL
+               00254         extern _TOSH
+               00255         extern _TOSU
+               00256         extern _device_descriptor
+               00257         extern _configuration_descriptor
+               00258         extern _string_descriptor
+               00259         extern _str0
+               00260         extern _str1
+               00261         extern _str2
+               00262         extern _str3
+               00263         extern _ep_init
+               00264         extern _ep_in
+               00265         extern _ep_out
+               00266         extern _ep_setup
+               00267         extern _application_main
+               00268 
+               00269 ;--------------------------------------------------------
+               00270 ; global & static initialisations
+gpasm-0.13.4 beta               application_iface.asm5-19-2009  21:44:03          PAGE  6
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+               00271 ;--------------------------------------------------------
+               00272 ; ; Starting pCode block for absolute Ival
+               00273 S_application_iface__application_data   code    0X002000
+2000           00274 _application_data:
+2000 0000 0000 00275         DB      0x00, LOW(_device_descriptor), HIGH(_device_descriptor), UPPER(_device_descriptor), LOW(_configuration_descriptor), HIGH(_configuration_descriptor), UPPER(_configuration_descriptor), LOW(_string_descriptor), HIGH(_string_descriptor), UPPER(_string_descriptor), LOW(_ep_init), HIGH(_ep_init)
+2004 0000 0000
+2008 0000 0000
+200C 0000 0000 00276         DB      UPPER(_ep_init), LOW(_ep_in), HIGH(_ep_in), UPPER(_ep_in), LOW(_ep_out), HIGH(_ep_out), UPPER(_ep_out), LOW(_ep_setup), HIGH(_ep_setup), UPPER(_ep_setup), LOW(_application_main), HIGH(_application_main)
+2010 0000 0000
+2014 0000 0000
+2018 0000      00277         DB      UPPER(_application_main)
+               00278 
+               00279 ; I code from now on!
+               00280 
+               00281 
+               00282 ; Statistics:
+               00283 ; code size:        6 (0x0006) bytes ( 0.00%)
+               00284 ;                   3 (0x0003) words
+               00285 ; udata size:       0 (0x0000) bytes ( 0.00%)
+               00286 ; access size:      0 (0x0000) bytes
+               00287 
+               00288 
+gpasm-0.13.4 beta               application_iface.asm5-19-2009  21:44:03          PAGE  7
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+_ADCON0                           00000000
+_ADCON0bits                       00000000
+_ADCON1                           00000000
+_ADCON1bits                       00000000
+_ADCON2                           00000000
+_ADCON2bits                       00000000
+_ADRESH                           00000000
+_ADRESL                           00000000
+_BAUDCON                          00000000
+_BAUDCONbits                      00000000
+_BSR                              00000000
+_BSRbits                          00000000
+_CCP1CON                          00000000
+_CCP1CONbits                      00000000
+_CCP2CON                          00000000
+_CCP2CONbits                      00000000
+_CCPR1H                           00000000
+_CCPR1L                           00000000
+_CCPR2H                           00000000
+_CCPR2L                           00000000
+_CMCON                            00000000
+_CMCONbits                        00000000
+_CVRCON                           00000000
+_CVRCONbits                       00000000
+_ECCP1AS                          00000000
+_ECCP1ASbits                      00000000
+_ECCP1DEL                         00000000
+_ECCP1DELbits                     00000000
+_EEADR                            00000000
+_EECON1                           00000000
+_EECON1bits                       00000000
+_EECON2                           00000000
+_EEDATA                           00000000
+_FSR0H                            00000000
+_FSR0Hbits                        00000000
+_FSR0L                            00000000
+_FSR1H                            00000000
+_FSR1Hbits                        00000000
+_FSR1L                            00000000
+_FSR2H                            00000000
+_FSR2Hbits                        00000000
+_FSR2L                            00000000
+_HLVDCON                          00000000
+_HLVDCONbits                      00000000
+_INDF0                            00000000
+_INDF1                            00000000
+_INDF2                            00000000
+_INTCON                           00000000
+_INTCON2                          00000000
+_INTCON2bits                      00000000
+_INTCON3                          00000000
+_INTCON3bits                      00000000
+_INTCONbits                       00000000
+gpasm-0.13.4 beta               application_iface.asm5-19-2009  21:44:03          PAGE  8
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+_IPR1                             00000000
+_IPR1bits                         00000000
+_IPR2                             00000000
+_IPR2bits                         00000000
+_LATA                             00000000
+_LATAbits                         00000000
+_LATB                             00000000
+_LATBbits                         00000000
+_LATC                             00000000
+_LATCbits                         00000000
+_LATD                             00000000
+_LATDbits                         00000000
+_LATE                             00000000
+_LATEbits                         00000000
+_OSCCON                           00000000
+_OSCCONbits                       00000000
+_OSCTUNE                          00000000
+_OSCTUNEbits                      00000000
+_PCL                              00000000
+_PCLATH                           00000000
+_PCLATHbits                       00000000
+_PCLATU                           00000000
+_PCLATUbits                       00000000
+_PIE1                             00000000
+_PIE1bits                         00000000
+_PIE2                             00000000
+_PIE2bits                         00000000
+_PIR1                             00000000
+_PIR1bits                         00000000
+_PIR2                             00000000
+_PIR2bits                         00000000
+_PLUSW0                           00000000
+_PLUSW1                           00000000
+_PLUSW2                           00000000
+_PORTA                            00000000
+_PORTAbits                        00000000
+_PORTB                            00000000
+_PORTBbits                        00000000
+_PORTC                            00000000
+_PORTCbits                        00000000
+_PORTD                            00000000
+_PORTDbits                        00000000
+_PORTE                            00000000
+_PORTEbits                        00000000
+_POSTDEC0                         00000000
+_POSTDEC1                         00000000
+_POSTDEC2                         00000000
+_POSTINC0                         00000000
+_POSTINC1                         00000000
+_POSTINC2                         00000000
+_PR2                              00000000
+_PREINC0                          00000000
+_PREINC1                          00000000
+_PREINC2                          00000000
+gpasm-0.13.4 beta               application_iface.asm5-19-2009  21:44:03          PAGE  9
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+_PRODH                            00000000
+_PRODL                            00000000
+_RCON                             00000000
+_RCONbits                         00000000
+_RCREG                            00000000
+_RCSTA                            00000000
+_RCSTAbits                        00000000
+_SPBRG                            00000000
+_SPBRGH                           00000000
+_SPPCFG                           00000000
+_SPPCFGbits                       00000000
+_SPPCON                           00000000
+_SPPCONbits                       00000000
+_SPPDATA                          00000000
+_SPPDATAbits                      00000000
+_SPPEPS                           00000000
+_SPPEPSbits                       00000000
+_SSPADD                           00000000
+_SSPBUF                           00000000
+_SSPCON1                          00000000
+_SSPCON1bits                      00000000
+_SSPCON2                          00000000
+_SSPCON2bits                      00000000
+_SSPSTAT                          00000000
+_SSPSTATbits                      00000000
+_STATUS                           00000000
+_STATUSbits                       00000000
+_STKPTR                           00000000
+_STKPTRbits                       00000000
+_T0CON                            00000000
+_T0CONbits                        00000000
+_T1CON                            00000000
+_T1CONbits                        00000000
+_T2CON                            00000000
+_T2CONbits                        00000000
+_T3CON                            00000000
+_T3CONbits                        00000000
+_TABLAT                           00000000
+_TBLPTRH                          00000000
+_TBLPTRL                          00000000
+_TBLPTRU                          00000000
+_TBLPTRUbits                      00000000
+_TMR0H                            00000000
+_TMR0L                            00000000
+_TMR1H                            00000000
+_TMR1L                            00000000
+_TMR2                             00000000
+_TMR3H                            00000000
+_TMR3L                            00000000
+_TOSH                             00000000
+_TOSL                             00000000
+_TOSU                             00000000
+_TOSUbits                         00000000
+_TRISA                            00000000
+gpasm-0.13.4 beta               application_iface.asm5-19-2009  21:44:03          PAGE 10
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+_TRISAbits                        00000000
+_TRISB                            00000000
+_TRISBbits                        00000000
+_TRISC                            00000000
+_TRISCbits                        00000000
+_TRISD                            00000000
+_TRISDbits                        00000000
+_TRISE                            00000000
+_TRISEbits                        00000000
+_TXREG                            00000000
+_TXSTA                            00000000
+_TXSTAbits                        00000000
+_UADDR                            00000000
+_UADDRbits                        00000000
+_UCFG                             00000000
+_UCFGbits                         00000000
+_UCON                             00000000
+_UCONbits                         00000000
+_UEIE                             00000000
+_UEIEbits                         00000000
+_UEIR                             00000000
+_UEIRbits                         00000000
+_UEP0                             00000000
+_UEP0bits                         00000000
+_UEP1                             00000000
+_UEP10                            00000000
+_UEP10bits                        00000000
+_UEP11                            00000000
+_UEP11bits                        00000000
+_UEP12                            00000000
+_UEP12bits                        00000000
+_UEP13                            00000000
+_UEP13bits                        00000000
+_UEP14                            00000000
+_UEP14bits                        00000000
+_UEP15                            00000000
+_UEP15bits                        00000000
+_UEP1bits                         00000000
+_UEP2                             00000000
+_UEP2bits                         00000000
+_UEP3                             00000000
+_UEP3bits                         00000000
+_UEP4                             00000000
+_UEP4bits                         00000000
+_UEP5                             00000000
+_UEP5bits                         00000000
+_UEP6                             00000000
+_UEP6bits                         00000000
+_UEP7                             00000000
+_UEP7bits                         00000000
+_UEP8                             00000000
+_UEP8bits                         00000000
+_UEP9                             00000000
+_UEP9bits                         00000000
+gpasm-0.13.4 beta               application_iface.asm5-19-2009  21:44:03          PAGE 11
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+_UFRMH                            00000000
+_UFRMHbits                        00000000
+_UFRML                            00000000
+_UFRMLbits                        00000000
+_UIE                              00000000
+_UIEbits                          00000000
+_UIR                              00000000
+_UIRbits                          00000000
+_USTAT                            00000000
+_USTATbits                        00000000
+_WDTCON                           00000000
+_WDTCONbits                       00000000
+_WREG                             00000000
+__18F4550                         00000001
+_an_data                          00000000
+_application_data                 00002000
+_application_main                 00000000
+_configuration_descriptor         00000000
+_device_descriptor                00000000
+_ep2_num_bytes_to_send            00000000
+_ep2_source_data                  00000000
+_ep_bdt                           00000000
+_ep_in                            00000000
+_ep_init                          00000000
+_ep_out                           00000000
+_ep_setup                         00000000
+_mydata                           00000000
+_str0                             00000000
+_str1                             00000000
+_str2                             00000000
+_str3                             00000000
+_string_descriptor                00000000
+_usb_active_alt_setting           00000000
+_usb_active_cfg                   00000000
+_usb_device_state                 00000000
+
+
+Errors   :       0
+Warnings :       0 reported,       0 suppressed
+Messages :       0 reported,       0 suppressed
+

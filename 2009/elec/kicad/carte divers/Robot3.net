@@ -1,0 +1,320 @@
+# EESchema Netlist Version 1.1 created  20/11/2008-06:44:00
+(
+ ( /4908B4EF bornier2 ALIM1 CONN_2
+  ( 1 N-000002 )
+  ( 2 /GND )
+ )
+ ( /490A197B bornier2 APWR1 CONN_2
+  ( 1 /GNDPWR )
+  ( 2 N-000007 )
+ )
+ ( /49075D2C C2 C1 22pF
+  ( 1 /OSC2 )
+  ( 2 /GND )
+ )
+ ( /49075D35 C2 C2 22pF
+  ( 1 /OSC1 )
+  ( 2 /GND )
+ )
+ ( /4908B452 C2 C3 220nF
+  ( 1 N-000046 )
+  ( 2 /GND )
+ )
+ ( /4908B459 C2 C4 100nF
+  ( 1 /VDD )
+  ( 2 /GND )
+ )
+ ( /490B37CC C2 C15 100nF
+  ( 1 /VDDSVO )
+  ( 2 /GNDPWR )
+ )
+ ( /490B37CB C2 C16 220nF
+  ( 1 N-000039 )
+  ( 2 /GNDPWR )
+ )
+ ( /491346EF LEDV D3 LED
+  ( 1 N-000004 )
+  ( 2 N-000078 )
+ )
+ ( /49134AB4 LEDV D4 LED
+  ( 1 N-000008 )
+  ( 2 /GND )
+ )
+ ( /49134B0D LEDV D5 LED
+  ( 1 N-000076 )
+  ( 2 /GNDPWR )
+ )
+ ( /491345DB D4 DAC1 DIODE
+  ( 1 N-000002 )
+  ( 2 N-000046 )
+ )
+ ( /49134627 D4 DAC2 DIODE
+  ( 1 N-000007 )
+  ( 2 N-000039 )
+ )
+ ( /49134826 PIN_ARRAY_3X1 K0 CONN_3
+  ( 1 /GND )
+  ( 2 /VDD )
+  ( 3 ? )
+ )
+ ( /4913482F PIN_ARRAY_3X1 K1 CONN_3
+  ( 1 /GND )
+  ( 2 /VDD )
+  ( 3 ? )
+ )
+ ( /49134833 PIN_ARRAY_3X1 K2 CONN_3
+  ( 1 /GND )
+  ( 2 /VDD )
+  ( 3 ? )
+ )
+ ( /49134834 PIN_ARRAY_3X1 K3 CONN_3
+  ( 1 /GND )
+  ( 2 /VDD )
+  ( 3 ? )
+ )
+ ( /4913483D PIN_ARRAY_3X1 K4 CONN_3
+  ( 1 /GND )
+  ( 2 /VDD )
+  ( 3 ? )
+ )
+ ( /49134841 PIN_ARRAY_3X1 K5 CONN_3
+  ( 1 /GND )
+  ( 2 /VDD )
+  ( 3 ? )
+ )
+ ( /49134844 PIN_ARRAY_3X1 K6 CONN_3
+  ( 1 /GND )
+  ( 2 /VDD )
+  ( 3 ? )
+ )
+ ( /49134838 PIN_ARRAY_3X1 K7 CONN_3
+  ( 1 /GND )
+  ( 2 /VDD )
+  ( 3 ? )
+ )
+ ( /490B3A7B PIN_ARRAY_3X1 KSVO1 CONN_3
+  ( 1 ? )
+  ( 2 /VDDSVO )
+  ( 3 /GNDPWR )
+ )
+ ( /490B3AB1 PIN_ARRAY_3X1 KSVO2 CONN_3
+  ( 1 ? )
+  ( 2 /VDDSVO )
+  ( 3 /GNDPWR )
+ )
+ ( /490B3AB7 PIN_ARRAY_3X1 KSVO3 CONN_3
+  ( 1 ? )
+  ( 2 /VDDSVO )
+  ( 3 /GNDPWR )
+ )
+ ( /490B3ABC PIN_ARRAY_3X1 KSVO4 CONN_3
+  ( 1 ? )
+  ( 2 /VDDSVO )
+  ( 3 /GNDPWR )
+ )
+ ( /490B384A optocoupler-2-DIL16 OK2 PC847
+  ( 1 N-000033 )
+  ( 2 ? )
+  ( 3 N-000058 )
+  ( 4 ? )
+  ( 5 N-000025 )
+  ( 6 ? )
+  ( 7 N-000024 )
+  ( 8 ? )
+  ( 9 /GNDPWR )
+  ( 10 /SVO4 )
+  ( 11 /GNDPWR )
+  ( 12 /SVO3 )
+  ( 13 /GNDPWR )
+  ( 14 /SVO2 )
+  ( 15 /GNDPWR )
+  ( 16 /SVO1 )
+ )
+ ( /490B3198 R3 R9 4.7ko
+  ( 1 ? )
+  ( 2 /MCLR/ )
+ )
+ ( /490B384E R1 R10 470o
+  ( 1 N-000033 )
+  ( 2 ? )
+ )
+ ( /490B384B R3 R11 470o
+  ( 1 N-000058 )
+  ( 2 ? )
+ )
+ ( /490B384C R3 R12 470o
+  ( 1 N-000025 )
+  ( 2 ? )
+ )
+ ( /490B384D R1 R13 470o
+  ( 1 N-000024 )
+  ( 2 ? )
+ )
+ ( /491346FF R3 R14 470o
+  ( 1 N-000078 )
+  ( 2 ? )
+ )
+ ( /49134A92 R1 R15 1ko
+  ( 1 N-000008 )
+  ( 2 N-000002 )
+ )
+ ( /49134B14 R1 R16 1ko
+  ( 1 N-000076 )
+  ( 2 N-000007 )
+ )
+ ( /490B384F PIN_ARRAY_5x1 RR2 10ko
+  ( 1 ? )
+  ( 2 /SVO4 )
+  ( 3 /SVO3 )
+  ( 4 /SVO2 )
+  ( 5 /SVO1 )
+ )
+ ( /490BB498 SW_PUSH_SMALL SW3 SW_PUSH_SMALL
+  ( 1 ? )
+  ( 2 /MCLR/ )
+ )
+ ( /49075D01 40DIP-ELL600 U1 PIC18F4550
+  ( 1 ? )
+  ( 2 ? )
+  ( 3 ? )
+  ( 4 ? )
+  ( 5 ? )
+  ( 6 N-000004 )
+  ( 7 ? )
+  ( 8 ? )
+  ( 9 ? )
+  ( 10 ? )
+  ( 11 ? )
+  ( 12 ? )
+  ( 13 ? )
+  ( 14 ? )
+  ( 15 ? )
+  ( 16 ? )
+  ( 17 ? )
+  ( 18 ? )
+  ( 19 ? )
+  ( 20 ? )
+  ( 21 ? )
+  ( 22 ? )
+  ( 23 ? )
+  ( 24 ? )
+  ( 25 ? )
+  ( 26 ? )
+  ( 27 ? )
+  ( 28 ? )
+  ( 29 ? )
+  ( 30 ? )
+  ( 31 ? )
+  ( 32 ? )
+  ( 33 ? )
+  ( 34 ? )
+  ( 35 ? )
+  ( 36 ? )
+  ( 37 ? )
+  ( 38 ? )
+  ( 39 ? )
+  ( 40 ? )
+ )
+ ( /4908B3EC LM78XX_VERT U2 7805
+  ( GND /GND )
+  ( VI N-000046 )
+  ( VO /VDD )
+ )
+ ( /490B37CA LM78XX_VERT U4 7805
+  ( GND /GNDPWR )
+  ( VI N-000039 )
+  ( VO /VDDSVO )
+ )
+ ( /4908B57B SIL-4 USB1 CONN_4
+  ( 1 ? )
+  ( 2 ? )
+  ( 3 ? )
+  ( 4 ? )
+ )
+ ( /49075D1F HC-18UV X1 CRYSTAL
+  ( 1 /OSC1 )
+  ( 2 /OSC2 )
+ )
+)
+*
+{ Allowed footprints by component:
+$component C1
+ SM*
+ C?
+ C1-1
+$endlist
+$component C2
+ SM*
+ C?
+ C1-1
+$endlist
+$component C3
+ SM*
+ C?
+ C1-1
+$endlist
+$component C4
+ SM*
+ C?
+ C1-1
+$endlist
+$component C15
+ SM*
+ C?
+ C1-1
+$endlist
+$component C16
+ SM*
+ C?
+ C1-1
+$endlist
+$component DAC1
+ D?
+ S*
+$endlist
+$component DAC2
+ D?
+ S*
+$endlist
+$component R9
+ R?
+ SM0603
+ SM0805
+$endlist
+$component R10
+ R?
+ SM0603
+ SM0805
+$endlist
+$component R11
+ R?
+ SM0603
+ SM0805
+$endlist
+$component R12
+ R?
+ SM0603
+ SM0805
+$endlist
+$component R13
+ R?
+ SM0603
+ SM0805
+$endlist
+$component R14
+ R?
+ SM0603
+ SM0805
+$endlist
+$component R15
+ R?
+ SM0603
+ SM0805
+$endlist
+$component R16
+ R?
+ SM0603
+ SM0805
+$endlist
+$endfootprintlist
+}

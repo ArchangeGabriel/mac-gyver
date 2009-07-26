@@ -1,0 +1,133 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html lang="en"><head>
+
+<!-- $Id -->
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>VASCO website</title>
+<link rel="stylesheet" href="VASCO%20website_fichiers/simple.css" type="text/css">
+</head><body>
+<div class="navbar" align="center">&nbsp;
+<!-- PLEASE LEAVE "Powered By GForge" on your site -->
+<table width="100%" border="0"><tbody><tr><td width="100%">
+<a href="http://vasco.gforge.enseeiht.fr/index.php?article=Odyssey.html">Odyssey</a> &nbsp;<a href="http://vasco.gforge.enseeiht.fr/index.php?article=PUF.html">PUF</a> &nbsp;<a href="http://vasco.gforge.enseeiht.fr/index.php?article="></a> &nbsp; </td><td><a href="http://gforge.org/"><img src="VASCO%20website_fichiers/pow-gforge.png" alt="Powered By GForge Collaborative Development Environment" border="0"></a></td></tr></tbody></table>
+<hr></div>
+<div class="head">
+<h1>PIC USB Framework</h1>
+
+<h2>About PUF</h2>
+<p>PUF is a USB application framework dedicated to Linux (on the host
+side) and to the PIC 18F4550 family of microcontrollers (on the device
+side). PUF includes: a bootloader that can flash the PIC application
+through the USB, a PIC demo and its corresponding application on the
+host side, and docker, the host-side flash programming utility.
+</p><p>
+PUF also contains gputils and sdcc as cross-building tools, and odyssey 0.4 vasco as a parallel port PIC programmer.
+</p>
+
+<h2>Features</h2>
+<p></p><ul>
+<li>Supported development platform : Linux. But should also work on other Un*xes, and with Cygwin</li>
+<li>Auto-build of the cross-development tools (sdcc, gputils)</li>
+<li>Support PIC18F2XX0/2X21/2XX5/4XX0/4X21/4XX5 family</li>
+</ul><p></p>
+
+<h2>License</h2>
+PUF is licensed under the terms of the LGPL 2.1. docker and demo are licensed under GPL 2.
+
+<h2>Download</h2>
+
+<p>
+You can download the current release of PUF, docker and demo at <a href="http://gforge.enseeiht.fr/frs/?group_id=10">http://gforge.enseeiht.fr/frs/?group_id=10</a>.
+</p>
+
+<h2>Build PUF</h2>
+<p>PUF is divided into 3 files :<br>
+</p><ul>
+	<li><i>puf-&lt;release #&gt;.tar.gz</i>
+	contains the bootloader and the demo device application,</li>
+	<li><i>docker-&lt;release #&gt;.tar.gz</i>
+	is the flash programmer that communicate with the bootloader through
+	USB,</li>
+	<li><i>demo-&lt;release #&gt;.tar.gz</i>
+	is the host demo application.</li>
+</ul>
+<p></p>
+<p>docker and demo depend on libusb
+&gt;=0.11.</p>
+
+<p></p><pre>tar xvzf puf-&lt;release #&gt;.tar.gz; cd puf-&lt;release #&gt;; make</pre>
+will build everything for the device side, including the cross tools. The bootloader is then available as
+<i>bootloader/bootloader.hex</i> and the demo device application in
+<i>application/application.hex</i>.
+
+<p></p><pre>tar xvzf docker-&lt;release #&gt;.tar.gz; cd docker-&lt;release #&gt;;./configure; make</pre>
+will build docker in the src folder. demo can be built in the same way.
+
+<h2>Use PUF</h2>
+<h3>Hardware</h3>
+<p>To use PUF, you will need a supported PIC, a PIC test board with a
+USB-B port, and a PIC programmer to burn the USB bootloader into the
+PIC. You can build your own parallel port PIC programmer and test board
+using our GPLed schematics:
+</p><ul>
+<li><a href="http://gforge.enseeiht.fr/docman/view.php/10/203/vascoprog-20061006.zip">Vasco parallel port programmer</a>
+</li><li><a href="http://gforge.enseeiht.fr/docman/view.php/10/245/generic-module.png">Vasco test board</a>
+</li></ul>
+<p></p>
+<h3>Upload the bootloader</h3>
+<p>Odyssey, once configured for your
+hardware, can then be used to flash the bootloader with :
+
+</p><pre>odyssey PIC18F4550 write bootloader.hex</pre>
+<p></p>
+<h3>Upload an application</h3>
+<p>You can then program your applications
+using docker and the bootloader with :</p>
+
+<pre>docker write application.hex</pre>
+<p>To do so, you need either to be root,
+or to install the stuff which is in the udev folder (provided you use
+udev, of course ;-) . I prefer this solution : it is never good to develop as root...</p>
+
+<h3>Use the demo application</h3>
+<p>When your device is started, it first toggles the signal on RA0, and stays
+in a neutral configuration (#1) until it receives a SET_CONFIGURATION
+request from the host. Configuration ID #2 is associated to the
+flashing function, and USB configuration ID &gt; 2 are reserved for
+the application. demo can be used to switch to the application with :</p>
+<pre>demo -c &lt;configuration ID&gt;</pre>
+
+<p>When activated with configuration ID #3, the demo application toggles periodically 
+the pin RA0.</p>
+
+<h2>Adapt PUF to your needs</h2>
+<h3>Modify the PUF configuration</h3>
+<p>The device and the bootloader can be
+configured in the <i>config.h</i> and <i>config.c</i> files (including the PIC configuration words). USB
+configuration (including End Point callbacks) can be set up in the
+<i>usb_descriptor.[ch]</i> files. But it will only be used as long as no application code has been uploaded.</p>
+
+<h3>Configure your application</h3>
+<p>When an application code has been flashed in the PIC, the USB
+descriptors of the bootloaders are not used anymore : there are
+replaced by the descriptors of the application code. USB
+configuration (including End Point callbacks) is set up in the
+<i>usb_descriptor.[ch]</i> files of the application.</p>
+
+<h2>Improve PUF</h2>
+<p>The <i>puf-&lt;release
+#&gt;/bootloader/models</i> folder contains 2 or 3 UML2 diagrams
+describing shortly the bootloader structure. These models can be
+edited using the UML 2.0 editor of the TOPCASED project (see
+<a href="http://gforge.enseeiht.fr/projects/topcased-mm">http://gforge.enseeiht.fr/projects/topcased-mm</a>
+and <a href="http://gforge.enseeiht.fr/projects/topcased-uml2">http://gforge.enseeiht.fr/projects/topcased-uml2</a>).</p>
+
+<p>Bug reports, feature requests, patchs, remarks, questions are welcome on our mailing list
+(<a href="http://gforge.enseeiht.fr/mail/?group_id=10">http://gforge.enseeiht.fr/mail/?group_id=10</a>)
+and on our trackers (<a href="http://gforge.enseeiht.fr/tracker/?group_id=10">http://gforge.enseeiht.fr/tracker/?group_id=10</a>).</p>
+
+</div>
+<hr title="Separator from Header">
+© 2006 Gilles Ballanger &amp; Pierre Gaufillet
+</body></html>
