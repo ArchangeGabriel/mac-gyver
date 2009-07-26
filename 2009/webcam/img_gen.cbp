@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="img_gen" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="img_gen_d" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="img_gen" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add option="`pkg-config --cflags sdl`" />
+			<Add option="`pkg-config --cflags gl`" />
+		</Compiler>
+		<Linker>
+			<Add option="`pkg-config --libs sdl`" />
+			<Add option="`pkg-config --libs gl`" />
+			<Add library="GLU" />
+			<Add library="IL" />
+			<Add library="ILU" />
+		</Linker>
+		<Unit filename="src/common.cpp" />
+		<Unit filename="src/common.hpp" />
+		<Unit filename="src/img_gen.cpp" />
+		<Unit filename="src/utils.cpp" />
+		<Unit filename="src/utils.hpp" />
+		<Extensions>
+			<envvars />
+			<code_completion />
+			<debugger />
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

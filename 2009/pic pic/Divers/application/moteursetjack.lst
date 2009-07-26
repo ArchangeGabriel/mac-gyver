@@ -1,0 +1,1656 @@
+gpasm-0.13.4 beta               moteursetjack.asm5-20-2009  17:01:05          PAGE  1
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+               00001 ;--------------------------------------------------------
+               00002 ; File Created by SDCC : FreeWare ANSI-C Compiler
+               00003 ; Version 2.6.1 #4482 (Mar 15 2009)
+               00004 ; This file generated Wed May 20 17:01:05 2009
+               00005 ;--------------------------------------------------------
+               00006 ; PIC16 port for the Microchip 16-bit core micros
+               00007 ;--------------------------------------------------------
+               00008         list    p=18f4550
+               00009 
+               00010         radix dec
+               00011 
+               00012 ;--------------------------------------------------------
+               00013 ; public variables in this module
+               00014 ;--------------------------------------------------------
+               00015         global _init_moteursetjack
+               00016         global _ordre_moteur
+               00017         global _moteursetjack_ints_RB_bas
+               00018         global _moteursetjack_ints_RB_haut
+               00019         global _moteursetjack_ints_INT0
+               00020         global _moteursetjack_ints_INT1
+               00021         global _moteursetjack_ints_INT2
+               00022         global _moteursetjack_ints_tmr0
+               00023         global _depart
+               00024         global _ticoutac
+               00025         global _mot1_phase
+               00026         global _mot1_sens
+               00027         global _etat_moteur
+               00028         global _mot1_position
+               00029         global _mot2_position
+               00030         global _mot1_pos_visee
+               00031         global _mot2_pos_visee
+               00032         global _compteur_mot
+               00033 
+               00034 ;--------------------------------------------------------
+               00035 ; extern variables in this module
+               00036 ;--------------------------------------------------------
+               00037         extern _SPPDATAbits
+               00038         extern _SPPCFGbits
+               00039         extern _SPPEPSbits
+               00040         extern _SPPCONbits
+               00041         extern _UFRMLbits
+               00042         extern _UFRMHbits
+               00043         extern _UIRbits
+               00044         extern _UIEbits
+               00045         extern _UEIRbits
+               00046         extern _UEIEbits
+               00047         extern _USTATbits
+               00048         extern _UCONbits
+               00049         extern _UADDRbits
+               00050         extern _UCFGbits
+               00051         extern _UEP0bits
+               00052         extern _UEP1bits
+               00053         extern _UEP2bits
+               00054         extern _UEP3bits
+gpasm-0.13.4 beta               moteursetjack.asm5-20-2009  17:01:05          PAGE  2
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+               00055         extern _UEP4bits
+               00056         extern _UEP5bits
+               00057         extern _UEP6bits
+               00058         extern _UEP7bits
+               00059         extern _UEP8bits
+               00060         extern _UEP9bits
+               00061         extern _UEP10bits
+               00062         extern _UEP11bits
+               00063         extern _UEP12bits
+               00064         extern _UEP13bits
+               00065         extern _UEP14bits
+               00066         extern _UEP15bits
+               00067         extern _PORTAbits
+               00068         extern _PORTBbits
+               00069         extern _PORTCbits
+               00070         extern _PORTDbits
+               00071         extern _PORTEbits
+               00072         extern _LATAbits
+               00073         extern _LATBbits
+               00074         extern _LATCbits
+               00075         extern _LATDbits
+               00076         extern _LATEbits
+               00077         extern _TRISAbits
+               00078         extern _TRISBbits
+               00079         extern _TRISCbits
+               00080         extern _TRISDbits
+               00081         extern _TRISEbits
+               00082         extern _OSCTUNEbits
+               00083         extern _PIE1bits
+               00084         extern _PIR1bits
+               00085         extern _IPR1bits
+               00086         extern _PIE2bits
+               00087         extern _PIR2bits
+               00088         extern _IPR2bits
+               00089         extern _EECON1bits
+               00090         extern _RCSTAbits
+               00091         extern _TXSTAbits
+               00092         extern _T3CONbits
+               00093         extern _CMCONbits
+               00094         extern _CVRCONbits
+               00095         extern _ECCP1ASbits
+               00096         extern _ECCP1DELbits
+               00097         extern _BAUDCONbits
+               00098         extern _CCP2CONbits
+               00099         extern _CCP1CONbits
+               00100         extern _ADCON2bits
+               00101         extern _ADCON1bits
+               00102         extern _ADCON0bits
+               00103         extern _SSPCON2bits
+               00104         extern _SSPCON1bits
+               00105         extern _SSPSTATbits
+               00106         extern _T2CONbits
+               00107         extern _T1CONbits
+               00108         extern _RCONbits
+gpasm-0.13.4 beta               moteursetjack.asm5-20-2009  17:01:05          PAGE  3
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+               00109         extern _WDTCONbits
+               00110         extern _HLVDCONbits
+               00111         extern _OSCCONbits
+               00112         extern _T0CONbits
+               00113         extern _STATUSbits
+               00114         extern _FSR2Hbits
+               00115         extern _BSRbits
+               00116         extern _FSR1Hbits
+               00117         extern _FSR0Hbits
+               00118         extern _INTCON3bits
+               00119         extern _INTCON2bits
+               00120         extern _INTCONbits
+               00121         extern _TBLPTRUbits
+               00122         extern _PCLATHbits
+               00123         extern _PCLATUbits
+               00124         extern _STKPTRbits
+               00125         extern _TOSUbits
+               00126         extern _ep2_num_bytes_to_send
+               00127         extern _ep2_source_data
+               00128         extern _an_data
+               00129         extern _mydata
+               00130         extern _SPPDATA
+               00131         extern _SPPCFG
+               00132         extern _SPPEPS
+               00133         extern _SPPCON
+               00134         extern _UFRML
+               00135         extern _UFRMH
+               00136         extern _UIR
+               00137         extern _UIE
+               00138         extern _UEIR
+               00139         extern _UEIE
+               00140         extern _USTAT
+               00141         extern _UCON
+               00142         extern _UADDR
+               00143         extern _UCFG
+               00144         extern _UEP0
+               00145         extern _UEP1
+               00146         extern _UEP2
+               00147         extern _UEP3
+               00148         extern _UEP4
+               00149         extern _UEP5
+               00150         extern _UEP6
+               00151         extern _UEP7
+               00152         extern _UEP8
+               00153         extern _UEP9
+               00154         extern _UEP10
+               00155         extern _UEP11
+               00156         extern _UEP12
+               00157         extern _UEP13
+               00158         extern _UEP14
+               00159         extern _UEP15
+               00160         extern _PORTA
+               00161         extern _PORTB
+               00162         extern _PORTC
+gpasm-0.13.4 beta               moteursetjack.asm5-20-2009  17:01:05          PAGE  4
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+               00163         extern _PORTD
+               00164         extern _PORTE
+               00165         extern _LATA
+               00166         extern _LATB
+               00167         extern _LATC
+               00168         extern _LATD
+               00169         extern _LATE
+               00170         extern _TRISA
+               00171         extern _TRISB
+               00172         extern _TRISC
+               00173         extern _TRISD
+               00174         extern _TRISE
+               00175         extern _OSCTUNE
+               00176         extern _PIE1
+               00177         extern _PIR1
+               00178         extern _IPR1
+               00179         extern _PIE2
+               00180         extern _PIR2
+               00181         extern _IPR2
+               00182         extern _EECON1
+               00183         extern _EECON2
+               00184         extern _EEDATA
+               00185         extern _EEADR
+               00186         extern _RCSTA
+               00187         extern _TXSTA
+               00188         extern _TXREG
+               00189         extern _RCREG
+               00190         extern _SPBRG
+               00191         extern _SPBRGH
+               00192         extern _T3CON
+               00193         extern _TMR3L
+               00194         extern _TMR3H
+               00195         extern _CMCON
+               00196         extern _CVRCON
+               00197         extern _ECCP1AS
+               00198         extern _ECCP1DEL
+               00199         extern _BAUDCON
+               00200         extern _CCP2CON
+               00201         extern _CCPR2L
+               00202         extern _CCPR2H
+               00203         extern _CCP1CON
+               00204         extern _CCPR1L
+               00205         extern _CCPR1H
+               00206         extern _ADCON2
+               00207         extern _ADCON1
+               00208         extern _ADCON0
+               00209         extern _ADRESL
+               00210         extern _ADRESH
+               00211         extern _SSPCON2
+               00212         extern _SSPCON1
+               00213         extern _SSPSTAT
+               00214         extern _SSPADD
+               00215         extern _SSPBUF
+               00216         extern _T2CON
+gpasm-0.13.4 beta               moteursetjack.asm5-20-2009  17:01:05          PAGE  5
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+               00217         extern _PR2
+               00218         extern _TMR2
+               00219         extern _T1CON
+               00220         extern _TMR1L
+               00221         extern _TMR1H
+               00222         extern _RCON
+               00223         extern _WDTCON
+               00224         extern _HLVDCON
+               00225         extern _OSCCON
+               00226         extern _T0CON
+               00227         extern _TMR0L
+               00228         extern _TMR0H
+               00229         extern _STATUS
+               00230         extern _FSR2L
+               00231         extern _FSR2H
+               00232         extern _PLUSW2
+               00233         extern _PREINC2
+               00234         extern _POSTDEC2
+               00235         extern _POSTINC2
+               00236         extern _INDF2
+               00237         extern _BSR
+               00238         extern _FSR1L
+               00239         extern _FSR1H
+               00240         extern _PLUSW1
+               00241         extern _PREINC1
+               00242         extern _POSTDEC1
+               00243         extern _POSTINC1
+               00244         extern _INDF1
+               00245         extern _WREG
+               00246         extern _FSR0L
+               00247         extern _FSR0H
+               00248         extern _PLUSW0
+               00249         extern _PREINC0
+               00250         extern _POSTDEC0
+               00251         extern _POSTINC0
+               00252         extern _INDF0
+               00253         extern _INTCON3
+               00254         extern _INTCON2
+               00255         extern _INTCON
+               00256         extern _PRODL
+               00257         extern _PRODH
+               00258         extern _TABLAT
+               00259         extern _TBLPTRL
+               00260         extern _TBLPTRH
+               00261         extern _TBLPTRU
+               00262         extern _PCL
+               00263         extern _PCLATH
+               00264         extern _PCLATU
+               00265         extern _STKPTR
+               00266         extern _TOSL
+               00267         extern _TOSH
+               00268         extern _TOSU
+               00269 ;--------------------------------------------------------
+               00270 ;       Equates to used internal registers
+gpasm-0.13.4 beta               moteursetjack.asm5-20-2009  17:01:05          PAGE  6
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+               00271 ;--------------------------------------------------------
+  00000FD8     00272 STATUS  equ     0xfd8
+  00000FE8     00273 WREG    equ     0xfe8
+  00000FE1     00274 FSR1L   equ     0xfe1
+  00000FD9     00275 FSR2L   equ     0xfd9
+  00000FE5     00276 POSTDEC1        equ     0xfe5
+  00000FE4     00277 PREINC1 equ     0xfe4
+  00000FDB     00278 PLUSW2  equ     0xfdb
+  00000FF4     00279 PRODH   equ     0xff4
+               00280 
+               00281 
+               00282         idata
+               00283 _depart db      0x00
+               00284 _ticoutac       db      0x00
+               00285 _mot1_sens      db      0x00
+               00286 _mot1_position  db      0x00
+               00287 _mot2_position  db      0x00
+               00288 _mot1_pos_visee db      0x00
+               00289 _mot2_pos_visee db      0x00
+               00290 _compteur_mot   db      0x00, 0x00
+               00291 
+               00292 
+               00293 ; Internal registers
+               00294 .registers      udata_ovr       0x0000
+               00295 r0x00   res     1
+               00296 r0x01   res     1
+               00297 r0x02   res     1
+               00298 r0x03   res     1
+               00299 
+               00300 udata_moteursetjack_0   udata
+               00301 _etat_moteur    res     2
+               00302 
+               00303 udata_moteursetjack_1   udata
+               00304 _mot1_phase     res     1
+               00305 
+               00306 ;--------------------------------------------------------
+               00307 ; global & static initialisations
+               00308 ;--------------------------------------------------------
+               00309 ; I code from now on!
+               00310 ; ; Starting pCode block
+               00311 S_moteursetjack__moteursetjack_ints_tmr0        code
+0000           00312 _moteursetjack_ints_tmr0:
+               00313 ;       .line   192; moteursetjack.c    void moteursetjack_ints_tmr0(void)
+0000 C000 FFE5 00314         MOVFF   r0x00, POSTDEC1
+0004 C000 FFE5 00315         MOVFF   r0x01, POSTDEC1
+0008 0000      00316         BANKSEL _depart
+               00317 ;       .line   194; moteursetjack.c    if((!depart)&&(etat_moteur[0] & ACTIV_MOTEUR_1))
+000A 5100      00318         MOVF    _depart, W, B
+000C A4D8      00319         BTFSS   STATUS, 2
+000E D000      00320         BRA     _00240_DS_
+0010 C000 F000 00321         MOVFF   _etat_moteur, r0x00
+0014 AE00      00322         BTFSS   r0x00, 7
+0016 D000      00323         BRA     _00240_DS_
+0018 0000      00324         BANKSEL _ticoutac
+gpasm-0.13.4 beta               moteursetjack.asm5-20-2009  17:01:05          PAGE  7
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+               00325 ;       .line   196; moteursetjack.c    if(ticoutac)
+001A 5100      00326         MOVF    _ticoutac, W, B
+001C E000      00327         BZ      _00224_DS_
+               00328 ;       .line   198; moteursetjack.c    PIN_MOT1_1 = !PIN_MOT1_1;
+001E 6A00      00329         CLRF    r0x01
+0020 B400      00330         BTFSC   _PORTDbits, 2
+0022 2A00      00331         INCF    r0x01, F
+0024 5000      00332         MOVF    r0x01, W
+0026 80D8      00333         BSF     STATUS, 0
+0028 66E8      00334         TSTFSZ  WREG
+002A 90D8      00335         BCF     STATUS, 0
+002C 6A00      00336         CLRF    r0x01
+002E 3600      00337         RLCF    r0x01, F
+0030 5000      00338         MOVF    r0x01, W
+0032 0B01      00339         ANDLW   0x01
+0034 44E8      00340         RLNCF   WREG, W
+0036 44E8      00341         RLNCF   WREG, W
+0038 6EF4      00342         MOVWF   PRODH
+003A 5000      00343         MOVF    _PORTDbits, W
+003C 0BFB      00344         ANDLW   0xfb
+003E 10F4      00345         IORWF   PRODH, W
+0040 6E00      00346         MOVWF   _PORTDbits
+               00347 ;       .line   199; moteursetjack.c    PIN_MOT1_2 = !PIN_MOT1_2;
+0042 6A00      00348         CLRF    r0x01
+0044 B600      00349         BTFSC   _PORTDbits, 3
+0046 2A00      00350         INCF    r0x01, F
+0048 5000      00351         MOVF    r0x01, W
+004A 80D8      00352         BSF     STATUS, 0
+004C 66E8      00353         TSTFSZ  WREG
+004E 90D8      00354         BCF     STATUS, 0
+0050 6A00      00355         CLRF    r0x01
+0052 3600      00356         RLCF    r0x01, F
+0054 5000      00357         MOVF    r0x01, W
+0056 0B01      00358         ANDLW   0x01
+0058 38E8      00359         SWAPF   WREG, W
+005A 40E8      00360         RRNCF   WREG, W
+005C 6EF4      00361         MOVWF   PRODH
+005E 5000      00362         MOVF    _PORTDbits, W
+0060 0BF7      00363         ANDLW   0xf7
+0062 10F4      00364         IORWF   PRODH, W
+0064 6E00      00365         MOVWF   _PORTDbits
+               00366 ; removed redundant BANKSEL
+               00367 ;       .line   200; moteursetjack.c    ticoutac = 0;
+0066 6B00      00368         CLRF    _ticoutac, B
+0068 D000      00369         BRA     _00225_DS_
+006A           00370 _00224_DS_:
+               00371 ;       .line   204; moteursetjack.c    PIN_MOT1_3 = !PIN_MOT1_3;
+006A 6A00      00372         CLRF    r0x01
+006C BC00      00373         BTFSC   _PORTCbits, 6
+006E 2A00      00374         INCF    r0x01, F
+0070 5000      00375         MOVF    r0x01, W
+0072 80D8      00376         BSF     STATUS, 0
+0074 66E8      00377         TSTFSZ  WREG
+0076 90D8      00378         BCF     STATUS, 0
+gpasm-0.13.4 beta               moteursetjack.asm5-20-2009  17:01:05          PAGE  8
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+0078 6A00      00379         CLRF    r0x01
+007A 3600      00380         RLCF    r0x01, F
+007C 5000      00381         MOVF    r0x01, W
+007E 0B01      00382         ANDLW   0x01
+0080 40E8      00383         RRNCF   WREG, W
+0082 40E8      00384         RRNCF   WREG, W
+0084 6EF4      00385         MOVWF   PRODH
+0086 5000      00386         MOVF    _PORTCbits, W
+0088 0BBF      00387         ANDLW   0xbf
+008A 10F4      00388         IORWF   PRODH, W
+008C 6E00      00389         MOVWF   _PORTCbits
+               00390 ;       .line   205; moteursetjack.c    PIN_MOT1_4 = !PIN_MOT1_4;
+008E 6A00      00391         CLRF    r0x01
+0090 BE00      00392         BTFSC   _PORTCbits, 7
+0092 2A00      00393         INCF    r0x01, F
+0094 5000      00394         MOVF    r0x01, W
+0096 80D8      00395         BSF     STATUS, 0
+0098 66E8      00396         TSTFSZ  WREG
+009A 90D8      00397         BCF     STATUS, 0
+009C 6A00      00398         CLRF    r0x01
+009E 3600      00399         RLCF    r0x01, F
+00A0 5000      00400         MOVF    r0x01, W
+00A2 0B01      00401         ANDLW   0x01
+00A4 40E8      00402         RRNCF   WREG, W
+00A6 6EF4      00403         MOVWF   PRODH
+00A8 5000      00404         MOVF    _PORTCbits, W
+00AA 0B7F      00405         ANDLW   0x7f
+00AC 10F4      00406         IORWF   PRODH, W
+00AE 6E00      00407         MOVWF   _PORTCbits
+               00408 ;       .line   206; moteursetjack.c    ticoutac = 1;
+00B0 0E01      00409         MOVLW   0x01
+00B2 0000      00410         BANKSEL _ticoutac
+00B4 6F00      00411         MOVWF   _ticoutac, B
+00B6           00412 _00225_DS_:
+00B6 0000      00413         BANKSEL _compteur_mot
+               00414 ;       .line   208; moteursetjack.c    compteur_mot++;
+00B8 2B00      00415         INCF    _compteur_mot, F, B
+00BA E300      00416         BNC     _10223_DS_
+               00417 ; removed redundant BANKSEL
+00BC 2B00      00418         INCF    (_compteur_mot + 1), F, B
+00BE           00419 _10223_DS_:
+               00420 ;       .line   209; moteursetjack.c    if(compteur_mot >= PAS_PAR_ETAGE)
+00BE 0E00      00421         MOVLW   0x00
+00C0 0000      00422         BANKSEL (_compteur_mot + 1)
+00C2 5D00      00423         SUBWF   (_compteur_mot + 1), W, B
+00C4 E100      00424         BNZ     _00253_DS_
+00C6 0E32      00425         MOVLW   0x32
+               00426 ; removed redundant BANKSEL
+00C8 5D00      00427         SUBWF   _compteur_mot, W, B
+00CA           00428 _00253_DS_:
+00CA A0D8      00429         BTFSS   STATUS, 0
+00CC D000      00430         BRA     _00243_DS_
+00CE 0000      00431         BANKSEL _mot1_sens
+               00432 ;       .line   211; moteursetjack.c    if(mot1_sens) mot1_position++;
+gpasm-0.13.4 beta               moteursetjack.asm5-20-2009  17:01:05          PAGE  9
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+00D0 5100      00433         MOVF    _mot1_sens, W, B
+00D2 E000      00434         BZ      _00227_DS_
+00D4 0000      00435         BANKSEL _mot1_position
+00D6 2B00      00436         INCF    _mot1_position, F, B
+00D8 D000      00437         BRA     _00228_DS_
+00DA           00438 _00227_DS_:
+00DA 0000      00439         BANKSEL _mot1_position
+               00440 ;       .line   212; moteursetjack.c    else mot1_position--;
+00DC 0700      00441         DECF    _mot1_position, F, B
+00DE           00442 _00228_DS_:
+               00443 ;       .line   214; moteursetjack.c    etat_moteur[0] &= ~POSITION_MOTEUR_1;                // Maj position
+00DE 0EC0      00444         MOVLW   0xc0
+00E0 1600      00445         ANDWF   r0x00, F
+00E2 5000      00446         MOVF    r0x00, W
+00E4 0000      00447         BANKSEL _etat_moteur
+00E6 6F00      00448         MOVWF   _etat_moteur, B
+               00449 ;       .line   215; moteursetjack.c    etat_moteur[0] |= mot1_position & POSITION_MOTEUR_1; // ...
+00E8 0E3F      00450         MOVLW   0x3f
+00EA 0000      00451         BANKSEL _mot1_position
+00EC 1500      00452         ANDWF   _mot1_position, W, B
+00EE 6E00      00453         MOVWF   r0x00
+00F0 0000      00454         BANKSEL _etat_moteur
+00F2 5100      00455         MOVF    _etat_moteur, W, B
+00F4 1200      00456         IORWF   r0x00, F
+00F6 5000      00457         MOVF    r0x00, W
+               00458 ; removed redundant BANKSEL
+00F8 6F00      00459         MOVWF   _etat_moteur, B
+00FA 0000      00460         BANKSEL _mot1_position
+               00461 ;       .line   217; moteursetjack.c    if(mot1_position == mot1_pos_visee)
+00FC 5100      00462         MOVF    _mot1_position, W, B
+00FE 0000      00463         BANKSEL _mot1_pos_visee
+0100 1900      00464         XORWF   _mot1_pos_visee, W, B
+0102 E100      00465         BNZ     _00230_DS_
+               00466 ;       .line   219; moteursetjack.c    T0CON = CONFIG_TMR0_MOTEUR & 0x7f; // TMR0OFF
+0104 0E06      00467         MOVLW   0x06
+0106 6E00      00468         MOVWF   _T0CON
+               00469 ;       .line   220; moteursetjack.c    etat_moteur[0] &= ~ACTIV_MOTEUR_1; // Inactif
+0108 0E7F      00470         MOVLW   0x7f
+010A 0000      00471         BANKSEL _etat_moteur
+010C 1500      00472         ANDWF   _etat_moteur, W, B
+               00473 ; #     MOVWF   r0x00
+               00474 ; #     MOVF    r0x00, W
+               00475 ; ;     peep 2 - Removed redundant move
+010E 6F00      00476         MOVWF   _etat_moteur, B
+               00477 ;       .line   222; moteursetjack.c    mot1_phase.b0 = PIN_MOT1_1;
+0110 6A00      00478         CLRF    r0x00
+0112 B400      00479         BTFSC   _PORTDbits, 2
+0114 2A00      00480         INCF    r0x00, F
+0116 5000      00481         MOVF    r0x00, W
+0118 0B01      00482         ANDLW   0x01
+011A 6EF4      00483         MOVWF   PRODH
+011C 0000      00484         BANKSEL _mot1_phase
+011E 5100      00485         MOVF    _mot1_phase, W, B
+0120 0BFE      00486         ANDLW   0xfe
+gpasm-0.13.4 beta               moteursetjack.asm5-20-2009  17:01:05          PAGE 10
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+0122 10F4      00487         IORWF   PRODH, W
+               00488 ; removed redundant BANKSEL
+0124 6F00      00489         MOVWF   _mot1_phase, B
+               00490 ;       .line   223; moteursetjack.c    mot1_phase.b1 = PIN_MOT1_3;
+0126 6A00      00491         CLRF    r0x00
+0128 BC00      00492         BTFSC   _PORTCbits, 6
+012A 2A00      00493         INCF    r0x00, F
+012C 5000      00494         MOVF    r0x00, W
+012E 0B01      00495         ANDLW   0x01
+0130 44E8      00496         RLNCF   WREG, W
+0132 6EF4      00497         MOVWF   PRODH
+               00498 ; removed redundant BANKSEL
+0134 5100      00499         MOVF    _mot1_phase, W, B
+0136 0BFD      00500         ANDLW   0xfd
+0138 10F4      00501         IORWF   PRODH, W
+               00502 ; removed redundant BANKSEL
+013A 6F00      00503         MOVWF   _mot1_phase, B
+               00504 ;       .line   224; moteursetjack.c    PIN_MOT1_1 = 0;
+013C 9400      00505         BCF     _PORTDbits, 2
+               00506 ;       .line   225; moteursetjack.c    PIN_MOT1_2 = 0;
+013E 9600      00507         BCF     _PORTDbits, 3
+               00508 ;       .line   226; moteursetjack.c    PIN_MOT1_3 = 0;
+0140 9C00      00509         BCF     _PORTCbits, 6
+               00510 ;       .line   227; moteursetjack.c    PIN_MOT1_4 = 0;
+0142 9E00      00511         BCF     _PORTCbits, 7
+0144           00512 _00230_DS_:
+0144 0000      00513         BANKSEL _compteur_mot
+               00514 ;       .line   229; moteursetjack.c    compteur_mot = 0;
+0146 6B00      00515         CLRF    _compteur_mot, B
+               00516 ; removed redundant BANKSEL
+0148 6B00      00517         CLRF    (_compteur_mot + 1), B
+014A D000      00518         BRA     _00243_DS_
+014C           00519 _00240_DS_:
+               00520 ;       .line   234; moteursetjack.c    if(depart < 3)
+014C 0E03      00521         MOVLW   0x03
+014E 0000      00522         BANKSEL _depart
+0150 5D00      00523         SUBWF   _depart, W, B
+0152 E200      00524         BC      _00237_DS_
+               00525 ;       .line   236; moteursetjack.c    if(PIN_JACK)
+0154 BE00      00526         BTFSC   _PORTBbits, 7
+0156 D000      00527         BRA     _00243_DS_
+               00528 ;       .line   249; moteursetjack.c    else depart = 1;
+0158 0E01      00529         MOVLW   0x01
+               00530 ; removed redundant BANKSEL
+015A 6F00      00531         MOVWF   _depart, B
+015C D000      00532         BRA     _00243_DS_
+015E           00533 _00237_DS_:
+015E 0000      00534         BANKSEL _depart
+               00535 ;       .line   251; moteursetjack.c    else depart++; // Pour les tempos au changement de sens...
+0160 2B00      00536         INCF    _depart, F, B
+0162           00537 _00243_DS_:
+0162 CFE4 F000 00538         MOVFF   PREINC1, r0x01
+0166 CFE4 F000 00539         MOVFF   PREINC1, r0x00
+016A 0012      00540         RETURN  
+gpasm-0.13.4 beta               moteursetjack.asm5-20-2009  17:01:05          PAGE 11
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+               00541 
+               00542 ; ; Starting pCode block
+               00543 S_moteursetjack__moteursetjack_ints_INT2        code
+0000           00544 _moteursetjack_ints_INT2:
+               00545 ;       .line   182; moteursetjack.c    void moteursetjack_ints_INT2(void) // position avant
+0000 C000 FFE5 00546         MOVFF   r0x00, POSTDEC1
+               00547 ;       .line   184; moteursetjack.c    PIN_MOT2_1 = 0;
+0004 9200      00548         BCF     _PORTDbits, 1
+               00549 ;       .line   185; moteursetjack.c    PIN_MOT2_2 = 0;
+0006 9000      00550         BCF     _PORTDbits, 0
+               00551 ;       .line   186; moteursetjack.c    mot2_position = 2;
+0008 0E02      00552         MOVLW   0x02
+000A 0000      00553         BANKSEL _mot2_position
+000C 6F00      00554         MOVWF   _mot2_position, B
+               00555 ;       .line   187; moteursetjack.c    etat_moteur[1] &= ~POSITION_MOTEUR_2; // Maj position
+000E 0EFC      00556         MOVLW   0xfc
+0010 0000      00557         BANKSEL (_etat_moteur + 1)
+0012 1500      00558         ANDWF   (_etat_moteur + 1), W, B
+               00559 ; #     MOVWF   r0x00
+               00560 ; #     MOVF    r0x00, W
+               00561 ; ;     peep 2 - Removed redundant move
+0014 6F00      00562         MOVWF   (_etat_moteur + 1), B
+               00563 ;       .line   188; moteursetjack.c    etat_moteur[1] |= 0x02;               // ..
+0016 0E02      00564         MOVLW   0x02
+               00565 ; removed redundant BANKSEL
+0018 1100      00566         IORWF   (_etat_moteur + 1), W, B
+               00567 ; #     MOVWF   r0x00
+               00568 ; #     MOVF    r0x00, W
+               00569 ; ;     peep 2 - Removed redundant move
+001A 6E00      00570         MOVWF   r0x00
+               00571 ; removed redundant BANKSEL
+001C 6F00      00572         MOVWF   (_etat_moteur + 1), B
+               00573 ;       .line   189; moteursetjack.c    etat_moteur[1] &= ~ACTIV_MOTEUR_2;    // Inactif !
+001E 9600      00574         BCF     r0x00, 3
+0020 5000      00575         MOVF    r0x00, W
+               00576 ; removed redundant BANKSEL
+0022 6F00      00577         MOVWF   (_etat_moteur + 1), B
+0024 CFE4 F000 00578         MOVFF   PREINC1, r0x00
+0028 0012      00579         RETURN  
+               00580 
+               00581 ; ; Starting pCode block
+               00582 S_moteursetjack__moteursetjack_ints_INT1        code
+0000           00583 _moteursetjack_ints_INT1:
+0000 0000      00584         BANKSEL _mot2_pos_visee
+               00585 ;       .line   172; moteursetjack.c    if(mot2_pos_visee == 1)
+0002 5100      00586         MOVF    _mot2_pos_visee, W, B
+0004 0A01      00587         XORLW   0x01
+0006 E100      00588         BNZ     _00209_DS_
+               00589 ;       .line   174; moteursetjack.c    PIN_MOT2_1 = 0;
+0008 9200      00590         BCF     _PORTDbits, 1
+               00591 ;       .line   175; moteursetjack.c    PIN_MOT2_2 = 0;
+000A 9000      00592         BCF     _PORTDbits, 0
+               00593 ;       .line   176; moteursetjack.c    etat_moteur[1] &= ~ACTIV_MOTEUR_2;// Inactif !
+000C 0EF7      00594         MOVLW   0xf7
+gpasm-0.13.4 beta               moteursetjack.asm5-20-2009  17:01:05          PAGE 12
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+000E 0000      00595         BANKSEL (_etat_moteur + 1)
+0010 1500      00596         ANDWF   (_etat_moteur + 1), W, B
+               00597 ; #     MOVWF   r0x00
+               00598 ; #     MOVF    r0x00, W
+               00599 ; ;     peep 2 - Removed redundant move
+0012 6F00      00600         MOVWF   (_etat_moteur + 1), B
+0014           00601 _00209_DS_:
+               00602 ;       .line   178; moteursetjack.c    mot2_position = 1;
+0014 0E01      00603         MOVLW   0x01
+0016 0000      00604         BANKSEL _mot2_position
+0018 6F00      00605         MOVWF   _mot2_position, B
+               00606 ;       .line   179; moteursetjack.c    etat_moteur[1] &= ~POSITION_MOTEUR_2; // Maj position
+001A 0EFC      00607         MOVLW   0xfc
+001C 0000      00608         BANKSEL (_etat_moteur + 1)
+001E 1500      00609         ANDWF   (_etat_moteur + 1), W, B
+               00610 ; #     MOVWF   r0x00
+               00611 ; #     MOVF    r0x00, W
+               00612 ; ;     peep 2 - Removed redundant move
+0020 6F00      00613         MOVWF   (_etat_moteur + 1), B
+               00614 ;       .line   180; moteursetjack.c    etat_moteur[1] |= 0x01;               // ..
+0022 0E01      00615         MOVLW   0x01
+               00616 ; removed redundant BANKSEL
+0024 1100      00617         IORWF   (_etat_moteur + 1), W, B
+               00618 ; #     MOVWF   r0x00
+               00619 ; #     MOVF    r0x00, W
+               00620 ; ;     peep 2 - Removed redundant move
+0026 6F00      00621         MOVWF   (_etat_moteur + 1), B
+0028 0012      00622         RETURN  
+               00623 
+               00624 ; ; Starting pCode block
+               00625 S_moteursetjack__moteursetjack_ints_INT0        code
+0000           00626 _moteursetjack_ints_INT0:
+               00627 ;       .line   163; moteursetjack.c    PIN_MOT2_1 = 0;
+0000 9200      00628         BCF     _PORTDbits, 1
+               00629 ;       .line   164; moteursetjack.c    PIN_MOT2_2 = 0;
+0002 9000      00630         BCF     _PORTDbits, 0
+0004 0000      00631         BANKSEL _mot2_position
+               00632 ;       .line   165; moteursetjack.c    mot2_position = 0;
+0006 6B00      00633         CLRF    _mot2_position, B
+               00634 ;       .line   166; moteursetjack.c    etat_moteur[1] &= ~POSITION_MOTEUR_2; // Maj position
+0008 0EFC      00635         MOVLW   0xfc
+000A 0000      00636         BANKSEL (_etat_moteur + 1)
+000C 1500      00637         ANDWF   (_etat_moteur + 1), W, B
+               00638 ; #     MOVWF   r0x00
+               00639 ; #     MOVF    r0x00, W
+               00640 ; ;     peep 2 - Removed redundant move
+000E 6F00      00641         MOVWF   (_etat_moteur + 1), B
+               00642 ;       .line   168; moteursetjack.c    etat_moteur[1] &= ~ACTIV_MOTEUR_2;    // Inactif !
+0010 0EF7      00643         MOVLW   0xf7
+               00644 ; removed redundant BANKSEL
+0012 1500      00645         ANDWF   (_etat_moteur + 1), W, B
+               00646 ; #     MOVWF   r0x00
+               00647 ; #     MOVF    r0x00, W
+               00648 ; ;     peep 2 - Removed redundant move
+gpasm-0.13.4 beta               moteursetjack.asm5-20-2009  17:01:05          PAGE 13
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+0014 6F00      00649         MOVWF   (_etat_moteur + 1), B
+0016 0012      00650         RETURN  
+               00651 
+               00652 ; ; Starting pCode block
+               00653 S_moteursetjack__moteursetjack_ints_RB_haut     code
+0000           00654 _moteursetjack_ints_RB_haut:
+               00655 ;       .line   140; moteursetjack.c    void moteursetjack_ints_RB_haut(void)
+0000 C000 FFE5 00656         MOVFF   r0x00, POSTDEC1
+               00657 ; #     MOVLW   0x3f
+               00658 ; #     MOVWF   _mot1_pos_visee, B
+               00659 ; #     MOVLW   0x3f
+               00660 ; ;     peep 5 - Removed redundant move
+               00661 ;       .line   146; moteursetjack.c    mot1_pos_visee = POSITION_MAX_1;
+0004 0E3F      00662         MOVLW   0x3f
+0006 0000      00663         BANKSEL _mot1_pos_visee
+               00664 ;       .line   147; moteursetjack.c    mot1_position = POSITION_MAX_1;
+0008 6F00      00665         MOVWF   _mot1_pos_visee, B
+000A 0000      00666         BANKSEL _mot1_position
+000C 6F00      00667         MOVWF   _mot1_position, B
+               00668 ;       .line   148; moteursetjack.c    etat_moteur[0] &= ~POSITION_MOTEUR_1; // Maj position
+000E 0EC0      00669         MOVLW   0xc0
+0010 0000      00670         BANKSEL _etat_moteur
+0012 1500      00671         ANDWF   _etat_moteur, W, B
+               00672 ; #     MOVWF   r0x00
+               00673 ; #     MOVF    r0x00, W
+               00674 ; ;     peep 2 - Removed redundant move
+0014 6F00      00675         MOVWF   _etat_moteur, B
+               00676 ;       .line   149; moteursetjack.c    etat_moteur[0] |= POSITION_MAX_1;     // ..
+0016 0E3F      00677         MOVLW   0x3f
+               00678 ; removed redundant BANKSEL
+0018 1100      00679         IORWF   _etat_moteur, W, B
+               00680 ; #     MOVWF   r0x00
+               00681 ; #     MOVF    r0x00, W
+               00682 ; ;     peep 2 - Removed redundant move
+001A 6E00      00683         MOVWF   r0x00
+               00684 ; removed redundant BANKSEL
+001C 6F00      00685         MOVWF   _etat_moteur, B
+               00686 ;       .line   151; moteursetjack.c    T0CON = CONFIG_TMR0_MOTEUR & 0x7f; // TMR0OFF
+001E 0E06      00687         MOVLW   0x06
+0020 6E00      00688         MOVWF   _T0CON
+               00689 ;       .line   152; moteursetjack.c    etat_moteur[0] &= ~ACTIV_MOTEUR_1; // Inactif
+0022 9E00      00690         BCF     r0x00, 7
+0024 5000      00691         MOVF    r0x00, W
+               00692 ; removed redundant BANKSEL
+0026 6F00      00693         MOVWF   _etat_moteur, B
+               00694 ;       .line   154; moteursetjack.c    mot1_phase.b0 = PIN_MOT1_1;
+0028 6A00      00695         CLRF    r0x00
+002A B400      00696         BTFSC   _PORTDbits, 2
+002C 2A00      00697         INCF    r0x00, F
+002E 5000      00698         MOVF    r0x00, W
+0030 0B01      00699         ANDLW   0x01
+0032 6EF4      00700         MOVWF   PRODH
+0034 0000      00701         BANKSEL _mot1_phase
+0036 5100      00702         MOVF    _mot1_phase, W, B
+gpasm-0.13.4 beta               moteursetjack.asm5-20-2009  17:01:05          PAGE 14
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+0038 0BFE      00703         ANDLW   0xfe
+003A 10F4      00704         IORWF   PRODH, W
+               00705 ; removed redundant BANKSEL
+003C 6F00      00706         MOVWF   _mot1_phase, B
+               00707 ;       .line   155; moteursetjack.c    mot1_phase.b1 = PIN_MOT1_3;
+003E 6A00      00708         CLRF    r0x00
+0040 BC00      00709         BTFSC   _PORTCbits, 6
+0042 2A00      00710         INCF    r0x00, F
+0044 5000      00711         MOVF    r0x00, W
+0046 0B01      00712         ANDLW   0x01
+0048 44E8      00713         RLNCF   WREG, W
+004A 6EF4      00714         MOVWF   PRODH
+               00715 ; removed redundant BANKSEL
+004C 5100      00716         MOVF    _mot1_phase, W, B
+004E 0BFD      00717         ANDLW   0xfd
+0050 10F4      00718         IORWF   PRODH, W
+               00719 ; removed redundant BANKSEL
+0052 6F00      00720         MOVWF   _mot1_phase, B
+               00721 ;       .line   156; moteursetjack.c    PIN_MOT1_1 = 0;
+0054 9400      00722         BCF     _PORTDbits, 2
+               00723 ;       .line   157; moteursetjack.c    PIN_MOT1_2 = 0;
+0056 9600      00724         BCF     _PORTDbits, 3
+               00725 ;       .line   158; moteursetjack.c    PIN_MOT1_3 = 0;
+0058 9C00      00726         BCF     _PORTCbits, 6
+               00727 ;       .line   159; moteursetjack.c    PIN_MOT1_4 = 0;
+005A 9E00      00728         BCF     _PORTCbits, 7
+005C CFE4 F000 00729         MOVFF   PREINC1, r0x00
+0060 0012      00730         RETURN  
+               00731 
+               00732 ; ; Starting pCode block
+               00733 S_moteursetjack__moteursetjack_ints_RB_bas      code
+0000           00734 _moteursetjack_ints_RB_bas:
+               00735 ;       .line   119; moteursetjack.c    void moteursetjack_ints_RB_bas(void)
+0000 C000 FFE5 00736         MOVFF   r0x00, POSTDEC1
+0004 0000      00737         BANKSEL _mot1_pos_visee
+               00738 ;       .line   125; moteursetjack.c    mot1_pos_visee = 0;
+0006 6B00      00739         CLRF    _mot1_pos_visee, B
+0008 0000      00740         BANKSEL _mot1_position
+               00741 ;       .line   126; moteursetjack.c    mot1_position = 0;
+000A 6B00      00742         CLRF    _mot1_position, B
+               00743 ;       .line   127; moteursetjack.c    etat_moteur[0] &= ~POSITION_MOTEUR_1; // Maj position
+000C 0EC0      00744         MOVLW   0xc0
+000E 0000      00745         BANKSEL _etat_moteur
+0010 1500      00746         ANDWF   _etat_moteur, W, B
+               00747 ; #     MOVWF   r0x00
+               00748 ; #     MOVF    r0x00, W
+               00749 ; ;     peep 2 - Removed redundant move
+0012 6F00      00750         MOVWF   _etat_moteur, B
+               00751 ;       .line   130; moteursetjack.c    T0CON = CONFIG_TMR0_MOTEUR & 0x7f; // TMR0OFF
+0014 0E06      00752         MOVLW   0x06
+0016 6E00      00753         MOVWF   _T0CON
+               00754 ;       .line   131; moteursetjack.c    etat_moteur[0] &= ~ACTIV_MOTEUR_1; // Inactif
+0018 0E7F      00755         MOVLW   0x7f
+               00756 ; removed redundant BANKSEL
+gpasm-0.13.4 beta               moteursetjack.asm5-20-2009  17:01:05          PAGE 15
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+001A 1500      00757         ANDWF   _etat_moteur, W, B
+               00758 ; #     MOVWF   r0x00
+               00759 ; #     MOVF    r0x00, W
+               00760 ; ;     peep 2 - Removed redundant move
+001C 6F00      00761         MOVWF   _etat_moteur, B
+               00762 ;       .line   133; moteursetjack.c    mot1_phase.b0 = PIN_MOT1_1;
+001E 6A00      00763         CLRF    r0x00
+0020 B400      00764         BTFSC   _PORTDbits, 2
+0022 2A00      00765         INCF    r0x00, F
+0024 5000      00766         MOVF    r0x00, W
+0026 0B01      00767         ANDLW   0x01
+0028 6EF4      00768         MOVWF   PRODH
+002A 0000      00769         BANKSEL _mot1_phase
+002C 5100      00770         MOVF    _mot1_phase, W, B
+002E 0BFE      00771         ANDLW   0xfe
+0030 10F4      00772         IORWF   PRODH, W
+               00773 ; removed redundant BANKSEL
+0032 6F00      00774         MOVWF   _mot1_phase, B
+               00775 ;       .line   134; moteursetjack.c    mot1_phase.b1 = PIN_MOT1_3;
+0034 6A00      00776         CLRF    r0x00
+0036 BC00      00777         BTFSC   _PORTCbits, 6
+0038 2A00      00778         INCF    r0x00, F
+003A 5000      00779         MOVF    r0x00, W
+003C 0B01      00780         ANDLW   0x01
+003E 44E8      00781         RLNCF   WREG, W
+0040 6EF4      00782         MOVWF   PRODH
+               00783 ; removed redundant BANKSEL
+0042 5100      00784         MOVF    _mot1_phase, W, B
+0044 0BFD      00785         ANDLW   0xfd
+0046 10F4      00786         IORWF   PRODH, W
+               00787 ; removed redundant BANKSEL
+0048 6F00      00788         MOVWF   _mot1_phase, B
+               00789 ;       .line   135; moteursetjack.c    PIN_MOT1_1 = 0;
+004A 9400      00790         BCF     _PORTDbits, 2
+               00791 ;       .line   136; moteursetjack.c    PIN_MOT1_2 = 0;
+004C 9600      00792         BCF     _PORTDbits, 3
+               00793 ;       .line   137; moteursetjack.c    PIN_MOT1_3 = 0;
+004E 9C00      00794         BCF     _PORTCbits, 6
+               00795 ;       .line   138; moteursetjack.c    PIN_MOT1_4 = 0;
+0050 9E00      00796         BCF     _PORTCbits, 7
+0052 CFE4 F000 00797         MOVFF   PREINC1, r0x00
+0056 0012      00798         RETURN  
+               00799 
+               00800 ; ; Starting pCode block
+               00801 S_moteursetjack__ordre_moteur   code
+0000           00802 _ordre_moteur:
+               00803 ;       .line   35; moteursetjack.c     void ordre_moteur(unsigned char ordre1, unsigned char ordre2)
+0000 CFD9 FFE5 00804         MOVFF   FSR2L, POSTDEC1
+0004 CFE1 FFD9 00805         MOVFF   FSR1L, FSR2L
+0008 C000 FFE5 00806         MOVFF   r0x00, POSTDEC1
+000C C000 FFE5 00807         MOVFF   r0x01, POSTDEC1
+0010 C000 FFE5 00808         MOVFF   r0x02, POSTDEC1
+0014 C000 FFE5 00809         MOVFF   r0x03, POSTDEC1
+0018 0E02      00810         MOVLW   0x02
+gpasm-0.13.4 beta               moteursetjack.asm5-20-2009  17:01:05          PAGE 16
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+001A CFDB F000 00811         MOVFF   PLUSW2, r0x00
+001E 0E03      00812         MOVLW   0x03
+0020 CFDB F000 00813         MOVFF   PLUSW2, r0x01
+               00814 ;       .line   38; moteursetjack.c     if(ordre1 & ACTIV_MOTEUR_1)
+0024 AE00      00815         BTFSS   r0x00, 7
+0026 D000      00816         BRA     _00133_DS_
+               00817 ;       .line   40; moteursetjack.c     if(ordre1 & INITIALISATION_1) 
+0028 AC00      00818         BTFSS   r0x00, 6
+002A D000      00819         BRA     _00113_DS_
+               00820 ;       .line   42; moteursetjack.c     dest = 0;
+002C 6A00      00821         CLRF    r0x02
+               00822 ;       .line   43; moteursetjack.c     if(FIN_COURSE1_BAS)
+002E A600      00823         BTFSS   _PORTBbits, 3
+0030 D000      00824         BRA     _00110_DS_
+0032 0000      00825         BANKSEL _mot1_position
+               00826 ;       .line   44; moteursetjack.c     mot1_position = 0;
+0034 6B00      00827         CLRF    _mot1_position, B
+0036 D000      00828         BRA     _00111_DS_
+0038           00829 _00110_DS_:
+               00830 ;       .line   46; moteursetjack.c     mot1_position = 255;
+0038 0EFF      00831         MOVLW   0xff
+003A 0000      00832         BANKSEL _mot1_position
+003C 6F00      00833         MOVWF   _mot1_position, B
+003E           00834 _00111_DS_:
+               00835 ;       .line   47; moteursetjack.c     etat_moteur[0] &= ~INITIALISATION_1;
+003E 0EBF      00836         MOVLW   0xbf
+0040 0000      00837         BANKSEL _etat_moteur
+0042 1500      00838         ANDWF   _etat_moteur, W, B
+               00839 ; #     MOVWF   r0x03
+               00840 ; #     MOVF    r0x03, W
+               00841 ; ;     peep 2 - Removed redundant move
+0044 6F00      00842         MOVWF   _etat_moteur, B
+0046 D000      00843         BRA     _00114_DS_
+0048           00844 _00113_DS_:
+               00845 ;       .line   49; moteursetjack.c     else dest = (ordre1 & POSITION_MOTEUR_1);
+0048 0E3F      00846         MOVLW   0x3f
+004A 1400      00847         ANDWF   r0x00, W
+004C 6E00      00848         MOVWF   r0x02
+004E           00849 _00114_DS_:
+               00850 ;       .line   50; moteursetjack.c     if((dest != mot1_position) || (etat_moteur[0] & ACTIV_MOTEUR_1))
+004E 5000      00851         MOVF    r0x02, W
+0050 0000      00852         BANKSEL _mot1_position
+0052 1900      00853         XORWF   _mot1_position, W, B
+0054 E100      00854         BNZ     _00129_DS_
+0056           00855 _00175_DS_:
+0056 0000      00856         BANKSEL _etat_moteur
+0058 AF00      00857         BTFSS   _etat_moteur, 7, B
+005A D000      00858         BRA     _00133_DS_
+005C           00859 _00129_DS_:
+               00860 ;       .line   52; moteursetjack.c     if(etat_moteur[0] & ACTIV_MOTEUR_1)
+005C C000 F000 00861         MOVFF   _etat_moteur, r0x00
+0060 AE00      00862         BTFSS   r0x00, 7
+0062 D000      00863         BRA     _00124_DS_
+               00864 ;       .line   54; moteursetjack.c     if(((dest > mot1_position)&&(!mot1_sens))||((dest < mot1_position)&&(mot1_sens))) // ie si on change de sens
+gpasm-0.13.4 beta               moteursetjack.asm5-20-2009  17:01:05          PAGE 17
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+0064 5000      00865         MOVF    r0x02, W
+0066 0000      00866         BANKSEL _mot1_position
+0068 5D00      00867         SUBWF   _mot1_position, W, B
+006A E200      00868         BC      _00122_DS_
+006C 0000      00869         BANKSEL _mot1_sens
+006E 5100      00870         MOVF    _mot1_sens, W, B
+0070 E000      00871         BZ      _00118_DS_
+0072           00872 _00122_DS_:
+0072 0000      00873         BANKSEL _mot1_position
+0074 5100      00874         MOVF    _mot1_position, W, B
+0076 5C00      00875         SUBWF   r0x02, W
+0078 B0D8      00876         BTFSC   STATUS, 0
+007A D000      00877         BRA     _00125_DS_
+007C 0000      00878         BANKSEL _mot1_sens
+007E 5100      00879         MOVF    _mot1_sens, W, B
+0080 B4D8      00880         BTFSC   STATUS, 2
+0082 D000      00881         BRA     _00125_DS_
+0084           00882 _00118_DS_:
+0084 0000      00883         BANKSEL _compteur_mot
+               00884 ;       .line   56; moteursetjack.c     compteur_mot = PAS_PAR_ETAGE - compteur_mot;
+0086 5100      00885         MOVF    _compteur_mot, W, B
+0088 0832      00886         SUBLW   0x32
+               00887 ; removed redundant BANKSEL
+008A 6F00      00888         MOVWF   _compteur_mot, B
+008C 0E00      00889         MOVLW   0x00
+               00890 ; removed redundant BANKSEL
+008E 5700      00891         SUBFWB  (_compteur_mot + 1), F, B
+               00892 ;       .line   57; moteursetjack.c     depart = -TEMPS_ATTENTE; // Attend TEMPS_ATTENTE interruptions du timer0 avant de repartir dans l'autre sens
+0090 0EEC      00893         MOVLW   0xec
+0092 0000      00894         BANKSEL _depart
+0094 6F00      00895         MOVWF   _depart, B
+0096 0000      00896         BANKSEL _mot1_sens
+               00897 ;       .line   58; moteursetjack.c     if(mot1_sens) mot1_position++;
+0098 5100      00898         MOVF    _mot1_sens, W, B
+009A E000      00899         BZ      _00116_DS_
+009C 0000      00900         BANKSEL _mot1_position
+009E 2B00      00901         INCF    _mot1_position, F, B
+00A0 D000      00902         BRA     _00125_DS_
+00A2           00903 _00116_DS_:
+00A2 0000      00904         BANKSEL _mot1_position
+               00905 ;       .line   59; moteursetjack.c     else mot1_position--;
+00A4 0700      00906         DECF    _mot1_position, F, B
+00A6 D000      00907         BRA     _00125_DS_
+00A8           00908 _00124_DS_:
+               00909 ;       .line   64; moteursetjack.c     etat_moteur[0] |= ACTIV_MOTEUR_1;
+00A8 8E00      00910         BSF     r0x00, 7
+00AA 5000      00911         MOVF    r0x00, W
+00AC 0000      00912         BANKSEL _etat_moteur
+00AE 6F00      00913         MOVWF   _etat_moteur, B
+00B0 0000      00914         BANKSEL _compteur_mot
+               00915 ;       .line   65; moteursetjack.c     compteur_mot = 0;
+00B2 6B00      00916         CLRF    _compteur_mot, B
+               00917 ; removed redundant BANKSEL
+00B4 6B00      00918         CLRF    (_compteur_mot + 1), B
+gpasm-0.13.4 beta               moteursetjack.asm5-20-2009  17:01:05          PAGE 18
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+               00919 ;       .line   66; moteursetjack.c     PIN_MOT1_1 = mot1_phase.b0;
+00B6 6A00      00920         CLRF    r0x00
+00B8 0000      00921         BANKSEL _mot1_phase
+00BA B100      00922         BTFSC   _mot1_phase, 0, B
+00BC 2A00      00923         INCF    r0x00, F
+00BE 5000      00924         MOVF    r0x00, W
+00C0 0B01      00925         ANDLW   0x01
+00C2 44E8      00926         RLNCF   WREG, W
+00C4 44E8      00927         RLNCF   WREG, W
+00C6 6EF4      00928         MOVWF   PRODH
+00C8 5000      00929         MOVF    _PORTDbits, W
+00CA 0BFB      00930         ANDLW   0xfb
+00CC 10F4      00931         IORWF   PRODH, W
+00CE 6E00      00932         MOVWF   _PORTDbits
+               00933 ;       .line   67; moteursetjack.c     PIN_MOT1_2 = !mot1_phase.b0;
+00D0 6A00      00934         CLRF    r0x00
+               00935 ; removed redundant BANKSEL
+00D2 B100      00936         BTFSC   _mot1_phase, 0, B
+00D4 2A00      00937         INCF    r0x00, F
+00D6 5000      00938         MOVF    r0x00, W
+00D8 80D8      00939         BSF     STATUS, 0
+00DA 66E8      00940         TSTFSZ  WREG
+00DC 90D8      00941         BCF     STATUS, 0
+00DE 6A00      00942         CLRF    r0x00
+00E0 3600      00943         RLCF    r0x00, F
+00E2 5000      00944         MOVF    r0x00, W
+00E4 0B01      00945         ANDLW   0x01
+00E6 38E8      00946         SWAPF   WREG, W
+00E8 40E8      00947         RRNCF   WREG, W
+00EA 6EF4      00948         MOVWF   PRODH
+00EC 5000      00949         MOVF    _PORTDbits, W
+00EE 0BF7      00950         ANDLW   0xf7
+00F0 10F4      00951         IORWF   PRODH, W
+00F2 6E00      00952         MOVWF   _PORTDbits
+               00953 ;       .line   68; moteursetjack.c     PIN_MOT1_3 = mot1_phase.b1;
+00F4 6A00      00954         CLRF    r0x00
+               00955 ; removed redundant BANKSEL
+00F6 B300      00956         BTFSC   _mot1_phase, 1, B
+00F8 2A00      00957         INCF    r0x00, F
+00FA 5000      00958         MOVF    r0x00, W
+00FC 0B01      00959         ANDLW   0x01
+00FE 40E8      00960         RRNCF   WREG, W
+0100 40E8      00961         RRNCF   WREG, W
+0102 6EF4      00962         MOVWF   PRODH
+0104 5000      00963         MOVF    _PORTCbits, W
+0106 0BBF      00964         ANDLW   0xbf
+0108 10F4      00965         IORWF   PRODH, W
+010A 6E00      00966         MOVWF   _PORTCbits
+               00967 ;       .line   69; moteursetjack.c     PIN_MOT1_4 = !mot1_phase.b1;
+010C 6A00      00968         CLRF    r0x00
+               00969 ; removed redundant BANKSEL
+010E B300      00970         BTFSC   _mot1_phase, 1, B
+0110 2A00      00971         INCF    r0x00, F
+0112 5000      00972         MOVF    r0x00, W
+gpasm-0.13.4 beta               moteursetjack.asm5-20-2009  17:01:05          PAGE 19
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+0114 80D8      00973         BSF     STATUS, 0
+0116 66E8      00974         TSTFSZ  WREG
+0118 90D8      00975         BCF     STATUS, 0
+011A 6A00      00976         CLRF    r0x00
+011C 3600      00977         RLCF    r0x00, F
+011E 5000      00978         MOVF    r0x00, W
+0120 0B01      00979         ANDLW   0x01
+0122 40E8      00980         RRNCF   WREG, W
+0124 6EF4      00981         MOVWF   PRODH
+0126 5000      00982         MOVF    _PORTCbits, W
+0128 0B7F      00983         ANDLW   0x7f
+012A 10F4      00984         IORWF   PRODH, W
+012C 6E00      00985         MOVWF   _PORTCbits
+012E           00986 _00125_DS_:
+               00987 ;       .line   71; moteursetjack.c     T0CON = CONFIG_TMR0_MOTEUR;
+012E 0E86      00988         MOVLW   0x86
+0130 6E00      00989         MOVWF   _T0CON
+               00990 ;       .line   72; moteursetjack.c     mot1_sens = (dest > mot1_position);
+0132 5000      00991         MOVF    r0x02, W
+0134 0000      00992         BANKSEL _mot1_position
+0136 5D00      00993         SUBWF   _mot1_position, W, B
+0138 70D8      00994         BTG     STATUS, 0
+013A 0000      00995         BANKSEL _mot1_sens
+013C 6B00      00996         CLRF    _mot1_sens, B
+013E 3700      00997         RLCF    _mot1_sens, F, B
+               00998 ;       .line   73; moteursetjack.c     if(PIN_MOT1_1 == PIN_MOT1_3) ticoutac = mot1_sens; // A modifier si mauvais sens
+0140 6A00      00999         CLRF    r0x00
+0142 B400      01000         BTFSC   _PORTDbits, 2
+0144 2A00      01001         INCF    r0x00, F
+0146 6A00      01002         CLRF    r0x03
+0148 BC00      01003         BTFSC   _PORTCbits, 6
+014A 2A00      01004         INCF    r0x03, F
+014C 5000      01005         MOVF    r0x00, W
+014E 1800      01006         XORWF   r0x03, W
+0150 E100      01007         BNZ     _00127_DS_
+0152 C000 F000 01008         MOVFF   _mot1_sens, _ticoutac
+0156 D000      01009         BRA     _00133_DS_
+0158           01010 _00127_DS_:
+0158 0000      01011         BANKSEL _mot1_sens
+               01012 ;       .line   74; moteursetjack.c     else ticoutac = !mot1_sens;
+015A 5100      01013         MOVF    _mot1_sens, W, B
+015C 80D8      01014         BSF     STATUS, 0
+015E 66E8      01015         TSTFSZ  WREG
+0160 90D8      01016         BCF     STATUS, 0
+0162 0000      01017         BANKSEL _ticoutac
+0164 6B00      01018         CLRF    _ticoutac, B
+0166 3700      01019         RLCF    _ticoutac, F, B
+0168           01020 _00133_DS_:
+               01021 ;       .line   77; moteursetjack.c     if(ordre2 & ACTIV_MOTEUR_2)
+0168 A600      01022         BTFSS   r0x01, 3
+016A D000      01023         BRA     _00145_DS_
+               01024 ;       .line   79; moteursetjack.c     if(ordre2 & INITIALISATION_2)
+016C A400      01025         BTFSS   r0x01, 2
+016E D000      01026         BRA     _00138_DS_
+gpasm-0.13.4 beta               moteursetjack.asm5-20-2009  17:01:05          PAGE 20
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+               01027 ;       .line   81; moteursetjack.c     if(FIN_COURSE2_ARRIERE) mot2_position = 0; else mot2_position = 2;
+0170 A000      01028         BTFSS   _PORTBbits, 0
+0172 D000      01029         BRA     _00135_DS_
+0174 0000      01030         BANKSEL _mot2_position
+0176 6B00      01031         CLRF    _mot2_position, B
+0178 D000      01032         BRA     _00138_DS_
+017A           01033 _00135_DS_:
+017A 0E02      01034         MOVLW   0x02
+017C 0000      01035         BANKSEL _mot2_position
+017E 6F00      01036         MOVWF   _mot2_position, B
+0180           01037 _00138_DS_:
+               01038 ;       .line   84; moteursetjack.c     dest = (ordre2 & POSITION_MOTEUR_2);
+0180 0E03      01039         MOVLW   0x03
+0182 1400      01040         ANDWF   r0x01, W
+               01041 ; #     MOVWF   r0x02
+               01042 ; #     MOVF    r0x02, W
+               01043 ; ;     peep 2 - Removed redundant move
+               01044 ;       .line   85; moteursetjack.c     if(dest != mot2_position)
+0184 6E00      01045         MOVWF   r0x02
+0186 0000      01046         BANKSEL _mot2_position
+0188 1900      01047         XORWF   _mot2_position, W, B
+018A E000      01048         BZ      _00145_DS_
+               01049 ;       .line   87; moteursetjack.c     mot2_pos_visee = dest;
+018C C000 F000 01050         MOVFF   r0x02, _mot2_pos_visee
+               01051 ;       .line   88; moteursetjack.c     if(dest > mot2_position)
+0190 5000      01052         MOVF    r0x02, W
+0192 0000      01053         BANKSEL _mot2_position
+0194 5D00      01054         SUBWF   _mot2_position, W, B
+0196 E200      01055         BC      _00140_DS_
+               01056 ;       .line   90; moteursetjack.c     PIN_MOT2_1 = 1;
+0198 8200      01057         BSF     _PORTDbits, 1
+               01058 ;       .line   91; moteursetjack.c     PIN_MOT2_2 = 0;
+019A 9000      01059         BCF     _PORTDbits, 0
+019C D000      01060         BRA     _00141_DS_
+019E           01061 _00140_DS_:
+               01062 ;       .line   95; moteursetjack.c     PIN_MOT2_1 = 0;
+019E 9200      01063         BCF     _PORTDbits, 1
+               01064 ;       .line   96; moteursetjack.c     PIN_MOT2_2 = 1;
+01A0 8000      01065         BSF     _PORTDbits, 0
+01A2           01066 _00141_DS_:
+               01067 ;       .line   98; moteursetjack.c     etat_moteur[1] |= ACTIV_MOTEUR_2;
+01A2 0E08      01068         MOVLW   0x08
+01A4 0000      01069         BANKSEL (_etat_moteur + 1)
+01A6 1100      01070         IORWF   (_etat_moteur + 1), W, B
+               01071 ; #     MOVWF   r0x00
+               01072 ; #     MOVF    r0x00, W
+               01073 ; ;     peep 2 - Removed redundant move
+01A8 6F00      01074         MOVWF   (_etat_moteur + 1), B
+01AA           01075 _00145_DS_:
+               01076 ;       .line   101; moteursetjack.c    if(ordre2 & ACTIV_MOTEUR_3)
+01AA AC00      01077         BTFSS   r0x01, 6
+01AC D000      01078         BRA     _00152_DS_
+               01079 ;       .line   103; moteursetjack.c    ftoggle_A4();
+01AE 6A00      01080         CLRF    r0x00
+gpasm-0.13.4 beta               moteursetjack.asm5-20-2009  17:01:05          PAGE 21
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+01B0 B800      01081         BTFSC   _PORTAbits, 4
+01B2 2A00      01082         INCF    r0x00, F
+01B4 5000      01083         MOVF    r0x00, W
+01B6 80D8      01084         BSF     STATUS, 0
+01B8 66E8      01085         TSTFSZ  WREG
+01BA 90D8      01086         BCF     STATUS, 0
+01BC 6A00      01087         CLRF    r0x00
+01BE 3600      01088         RLCF    r0x00, F
+01C0 5000      01089         MOVF    r0x00, W
+01C2 0B01      01090         ANDLW   0x01
+01C4 38E8      01091         SWAPF   WREG, W
+01C6 6EF4      01092         MOVWF   PRODH
+01C8 5000      01093         MOVF    _PORTAbits, W
+01CA 0BEF      01094         ANDLW   0xef
+01CC 10F4      01095         IORWF   PRODH, W
+01CE 6E00      01096         MOVWF   _PORTAbits
+               01097 ;       .line   104; moteursetjack.c    switch (ordre2 & MOTEUR_3)
+01D0 0E30      01098         MOVLW   0x30
+01D2 1400      01099         ANDWF   r0x01, W
+01D4 6E00      01100         MOVWF   r0x00
+01D6 5000      01101         MOVF    r0x00, W
+01D8 E000      01102         BZ      _00146_DS_
+01DA 5000      01103         MOVF    r0x00, W
+01DC 0A10      01104         XORLW   0x10
+01DE E000      01105         BZ      _00147_DS_
+01E0 5000      01106         MOVF    r0x00, W
+01E2 0A20      01107         XORLW   0x20
+01E4 E000      01108         BZ      _00148_DS_
+01E6 D000      01109         BRA     _00152_DS_
+01E8           01110 _00146_DS_:
+               01111 ;       .line   106; moteursetjack.c    case 0x00: PIN_MOT3_1 = 0;
+01E8 9000      01112         BCF     _PORTCbits, 0
+               01113 ;       .line   107; moteursetjack.c    PIN_MOT3_2 = 0;
+01EA 9200      01114         BCF     _PORTCbits, 1
+               01115 ;       .line   108; moteursetjack.c    break;
+01EC D000      01116         BRA     _00152_DS_
+01EE           01117 _00147_DS_:
+               01118 ;       .line   109; moteursetjack.c    case 0x10: PIN_MOT3_1 = 1;
+01EE 8000      01119         BSF     _PORTCbits, 0
+               01120 ;       .line   110; moteursetjack.c    PIN_MOT3_2 = 0;
+01F0 9200      01121         BCF     _PORTCbits, 1
+               01122 ;       .line   111; moteursetjack.c    break;
+01F2 D000      01123         BRA     _00152_DS_
+01F4           01124 _00148_DS_:
+               01125 ;       .line   112; moteursetjack.c    case 0x20: PIN_MOT3_1 = 0;
+01F4 9000      01126         BCF     _PORTCbits, 0
+               01127 ;       .line   113; moteursetjack.c    PIN_MOT3_2 = 1;
+01F6 8200      01128         BSF     _PORTCbits, 1
+01F8           01129 _00152_DS_:
+               01130 ;       .line   115; moteursetjack.c    }
+01F8 CFE4 F000 01131         MOVFF   PREINC1, r0x03
+01FC CFE4 F000 01132         MOVFF   PREINC1, r0x02
+0200 CFE4 F000 01133         MOVFF   PREINC1, r0x01
+0204 CFE4 F000 01134         MOVFF   PREINC1, r0x00
+gpasm-0.13.4 beta               moteursetjack.asm5-20-2009  17:01:05          PAGE 22
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+0208 CFE4 FFD9 01135         MOVFF   PREINC1, FSR2L
+020C 0012      01136         RETURN  
+               01137 
+               01138 ; ; Starting pCode block
+               01139 S_moteursetjack__init_moteursetjack     code
+0000           01140 _init_moteursetjack:
+               01141 ;       .line   22; moteursetjack.c     T0CON = CONFIG_TMR0_MOTEUR & 0x7F;// TMR0 off...    //| 0x08; // PSA off
+0000 0E06      01142         MOVLW   0x06
+0002 6E00      01143         MOVWF   _T0CON
+               01144 ;       .line   23; moteursetjack.c     etat_moteur[0] = INITIALISATION_1;
+0004 0E40      01145         MOVLW   0x40
+0006 0000      01146         BANKSEL _etat_moteur
+0008 6F00      01147         MOVWF   _etat_moteur, B
+               01148 ;       .line   24; moteursetjack.c     etat_moteur[1] = INITIALISATION_2;
+000A 0E04      01149         MOVLW   0x04
+               01150 ; removed redundant BANKSEL
+000C 6F00      01151         MOVWF   (_etat_moteur + 1), B
+               01152 ;       .line   25; moteursetjack.c     INTCON |= 0x38;                    // INT0, TMR0, RB on...
+000E 0E38      01153         MOVLW   0x38
+0010 1200      01154         IORWF   _INTCON, F
+               01155 ;       .line   26; moteursetjack.c     INTCON &= 0xf8;                    // ...
+0012 0EF8      01156         MOVLW   0xf8
+0014 1600      01157         ANDWF   _INTCON, F
+               01158 ;       .line   27; moteursetjack.c     INTCON2 = 0x85;                    // Rising edge for INT0,1,2. High priority for RB.
+0016 0E85      01159         MOVLW   0x85
+0018 6E00      01160         MOVWF   _INTCON2
+               01161 ;       .line   28; moteursetjack.c     INTCON3 = 0xD8;                    // INT1,2 on, High priority.
+001A 0ED8      01162         MOVLW   0xd8
+001C 6E00      01163         MOVWF   _INTCON3
+               01164 ;       .line   29; moteursetjack.c     TRISD &= 0xF0;                     // RD0..3 en sorties
+001E 0EF0      01165         MOVLW   0xf0
+0020 1600      01166         ANDWF   _TRISD, F
+               01167 ;       .line   30; moteursetjack.c     TRISC &= 0x3C;                     // RC0, 1, 6, 7 en sorties
+0022 0E3C      01168         MOVLW   0x3c
+0024 1600      01169         ANDWF   _TRISC, F
+               01170 ;       .line   31; moteursetjack.c     PORTD &= 0xF0;
+0026 0EF0      01171         MOVLW   0xf0
+0028 1600      01172         ANDWF   _PORTD, F
+               01173 ;       .line   32; moteursetjack.c     PORTC &= 0x3C;
+002A 0E3C      01174         MOVLW   0x3c
+002C 1600      01175         ANDWF   _PORTC, F
+002E 0012      01176         RETURN  
+               01177 
+               01178 
+               01179 
+               01180 ; Statistics:
+               01181 ; code size:     1232 (0x04d0) bytes ( 0.94%)
+               01182 ;                 616 (0x0268) words
+               01183 ; udata size:       3 (0x0003) bytes ( 0.17%)
+               01184 ; access size:      4 (0x0004) bytes
+               01185 
+               01186 
+gpasm-0.13.4 beta               moteursetjack.asm5-20-2009  17:01:05          PAGE 23
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+FSR1L                             00000FE1
+FSR2L                             00000FD9
+PLUSW2                            00000FDB
+POSTDEC1                          00000FE5
+PREINC1                           00000FE4
+PRODH                             00000FF4
+STATUS                            00000FD8
+WREG                              00000FE8
+_00110_DS_                        00000038
+_00111_DS_                        0000003E
+_00113_DS_                        00000048
+_00114_DS_                        0000004E
+_00116_DS_                        000000A2
+_00118_DS_                        00000084
+_00122_DS_                        00000072
+_00124_DS_                        000000A8
+_00125_DS_                        0000012E
+_00127_DS_                        00000158
+_00129_DS_                        0000005C
+_00133_DS_                        00000168
+_00135_DS_                        0000017A
+_00138_DS_                        00000180
+_00140_DS_                        0000019E
+_00141_DS_                        000001A2
+_00145_DS_                        000001AA
+_00146_DS_                        000001E8
+_00147_DS_                        000001EE
+_00148_DS_                        000001F4
+_00152_DS_                        000001F8
+_00175_DS_                        00000056
+_00209_DS_                        00000014
+_00224_DS_                        0000006A
+_00225_DS_                        000000B6
+_00227_DS_                        000000DA
+_00228_DS_                        000000DE
+_00230_DS_                        00000144
+_00237_DS_                        0000015E
+_00240_DS_                        0000014C
+_00243_DS_                        00000162
+_00253_DS_                        000000CA
+_10223_DS_                        000000BE
+_ADCON0                           00000000
+_ADCON0bits                       00000000
+_ADCON1                           00000000
+_ADCON1bits                       00000000
+_ADCON2                           00000000
+_ADCON2bits                       00000000
+_ADRESH                           00000000
+_ADRESL                           00000000
+_BAUDCON                          00000000
+_BAUDCONbits                      00000000
+_BSR                              00000000
+_BSRbits                          00000000
+gpasm-0.13.4 beta               moteursetjack.asm5-20-2009  17:01:05          PAGE 24
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+_CCP1CON                          00000000
+_CCP1CONbits                      00000000
+_CCP2CON                          00000000
+_CCP2CONbits                      00000000
+_CCPR1H                           00000000
+_CCPR1L                           00000000
+_CCPR2H                           00000000
+_CCPR2L                           00000000
+_CMCON                            00000000
+_CMCONbits                        00000000
+_CVRCON                           00000000
+_CVRCONbits                       00000000
+_ECCP1AS                          00000000
+_ECCP1ASbits                      00000000
+_ECCP1DEL                         00000000
+_ECCP1DELbits                     00000000
+_EEADR                            00000000
+_EECON1                           00000000
+_EECON1bits                       00000000
+_EECON2                           00000000
+_EEDATA                           00000000
+_FSR0H                            00000000
+_FSR0Hbits                        00000000
+_FSR0L                            00000000
+_FSR1H                            00000000
+_FSR1Hbits                        00000000
+_FSR1L                            00000000
+_FSR2H                            00000000
+_FSR2Hbits                        00000000
+_FSR2L                            00000000
+_HLVDCON                          00000000
+_HLVDCONbits                      00000000
+_INDF0                            00000000
+_INDF1                            00000000
+_INDF2                            00000000
+_INTCON                           00000000
+_INTCON2                          00000000
+_INTCON2bits                      00000000
+_INTCON3                          00000000
+_INTCON3bits                      00000000
+_INTCONbits                       00000000
+_IPR1                             00000000
+_IPR1bits                         00000000
+_IPR2                             00000000
+_IPR2bits                         00000000
+_LATA                             00000000
+_LATAbits                         00000000
+_LATB                             00000000
+_LATBbits                         00000000
+_LATC                             00000000
+_LATCbits                         00000000
+_LATD                             00000000
+_LATDbits                         00000000
+_LATE                             00000000
+gpasm-0.13.4 beta               moteursetjack.asm5-20-2009  17:01:05          PAGE 25
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+_LATEbits                         00000000
+_OSCCON                           00000000
+_OSCCONbits                       00000000
+_OSCTUNE                          00000000
+_OSCTUNEbits                      00000000
+_PCL                              00000000
+_PCLATH                           00000000
+_PCLATHbits                       00000000
+_PCLATU                           00000000
+_PCLATUbits                       00000000
+_PIE1                             00000000
+_PIE1bits                         00000000
+_PIE2                             00000000
+_PIE2bits                         00000000
+_PIR1                             00000000
+_PIR1bits                         00000000
+_PIR2                             00000000
+_PIR2bits                         00000000
+_PLUSW0                           00000000
+_PLUSW1                           00000000
+_PLUSW2                           00000000
+_PORTA                            00000000
+_PORTAbits                        00000000
+_PORTB                            00000000
+_PORTBbits                        00000000
+_PORTC                            00000000
+_PORTCbits                        00000000
+_PORTD                            00000000
+_PORTDbits                        00000000
+_PORTE                            00000000
+_PORTEbits                        00000000
+_POSTDEC0                         00000000
+_POSTDEC1                         00000000
+_POSTDEC2                         00000000
+_POSTINC0                         00000000
+_POSTINC1                         00000000
+_POSTINC2                         00000000
+_PR2                              00000000
+_PREINC0                          00000000
+_PREINC1                          00000000
+_PREINC2                          00000000
+_PRODH                            00000000
+_PRODL                            00000000
+_RCON                             00000000
+_RCONbits                         00000000
+_RCREG                            00000000
+_RCSTA                            00000000
+_RCSTAbits                        00000000
+_SPBRG                            00000000
+_SPBRGH                           00000000
+_SPPCFG                           00000000
+_SPPCFGbits                       00000000
+_SPPCON                           00000000
+_SPPCONbits                       00000000
+gpasm-0.13.4 beta               moteursetjack.asm5-20-2009  17:01:05          PAGE 26
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+_SPPDATA                          00000000
+_SPPDATAbits                      00000000
+_SPPEPS                           00000000
+_SPPEPSbits                       00000000
+_SSPADD                           00000000
+_SSPBUF                           00000000
+_SSPCON1                          00000000
+_SSPCON1bits                      00000000
+_SSPCON2                          00000000
+_SSPCON2bits                      00000000
+_SSPSTAT                          00000000
+_SSPSTATbits                      00000000
+_STATUS                           00000000
+_STATUSbits                       00000000
+_STKPTR                           00000000
+_STKPTRbits                       00000000
+_T0CON                            00000000
+_T0CONbits                        00000000
+_T1CON                            00000000
+_T1CONbits                        00000000
+_T2CON                            00000000
+_T2CONbits                        00000000
+_T3CON                            00000000
+_T3CONbits                        00000000
+_TABLAT                           00000000
+_TBLPTRH                          00000000
+_TBLPTRL                          00000000
+_TBLPTRU                          00000000
+_TBLPTRUbits                      00000000
+_TMR0H                            00000000
+_TMR0L                            00000000
+_TMR1H                            00000000
+_TMR1L                            00000000
+_TMR2                             00000000
+_TMR3H                            00000000
+_TMR3L                            00000000
+_TOSH                             00000000
+_TOSL                             00000000
+_TOSU                             00000000
+_TOSUbits                         00000000
+_TRISA                            00000000
+_TRISAbits                        00000000
+_TRISB                            00000000
+_TRISBbits                        00000000
+_TRISC                            00000000
+_TRISCbits                        00000000
+_TRISD                            00000000
+_TRISDbits                        00000000
+_TRISE                            00000000
+_TRISEbits                        00000000
+_TXREG                            00000000
+_TXSTA                            00000000
+_TXSTAbits                        00000000
+_UADDR                            00000000
+gpasm-0.13.4 beta               moteursetjack.asm5-20-2009  17:01:05          PAGE 27
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+_UADDRbits                        00000000
+_UCFG                             00000000
+_UCFGbits                         00000000
+_UCON                             00000000
+_UCONbits                         00000000
+_UEIE                             00000000
+_UEIEbits                         00000000
+_UEIR                             00000000
+_UEIRbits                         00000000
+_UEP0                             00000000
+_UEP0bits                         00000000
+_UEP1                             00000000
+_UEP10                            00000000
+_UEP10bits                        00000000
+_UEP11                            00000000
+_UEP11bits                        00000000
+_UEP12                            00000000
+_UEP12bits                        00000000
+_UEP13                            00000000
+_UEP13bits                        00000000
+_UEP14                            00000000
+_UEP14bits                        00000000
+_UEP15                            00000000
+_UEP15bits                        00000000
+_UEP1bits                         00000000
+_UEP2                             00000000
+_UEP2bits                         00000000
+_UEP3                             00000000
+_UEP3bits                         00000000
+_UEP4                             00000000
+_UEP4bits                         00000000
+_UEP5                             00000000
+_UEP5bits                         00000000
+_UEP6                             00000000
+_UEP6bits                         00000000
+_UEP7                             00000000
+_UEP7bits                         00000000
+_UEP8                             00000000
+_UEP8bits                         00000000
+_UEP9                             00000000
+_UEP9bits                         00000000
+_UFRMH                            00000000
+_UFRMHbits                        00000000
+_UFRML                            00000000
+_UFRMLbits                        00000000
+_UIE                              00000000
+_UIEbits                          00000000
+_UIR                              00000000
+_UIRbits                          00000000
+_USTAT                            00000000
+_USTATbits                        00000000
+_WDTCON                           00000000
+_WDTCONbits                       00000000
+_WREG                             00000000
+gpasm-0.13.4 beta               moteursetjack.asm5-20-2009  17:01:05          PAGE 28
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+__18F4550                         00000001
+_an_data                          00000000
+_compteur_mot                     00000007
+_depart                           00000000
+_ep2_num_bytes_to_send            00000000
+_ep2_source_data                  00000000
+_etat_moteur                      00000000
+_init_moteursetjack               00000000
+_mot1_phase                       00000000
+_mot1_pos_visee                   00000005
+_mot1_position                    00000003
+_mot1_sens                        00000002
+_mot2_pos_visee                   00000006
+_mot2_position                    00000004
+_moteursetjack_ints_INT0          00000000
+_moteursetjack_ints_INT1          00000000
+_moteursetjack_ints_INT2          00000000
+_moteursetjack_ints_RB_bas        00000000
+_moteursetjack_ints_RB_haut       00000000
+_moteursetjack_ints_tmr0          00000000
+_mydata                           00000000
+_ordre_moteur                     00000000
+_ticoutac                         00000001
+r0x00                             00000000
+r0x01                             00000001
+r0x02                             00000002
+r0x03                             00000003
+
+
+Errors   :       0
+Warnings :       0 reported,       0 suppressed
+Messages :       0 reported,       0 suppressed
+

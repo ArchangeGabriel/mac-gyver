@@ -1,0 +1,56 @@
+ref	value	sheet number	sheet name	footprint
+ALIM1	CONN_2	
+APWR1	CONN_2	
+C1	22pF	
+C10	15nF	
+C11	15nF	
+C12	220nF	
+C13	220nF	
+C14	100nF	
+C2	22pF	
+C3	220nF	
+C4	100nF	
+C5	220nF	
+C6	15nF	
+C7	15nF	
+C8	22nF	
+C9	22nF	
+COD0	CONN_5	
+COD1	CONN_5	
+D1	LED	
+D2	LED	
+D3	LED	
+D4	LED	
+D5	LED	
+DAC1	DIODE	
+DAC2	DIODE	
+IC1	L6203	st-microelectronics-MULTIWATT-11
+IC2	L6203	st-microelectronics-MULTIWATT-11
+MOT1	CONN_2	
+MOT2	CONN_2	
+OK1	PC847	optocoupler-2-DIL16
+R1	10o	
+R10	470o	
+R11	470o	
+R12	4.7ko	
+R13	4.7ko	
+R14	470o	
+R15	1ko	
+R16	1ko	
+R17	4.7ko	
+R18	4.7ko	
+R2	10o	
+R3	470o	
+R4	470o	
+R5	470o	
+R6	470o	
+R7	1ko	
+R8	1ko	
+R9	4.7ko	
+RR1	10ko	
+SW3	SW_PUSH_SMALL	
+U1	PIC18F4550	
+U2	7805	
+U3	7805	
+USB1	CONN_4	
+X1	CRYSTAL	
