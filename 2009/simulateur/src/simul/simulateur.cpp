@@ -386,7 +386,6 @@ void simulateur_t::add_robot(robot_t *robot,void* (*func1)(void*), void* (*func2
   info.moteur_R=robot->moteur[0].R;
   info.moteur_Kc=robot->moteur[0].Kc;
   info.moteur_Kv=robot->moteur[0].Kv;
-  info.moteur_d=robot->moteur[0].d;
   info.moteur_r=robot->rayon_roue;
   info.moteur_k=robot->moteur[0].k;
   info.moteur_n=robot->moteur[0].n;

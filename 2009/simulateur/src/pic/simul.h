@@ -32,7 +32,6 @@ typedef struct ROBOT_INFO
   double moteur_R;      // en ohms: résistance
   double moteur_Kc;     // en N/A: constante de couple
   double moteur_Kv;     // en rad/s/V: constante de vitesse
-  double moteur_d;      // en rad/s/N: pente couple/vitesse
   double moteur_r;      // en mètres: rayon de la roue
   double moteur_k;      // rapport de réduction
   double moteur_n;      // rendement
