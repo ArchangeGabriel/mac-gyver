@@ -10,10 +10,12 @@ class motor_t : public params_t
   double dt_sur_L;
   double Kc_k_n_0_98_2;
   double r_sur_k;
-  double J_sur_dt;
+  double m_sur_dt;
   double m_sur_J_plus_m_r_carre;
   double m_g_e;
-  double dt_k_sur_J;
+  double k_dt_2_sur_m_r2_carre;
+  double wmin;  // Vitesse minimale pour simuler les frottements
+  double Cr;    // Couple résistant
   
   public:
   // Variables:
@@ -27,7 +29,7 @@ class motor_t : public params_t
   double R;     // résistance
   double Kc;    // constante de couple
   double Kv;    // constante de vitesse
-  double d;     // pente couple/vitesse
+  double Umin;  // Tension minimale à appliquer pour observer un mouvement
 
   //Constantes réducteur:
   double k;     // rapport de réduction
