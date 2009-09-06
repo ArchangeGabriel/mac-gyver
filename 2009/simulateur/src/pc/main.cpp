@@ -15,6 +15,7 @@
 #include "path_planning.h"
 #include "strategie.h"
 #include "cinematik.h"
+#include "sdl.h"
 
 #define VERSION     0
 #define SUBVERSION  2
@@ -92,6 +93,8 @@ void* console(void*)
     printf(">>> ");
     fflush(stdout);  
     read_line(Buff);
+    Buff[0]='q';
+    Buff[1]='\0';
     if(Buff[0]=='\0') continue;    
     if(!strcmp(Buff,"help"))
     {
@@ -119,6 +122,7 @@ void* console(void*)
       printf("Les flèches pour diriger. Espace pour stopper.\nAppuie sur entrée pour quitter.\n");
     
       struct termios tios;
+
       tcgetattr(STDIN_FILENO, &tios);
       tcflag_t old_c_lflag;
       // Sauve l'ancien flag "c_lflag"
@@ -281,6 +285,9 @@ void change_dest(position_t *pos, int type)
 void exit_console()
 {
   reset_console();
+  #ifdef USE_SDL_FRANCHEMENT_OUAIS_TAS_VU
+  SDL_Quit();
+  #endif
 }
 //------------------------------------------------------------------------------
 

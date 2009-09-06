@@ -22,6 +22,7 @@ void SDL_First_Background();
 Uint32 makeColorSDL(char *color);
 Uint32 makeColorSDL(int R, int G, int B);
 Uint32 getColorSDL(int color_id);
+void setPixelVerif(int x, int y, Uint32 coul);
 void LigneSDL(int x1, int y1, int x2, int y2, Uint32 coul);
 void PolylineSDL(point_t *Points, int nbr, Uint32 coul);
 void RefreshSDL(void);

@@ -7,7 +7,7 @@
 #include "anticol.h"
 #include "sdl.h"
 
-#define _SCALE_SDL 200
+#define _SCALE_SDL 300
 
 SDL_Surface* affichage=NULL;
 SDL_Surface* background=NULL;
@@ -142,7 +142,7 @@ inline void echangerEntiers(int* x, int* y)
 void RefreshSDL(void)
 {
   SDL_Flip(affichage);
-  SDL_PumpEvents(); 
+//  SDL_PumpEvents(); 
 }
 //------------------------------------------------------------------------------
 void LigneHorizontaleSDL(int x, int y, int w, Uint32 coul)
