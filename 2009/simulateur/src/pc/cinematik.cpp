@@ -10,6 +10,7 @@
 #include "../common/comm.h"
 #include "strategie.h"
 #include "picAPI.h"
+#include "sdl.h"
 
 #include "cinematik.h"
 
@@ -41,11 +42,27 @@ void refresh_U_safe(bool force = false);
 // Asservissement en vitesse
 void make_asserv(bool force = false);
 
+/*
+// Valeurs réelles 
 #define _KPH  0.004
 #define _KIH  0.000155
 #define _KPL  0.04
 #define _KIL  0.001
+*/
 
+
+// Valeurs simulation
+#define _KPH  0.008
+#define _KIH  0.0004
+#define _KPL  0.08
+#define _KIL  0.004
+
+
+#ifdef USE_SDL_FRANCHEMENT_OUAIS_TAS_VU
+int trace_X=0;
+int max_X=800;
+int max_Y=180;  
+#endif
 
 //------------------------------------------------------------------------------
 void cine_init(int color)
@@ -67,11 +84,16 @@ void cine_init(int color)
   } 
 
   Cr = _CONST_TORQUE * _RAP_REDUC * _RENDEMNT * 0.98 * 0.2 * _TENSION / 2.;
-  ULim = 0.5* // Marge de sécurité (mais augmente la distance de freinage/d'accélération)
+  ULim = 0.85* // Marge de sécurité (entre 0 et 1) (mais augmente la distance de freinage/d'accélération si trop petit)
             2* ((_MASSE / 3.) * _CONST_G * _ADHERE_ROUE * _RAYON_ROUE + Cr)
             / (_CONST_TORQUE * _RAP_REDUC * _RENDEMNT * 0.98);
   
   time_out = false; 
+
+//  ULim = 4.502167 (pour 0.5)
+//  printf("ULim = %f\n",ULim);
+
+  printf("Ul; Ur; VCl; VCr; Vl; Vr\n");
 }
 //------------------------------------------------------------------------------
 position_t cine_get_position()
@@ -145,39 +167,32 @@ void cine_OnCoderRecv(int left, int right)
 void make_asserv(bool force)
 {
   float E;
-  E = W_consigne[0] - w[0];    
-  if(W_consigne[0] == 0)
-    U_consigne[0] = 0.;
-  else
+  for(int i=0; i<2 ; i++)
   {
-    if(w[0] * _RAYON_ROUE / _MOTOR_K < 0.1)
-      U_consigne[0] = U_consigne[0] + _KPL * (E - L_E[0]) + _KIL * E;
-    else    
-      U_consigne[0] = U_consigne[0] + _KPH * (E - L_E[0]) + _KIH * E;
+    E = W_consigne[i] - w[i];    
+  /*  if(W_consigne[i] == 0)
+      U_consigne[i] = 0.;
+    else*/
+    {
+      if(w[i] * _RAYON_ROUE / _MOTOR_K < 0.1)
+        U_consigne[i] += _KPL * (E - L_E[i]) + _KIL * E;
+      else    
+        U_consigne[i] += _KPH * (E - L_E[i]) + _KIH * E;
+    }
+    L_E[i] = E;  
   }
-  L_E[0] = E;  
-  E = W_consigne[1] - w[1];    
-  if(W_consigne[1] == 0)
-    U_consigne[1] = 0.;
-  else  
-  {
-    if(w[1] * _RAYON_ROUE / _MOTOR_K < 0.1)
-      U_consigne[1] = U_consigne[1] + _KPL * (E - L_E[1]) + _KIL * E;
-    else    
-      U_consigne[1] = U_consigne[1] + _KPH * (E - L_E[1]) + _KIH * E;
-  }
-  L_E[1] = E;    
- 
+  
   //printf("WC: (%f,%f),  w:(%f,%f)\n",W_consigne[0],W_consigne[1],w[0],w[1]);
   refresh_U_safe(force);
 }
 //------------------------------------------------------------------------------
 void refresh_U_safe(bool force)
 {
-  if(U_consigne[0]>_TENSION)  U_consigne[0] = _TENSION;
-  if(U_consigne[0]<-_TENSION) U_consigne[0] = -_TENSION;
-  if(U_consigne[1]>_TENSION)  U_consigne[1] = _TENSION;    
-  if(U_consigne[1]<-_TENSION) U_consigne[1] = -_TENSION; 
+  for(int i=0; i<2 ; i++)
+  {
+    if(U_consigne[i]>  _TENSION) U_consigne[i] =  _TENSION;
+    if(U_consigne[i]< -_TENSION) U_consigne[i] = -_TENSION;
+  }
     
   //Antidérapage
   float U,Umin,Umax;  // Calcul intermédiaire
@@ -195,15 +210,28 @@ void refresh_U_safe(bool force)
         U = Umin;  
       if(U > _TENSION) U = _TENSION;
       else if(U < -_TENSION) U = -_TENSION;
+      U_consigne[i] = U;      
       U_safe[i] = U / _TENSION;
       force = true;
     }
   }
-  fflush(stdout);
-  
+ 
   if(force && !time_out)
   {
-   // printf("UC: (%f,%f) v: (%f,%f) vc:(%f,%f) AL: %f BL: %f AR: %f BR: %f\n",U_consigne[0], U_consigne[1], w[0]*_RAYON_ROUE / _MOTOR_K, w[1]*_RAYON_ROUE / _MOTOR_K, W_consigne[0]*_RAYON_ROUE / _MOTOR_K, W_consigne[1]*_RAYON_ROUE / _MOTOR_K,_AL, _BL, _AR, _BR);
+    #ifdef USE_SDL_FRANCHEMENT_OUAIS_TAS_VU
+    if(is_SDL_ready())
+    {
+      LigneVerticaleSDL(trace_X,0,2*max_Y+10,makeColorSDL(0,0,0));
+      setPixelVerif(trace_X, max_Y+(int)((float)(max_Y)*U_safe[0]), makeColorSDL(0,0,255));    
+      setPixelVerif(trace_X, max_Y+(int)((float)(max_Y)*W_consigne[0]*_RAYON_ROUE / _MOTOR_K/1.31), makeColorSDL(0,255,0));        
+      setPixelVerif(trace_X, max_Y+(int)((float)(max_Y)*w[0]*_RAYON_ROUE / _MOTOR_K/1.31), makeColorSDL(255,0,0));            
+      LigneHorizontaleSDL(0,max_Y,max_X,makeColorSDL(255,255,255));
+      trace_X++;
+      if(trace_X==max_X) trace_X=0;
+      if((trace_X%10)==0) RefreshSDL();
+    }
+    #endif  
+    printf("%f; %f; %f; %f; %f; %f\n",U_safe[0],U_safe[1], W_consigne[0]*_RAYON_ROUE / _MOTOR_K, W_consigne[1]*_RAYON_ROUE / _MOTOR_K,w[0]*_RAYON_ROUE / _MOTOR_K, w[1]*_RAYON_ROUE / _MOTOR_K);     
     while(picMotorsPower(U_safe[0], U_safe[1])<0)
       usleep(1000);
   }
@@ -211,9 +239,10 @@ void refresh_U_safe(bool force)
 //------------------------------------------------------------------------------  
 void cine_motors(float left, float right)
 {
-  W_consigne[0] = left / _RAYON_ROUE * _MOTOR_K;  
+  W_consigne[0] = left  / _RAYON_ROUE * _MOTOR_K;  
   W_consigne[1] = right / _RAYON_ROUE * _MOTOR_K; 
   
   make_asserv(true);      
 }
 //------------------------------------------------------------------------------
+
