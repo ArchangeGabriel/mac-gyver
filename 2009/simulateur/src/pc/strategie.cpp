@@ -191,7 +191,8 @@ void strat_lets_go()
 void stratMainLoop()
 {
   fprintf(stderr,"Let's go!\n");  fflush(stdout);
-
+  while(true) {}
+  
   pthread_mutex_t *mutPos;    
   mutPos = pp_go_to(symetrize(position_t(0.6,0.35,M_PI_2)),tpDEST,false,false,false);
   wait_for_it(mutPos);

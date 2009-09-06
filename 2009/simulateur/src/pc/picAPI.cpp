@@ -361,6 +361,7 @@ int picMotorsPower(float pwleft, float pwright)
   
   return write_usb(PIC1, &msg, sizeof(msg));
   #else
+  printf("send: %f,%f\n",pwleft,pwright); fflush(stdout);
   if(pwleft>1.) pwleft = 1.;
   if(pwleft<-1.) pwleft = -1.;  
   if(pwright>1.) pwright = 1.;
