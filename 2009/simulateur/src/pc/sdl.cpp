@@ -7,7 +7,7 @@
 #include "anticol.h"
 #include "sdl.h"
 
-#define _SCALE_SDL 300
+#define _SCALE_SDL 200
 
 SDL_Surface* affichage=NULL;
 SDL_Surface* background=NULL;

@@ -65,9 +65,9 @@ int main(int argc, char **argv)
   
   #ifdef USE_SDL_FRANCHEMENT_OUAIS_TAS_VU
   initSDL();
-  //SDL_First_Background();
-  //Load_SDL_Background();  
-  //pthread_create(&SDLThread, NULL, start_SDL, NULL);   // Anti Collision  
+  SDL_First_Background();
+  Load_SDL_Background();  
+  pthread_create(&SDLThread, NULL, start_SDL, NULL);   // Anti Collision  
   #endif
 
   picOnRecvJack(strat_lets_go); // Point d'entrée pour démarrer le jeu ici
