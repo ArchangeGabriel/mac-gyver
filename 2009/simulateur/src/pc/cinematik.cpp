@@ -231,9 +231,9 @@ void refresh_U_safe(bool force)
       if((trace_X%10)==0) RefreshSDL();
     }
     #endif  */
-    printf("%f; %f; %f; %f; %f; %f\n",U_safe[0],U_safe[1], W_consigne[0]*_RAYON_ROUE / _MOTOR_K, W_consigne[1]*_RAYON_ROUE / _MOTOR_K,w[0]*_RAYON_ROUE / _MOTOR_K, w[1]*_RAYON_ROUE / _MOTOR_K);     
-    while(picMotorsPower(U_safe[0], U_safe[1])<0)
-      usleep(1000);
+    //printf("%f; %f; %f; %f; %f; %f\n",U_safe[0],U_safe[1], W_consigne[0]*_RAYON_ROUE / _MOTOR_K, W_consigne[1]*_RAYON_ROUE / _MOTOR_K,w[0]*_RAYON_ROUE / _MOTOR_K, w[1]*_RAYON_ROUE / _MOTOR_K);     
+    //while(picMotorsPower(U_safe[0], U_safe[1])<0)
+    //  usleep(1000);
   }
 }
 //------------------------------------------------------------------------------  

@@ -93,8 +93,6 @@ void* console(void*)
     printf(">>> ");
     fflush(stdout);  
     read_line(Buff);
-    Buff[0]='q';
-    Buff[1]='\0';
     if(Buff[0]=='\0') continue;    
     if(!strcmp(Buff,"help"))
     {
@@ -147,7 +145,7 @@ void* console(void*)
           picMotorsPower(0., 0.);        
 		    }
 		    if(c=='8')
-          picMotorsPower(1.3, 1.3);        
+          picMotorsPower(1., 1.);        
 		    else if(c==27)     // échappement
 		    {
 		      read(STDIN_FILENO, &c, 1);
@@ -158,7 +156,7 @@ void* console(void*)
 		        {
 		          case 'A':
 		          //haut
-              picMotorsPower(0.7, 0.7); 		          
+              picMotorsPower(0.7, 0.7);
 		          break;
 		          case 'B': 
 		          //bas

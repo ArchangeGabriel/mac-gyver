@@ -7,7 +7,7 @@
 #endif
 */
 
-#define USE_SDL_FRANCHEMENT_OUAIS_TAS_VU
+//#define USE_SDL_FRANCHEMENT_OUAIS_TAS_VU
 
 // Ne pas commenter
 #ifdef SIMULATION
