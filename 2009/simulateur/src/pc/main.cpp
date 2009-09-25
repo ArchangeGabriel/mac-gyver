@@ -27,9 +27,6 @@ void change_dest(position_t *d, int type=0);
 extern char *addr;
 extern long port;
 extern long robot_id;
-  
-pthread_t thread_console;
-
 
 //------------------------------------------------------------------------------
 int main(int argc, char** argv)
@@ -39,15 +36,7 @@ int main(int argc, char** argv)
   port=11111;
   robot_id=0;
   int i;
-  
-  int ac = argc;
-  char **av = new char*[ac];
-  for(i = 0; i<ac; i++)
-  {
-    av[i] = new char[strlen(argv[i])+1];
-    strcpy(av[i], argv[i]);
-  }
-  
+    
   while((i = getopt(argc, argv, "a:p:i:rg")) > 0)
     switch(i)
     {
@@ -66,14 +55,11 @@ int main(int argc, char** argv)
       case 'g':
       break;
       default:
-      printf("La syntaxe est la suivante: ./client -a adresse -p port -i robot_id\n");
+      printf("La syntaxe est la suivante: ./client -a adresse -p port -i robot_id [-r/-g]\n");
       return -1;
     }
-    
-  pthread_create(&thread_console, NULL, &console, NULL); 
-  pc_main(ac,av);
-  
-  atexit(exit_console);
+
+  pc_main(argc,argv);
    
   return 0;
 }  
@@ -280,10 +266,10 @@ void change_dest(position_t *pos, int type)
   pp_go_to(p);
 }
 //------------------------------------------------------------------------------
-void exit_console()
+void exiting()
 {
   reset_console();
-  #ifdef USE_SDL_FRANCHEMENT_OUAIS_TAS_VU
+  #ifdef USE_SDL_CLIENT
   SDL_Quit();
   #endif
 }

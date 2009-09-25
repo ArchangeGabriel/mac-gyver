@@ -58,7 +58,7 @@ void make_asserv(bool force = false);
 #define _KIL  0.004
 
 
-#ifdef USE_SDL_FRANCHEMENT_OUAIS_TAS_VU
+#ifdef USE_SDL_CLIENT
 int trace_X=0;
 int max_X=800;
 int max_Y=180;  
@@ -218,7 +218,7 @@ void refresh_U_safe(bool force)
  
   if(force && !time_out)
   {
-   /* #ifdef USE_SDL_FRANCHEMENT_OUAIS_TAS_VU
+   /* #ifdef USE_SDL_CLIENT
     if(is_SDL_ready())
     {
       LigneVerticaleSDL(trace_X,0,2*max_Y+10,makeColorSDL(0,0,0));
@@ -232,8 +232,8 @@ void refresh_U_safe(bool force)
     }
     #endif  */
     //printf("%f; %f; %f; %f; %f; %f\n",U_safe[0],U_safe[1], W_consigne[0]*_RAYON_ROUE / _MOTOR_K, W_consigne[1]*_RAYON_ROUE / _MOTOR_K,w[0]*_RAYON_ROUE / _MOTOR_K, w[1]*_RAYON_ROUE / _MOTOR_K);     
-    //while(picMotorsPower(U_safe[0], U_safe[1])<0)
-    //  usleep(1000);
+    while(picMotorsPower(U_safe[0], U_safe[1])<0)
+      usleep(1000);
   }
 }
 //------------------------------------------------------------------------------  

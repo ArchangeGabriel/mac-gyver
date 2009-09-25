@@ -105,6 +105,8 @@ void console()
     if(buff[0]=='\0') continue;
     if(!strcmp(buff,"help"))
     {
+      printf("Option de la ligne de commandes:\n");
+      printf("L'option -p xxxx permet de régler le port utilisé par le serveur (11111 par défaut).\n\n");
       printf("Commandes:\n");
       printf("- q: pour quitter le simulateur\n");
       printf("- version: affiche la version du simulateur\n");

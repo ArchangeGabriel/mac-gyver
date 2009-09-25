@@ -8,6 +8,6 @@ int main(int argc, char** argv);
 #endif
 
 void* console(void*);
-void exit_console();
+void exiting();
 
 #endif

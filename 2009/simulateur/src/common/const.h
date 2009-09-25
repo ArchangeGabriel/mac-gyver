@@ -45,8 +45,8 @@
 #define _LONGUEUR_ROBOT 0.27
 #define _LARGEUR_ROBOT  0.28
 
-#define _POS_INIT_X     0.045
-#define _POS_INIT_Y     0.35
+#define _POS_INIT_X     1.
+#define _POS_INIT_Y     1.5
 #define _POS_INIT_A     0.
 
 /*

@@ -43,8 +43,10 @@ double motor_t::calc_force(double U, double V)
   I = (U - w/Kv) / R;
   C = I*Kc_k_n_0_98_2;
   if(fabs(w) > wmin)
+  {
     if(w>0.) C -= Cr; else C += Cr;
-
+  }
+  
   F = (w*r_sur_k-V)*m_sur_dt; // force de frottement au sol
       
   if(F>m_g_e)
