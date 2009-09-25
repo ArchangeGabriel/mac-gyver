@@ -119,8 +119,8 @@ void read_line(char *buff)
 		  }  
 		  else
 		  {
-		    printf("(%c)",c);
-		    fflush(stdout);
+/*		    printf("(%c)",c);
+		    fflush(stdout);*/
 		  }
 		}
 		else if(c!=9 /*TAB*/)

@@ -40,20 +40,23 @@ int main(int argc, char **argv)
   int color = -1; 
   int i;
 
+  optind = 1;
   while((i = getopt(argc, argv, "rg")) > 0)
+  {
     switch(i)
     {
       case 'r':
       color = clRED;
-      fprintf(stderr,"Franchement rouge t'as vu!\n");      
+      fprintf(stderr,"Je suis rouge!\n");      
       break;
       case 'g':
       color = clGREEN;
-      fprintf(stderr,"Franchement vert t'as vu!\n");
+      fprintf(stderr,"Je suis vert!\n");
       break;
       default:
       break;
     }
+  }
   
   if(color == -1)
   {
@@ -63,7 +66,7 @@ int main(int argc, char **argv)
 
   strat_set_color(color);
   
-  #ifdef USE_SDL_FRANCHEMENT_OUAIS_TAS_VU
+  #ifdef USE_SDL_CLIENT
   initSDL();
   SDL_First_Background();
   Load_SDL_Background();  
@@ -81,18 +84,12 @@ int main(int argc, char **argv)
   pthread_create(&ACThread, NULL, start_AC, NULL);   // Anti Collision
   
   #ifdef CONSOLE
-  atexit(exit_console);
+  atexit(exiting);
   pthread_create(&ConsoleThread, NULL, console, NULL);   // Anti Collision 
   #endif
   
   picMainLoop();
   
-  #ifdef USE_SDL_FRANCHEMENT_OUAIS_TAS_VU
-  SDL_Quit();
-  #endif  
-  
-  
-
   return 0;
 }
 //------------------------------------------------------------------------------

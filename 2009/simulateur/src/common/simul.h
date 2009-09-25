@@ -1,13 +1,13 @@
 
 // Commenter les 3 lignes suivantes pour passer en compilation pour de vrai
 
-/*
+
 #ifndef SIMULATION
 #define SIMULATION
 #endif
-*/
 
-//#define USE_SDL_FRANCHEMENT_OUAIS_TAS_VU
+
+#define USE_SDL_CLIENT
 
 // Ne pas commenter
 #ifdef SIMULATION

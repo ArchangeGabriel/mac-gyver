@@ -191,12 +191,11 @@ void strat_lets_go()
 void stratMainLoop()
 {
   fprintf(stderr,"Let's go!\n");  fflush(stdout);
-  while(true) {}
   
   pthread_mutex_t *mutPos;    
-  mutPos = pp_go_to(symetrize(position_t(0.6,0.35,M_PI_2)),tpDEST,false,false,false);
+  mutPos = pp_go_to(symetrize(position_t(2.,1.5,0)),tpDEST,false,false,false);
   wait_for_it(mutPos);
-  mutPos = pp_go_to(symetrize(position_t(0.6,1.25,M_PI_2)),tpDEST,false,false,false);    
+/*  mutPos = pp_go_to(symetrize(position_t(0.6,1.25,M_PI_2)),tpDEST,false,false,false);    
   wait_for_it(mutPos);
   mutPos = pp_go_to(symetrize(position_t(0.85,1.7,M_PI_2)),tpDEST,false,false,false);    
   wait_for_it(mutPos);  
@@ -219,7 +218,7 @@ void stratMainLoop()
   mutPos = pp_go_to(symetrize(position_t(0.90,1.87,M_PI_2)),tpDEST,false,false,false); 
   wait_for_it(mutPos); 
   mutPos = pp_go_to(symetrize(position_t(0.90,1.7,M_PI_2)),tpDEST,false,false,true); 
-  wait_for_it(mutPos);   
+  wait_for_it(mutPos);   */
 //  pp_go_to_distrib(distribGrandCote);
 //  pp_go_to_distrib(distribPetitCoteDepot);  
 //  pp_go_to(position_t(1,1,-M_PI/4.*3.), tpDEST, false, false);
