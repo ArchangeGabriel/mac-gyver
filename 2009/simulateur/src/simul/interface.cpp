@@ -13,6 +13,7 @@
 #include "sdl.h"
 #include "server.h"
 #include "../common/console.h"
+#include "../the_cup/the_playground.h"
 
 #define VERSION      1
 #define SUBVERSION   0
@@ -77,7 +78,7 @@ int main(int argc,char **argv)
   printf("ok\n");  
   fflush(stdout);
 
-  initSDL(((int)(Simul.params.scale*Simul.params.longueur_terrain)),((int)(Simul.params.scale*Simul.params.largeur_terrain)));  
+  initSDL(((int)(Simul.params.scale*pgWidth)),((int)(Simul.params.scale*pgHeight)));  
   
   Simul.load_simul();            
               

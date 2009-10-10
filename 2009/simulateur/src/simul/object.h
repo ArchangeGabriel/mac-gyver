@@ -28,10 +28,8 @@ class simul_info_t : public params_t
 {
   public:
   double dt;
-  double largeur_terrain;
-  double longueur_terrain;
   double scale;
-  int config_palets;
+  int config_terrain;
   int nbr_obj;
   vector<object_t*> objets;  
   vector<object_t*> objets_fixes;
@@ -79,7 +77,7 @@ class force_t
 //----------------------------------------------------------------------------//
 
 //Type d'objets
-enum{OBJ_ROBOT,OBJ_PINCE_OUVERTE,OBJ_PINCE_FERMEE,OBJ_PALET,OBJ_DISTRIB,OBJ_TABLE,OBJ_TEST};
+enum{OBJ_ROBOT,OBJ_TABLE,OBJ_ELEMENT};
 
 class object_t : public params_t
 {
@@ -97,6 +95,7 @@ class object_t : public params_t
   int matiere;        // une des matières énoncées ci-dessus
 
   // variables cinématiques:
+  bool hide;          // indique que l'objet ne doit pas être dessiné
   bool fixe;          // indique si l'objet est indéplacable (élément du terrain)
   bool linked;        // indique si l'objet est une partie d'un objet plus complexe.
   bool detached;      // indique si l'objet ne doit pas être pris en compte et affiché  
@@ -156,13 +155,13 @@ class object_t : public params_t
 };
 //----------------------------------------------------------------------------//
 //                                                                            //
-//                              Objets rectangulaires                         //
+//                                     Pavé                                   //
 //                                                                            //
 //----------------------------------------------------------------------------//
-class rect_obj_t : public object_t
+class ObjBox : public object_t
 {
   public:
-  ~rect_obj_t();
+  ~ObjBox();
   void init_params();
   void maj_const_vars();
   void maj_dyn_vars();  
@@ -186,13 +185,13 @@ class rect_obj_t : public object_t
 
 //----------------------------------------------------------------------------//
 //                                                                            //
-//                              Objets circulaires                            //
+//                                  Cylindre                                  //
 //                                                                            //
 //----------------------------------------------------------------------------//
-class circle_obj_t : public object_t
+class ObjCylinder : public object_t
 {
   public:
-  ~circle_obj_t();
+  ~ObjCylinder();
   void init_params();  
     
   double rayon;        // dimensions du cyclindre
@@ -208,6 +207,32 @@ class circle_obj_t : public object_t
   double distance_to(vector_t &point, vector_t &dir, double capt_z);  
   vector_t get_normal(vector_t &point);   // cf class object_t
 };
+
+//----------------------------------------------------------------------------//
+//                                                                            //
+//                                   Sphere                                   //
+//                                                                            //
+//----------------------------------------------------------------------------//
+class ObjSphere : public object_t
+{
+  public:
+  ~ObjSphere();
+  void init_params();  
+    
+  double rayon;        // dimensions de la sphère
+
+  bool fast_collision_check(object_t*); // cf class object_t
+  bool slow_collision_check(object_t*); // cf class object_t
+  void draw();   
+  void draw3D();             
+  // pour les collisions
+  void get_overlapping_interval(vector_t &O, vector_t &Dir,double *min, double *max);  
+  bool is_point_in_obj(vector_t &point,object_t*&);  // cf class object_t
+  double dist_of_obj(vector_t &point, vector_t &u,object_t*&);  // cf class object_t
+  double distance_to(vector_t &point, vector_t &dir, double capt_z);  
+  vector_t get_normal(vector_t &point);   // cf class object_t
+};
+
 
 //----------------------------------------------------------------------------//
 //                                                                            //

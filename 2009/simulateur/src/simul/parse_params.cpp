@@ -4,7 +4,7 @@
 //------------------------------------------------------------------------------
 val_param_t::val_param_t(char* name_deb, int name_len, char* val_deb, char** val_fin)
 {
-  while(**val_fin==' ' || **val_fin=='#') (*val_fin)--;
+  while(**val_fin==' ' || **val_fin==';') (*val_fin)--;
   (*val_fin)++;
   if(name_len>0 && *val_fin-val_deb>0)
   {
@@ -176,7 +176,7 @@ void params_t::load_params(const char *FP)
       while((Ptr=(char*)memchr(PtrDeb,'\n',Len-(PtrDeb-Buff))))
       {
         while(*PtrDeb==' ') PtrDeb++;
-        if(*PtrDeb!='#')
+        if(*PtrDeb!=';')
         {
           while(*PtrDeb==' ' || *PtrDeb=='\r' || *PtrDeb=='\t') PtrDeb++;
           if(PtrDeb!=Ptr)
@@ -190,7 +190,7 @@ void params_t::load_params(const char *FP)
             }
             PtrEqual++;
             PtrFin=PtrEqual;
-            while(*PtrFin!='#' && PtrFin<Ptr) PtrFin++;
+            while(*PtrFin!=';' && PtrFin<Ptr) PtrFin++;
             if(*PtrFin=='\r') PtrFin--;
             
             for(iter = param_list.begin(); iter != param_list.end(); iter++)

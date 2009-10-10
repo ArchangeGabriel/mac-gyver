@@ -7,9 +7,6 @@
 //------------------------------------------------------------------------------
 int get_input2(PIC_ARG *SimulArg,int in_type,int in_index)
 {
-  if(in_type == HPOS || in_type == VPOS || in_type == CLAMP)
-    return robot_t::pic_io(SimulArg->robot,in_type,-1);
-  else
     return robot_t::pic_io(SimulArg->robot,in_type,in_index);  
 }
 //------------------------------------------------------------------------------

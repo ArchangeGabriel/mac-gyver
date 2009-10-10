@@ -17,13 +17,6 @@
 
 #include "pic_main2.h"
 
-int query_hpos  = -1;
-int query_vpos  = -1;
-int query_clamp = -1;
-int msg_hpos;
-int msg_vpos;
-int msg_clamp;
-
 #ifdef SIMULATION
 int query_webcam = -1;
 int msg_webcam;
@@ -61,48 +54,6 @@ void* pic_main2(void *)
     }
     else
     {
-      if(query_hpos != -1)
-      {    
-        if(query_hpos == get_input2(SIMULARG2(Simul,HPOS)))
-        {
-          MSG_INT1_t msg;
-          msg.type = ACK;
-          msg.msg_id = msg_hpos;
-          msg.value = HPOS;
-          if(write_usb(SIMULARG3(comm_id,&msg,sizeof(MSG_INT1_t)))<0)
-            close_connection(&comm_id);          
-          else
-            query_hpos=-1;
-        }
-      }
-      if(query_vpos != -1)
-      {  
-        if(query_vpos == get_input2(SIMULARG2(Simul,VPOS)))
-        {
-          MSG_INT1_t msg;
-          msg.type = ACK;
-          msg.msg_id = msg_vpos;
-          msg.value = VPOS;
-          if(write_usb(SIMULARG3(comm_id,&msg,sizeof(MSG_INT1_t)))<0)
-            close_connection(&comm_id);          
-          else
-            query_vpos=-1;
-        }
-      }
-      if(query_clamp != -1)
-      {  
-        if(query_clamp == get_input2(SIMULARG2(Simul,CLAMP)))
-        {
-          MSG_INT1_t msg;
-          msg.type = ACK;
-          msg.msg_id = msg_clamp;
-          msg.value = CLAMP;
-          if(write_usb(SIMULARG3(comm_id,&msg,sizeof(MSG_INT1_t)))<0)
-            close_connection(&comm_id);          
-          else
-            query_clamp=-1;
-        }       
-      }   
       #ifdef SIMULATION
       if(query_webcam != -1)
       {
@@ -170,7 +121,7 @@ void* pic_main2(void *)
               values = (int*) &buff[sizeof(MSG_INTn_t)];
               
               for(int i=0;i<4;i++)  
-                values[i] = get_input2(SIMULARG3(Simul,DIST,i));
+                values[i] = get_input2(SIMULARG3(Simul,DIST,(i==1?2:(i==2?1:i)) ));
               
               msg2->type = DIST;
               msg2->msg_id = msg_id--;
@@ -181,10 +132,6 @@ void* pic_main2(void *)
               free(buff);
             }
             break;
-            #ifdef SIMULATION              
-            case COUL:
-            break;                                
-            #endif
             default:
             #ifdef SIMULATION               
             printf("<pic_main2.c> PIC2 Unknown query type %d.\n",type);
@@ -192,35 +139,6 @@ void* pic_main2(void *)
             #endif       
             break;                  
           }
-        }
-        case BELT: 
-        {
-          MSG_INT1_t *msg = (MSG_INT1_t *)_msg;   
-          set_output2(SIMULARG4(Simul,msg->type,0,msg->value));
-        }
-        break;         
-        case VPOS:
-        {
-          MSG_INT1_t *msg = (MSG_INT1_t *)_msg;
-          set_output2(SIMULARG4(Simul,msg->type,0,msg->value));
-          query_vpos = msg->value;
-          msg_vpos = msg->msg_id;
-        }
-        break;         
-        case HPOS:
-        {      
-          MSG_INT1_t *msg = (MSG_INT1_t *)_msg;   
-          set_output2(SIMULARG4(Simul,msg->type,0,msg->value));
-          query_hpos = msg->value;
-          msg_hpos = msg->msg_id;          
-        }
-        break;         
-        case CLAMP:
-        {
-          MSG_INT1_t *msg = (MSG_INT1_t *)_msg;
-          set_output2(SIMULARG4(Simul,msg->type,0,msg->value));
-          query_clamp = msg->value;
-          msg_clamp = msg->msg_id;          
         }
         break;
         default:

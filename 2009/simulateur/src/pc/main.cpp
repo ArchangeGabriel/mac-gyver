@@ -269,9 +269,6 @@ void change_dest(position_t *pos, int type)
 void exiting()
 {
   reset_console();
-  #ifdef USE_SDL_CLIENT
-  SDL_Quit();
-  #endif
 }
 //------------------------------------------------------------------------------
 

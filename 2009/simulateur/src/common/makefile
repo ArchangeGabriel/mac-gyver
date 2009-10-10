@@ -1,6 +1,4 @@
-CC=g++
-CFLAGS=-W -Wall -pedantic `sdl-config --cflags` -g 
-LDFLAGS=`sdl-config --libs` -lncurses
+include ../makeopt
 
 all: console.o comm.o
 

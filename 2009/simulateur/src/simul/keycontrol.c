@@ -21,7 +21,10 @@ extern sem_t pic_sem;
   PIC_ARG *Simul=(PIC_ARG*)Args; 
   Simul->robot->data[Simul->my_nbr].destX = _POS_INIT_X;
   Simul->robot->data[Simul->my_nbr].destY = _POS_INIT_Y;
-  Simul->robot->data[Simul->my_nbr].destA = _POS_INIT_A;        
+  Simul->robot->data[Simul->my_nbr].destA = _POS_INIT_A;  
+  Simul->robot->data[Simul->my_nbr].posX =  _POS_INIT_X;      
+  Simul->robot->data[Simul->my_nbr].posY =  _POS_INIT_Y;       
+  Simul->robot->data[Simul->my_nbr].angle = _POS_INIT_A;       
   //</simulation> 
   
   double posX,posY,angle;     // la position
@@ -66,16 +69,6 @@ You're using the keyboard!\n\
         case 275: key[3]=true; break;   // right 
         case 97:  key[4]=true; break;   // a (vitesse+)
         case 113: key[5]=true; break;   // q (vitesse-)  
-        case 114: set_output(Simul,BELT,0,1); break;  // r
-        case 102: set_output(Simul,BELT,0,0); break;    // f
-        case 118: set_output(Simul,BELT,0,-1); break; // v       
-        case 116: set_output(Simul,HPOS,0,posClampFront); break;     // t
-        case 103: set_output(Simul,HPOS,0,posClampMiddle); break;     // g        
-        case 98:  set_output(Simul,HPOS,0,posClampBack); break;     // b
-        case 121: set_output(Simul,VPOS,0,400); break;    // y
-        case 110:  set_output(Simul,VPOS,0,-100); break; // n        
-        case 122: set_output(Simul,CLAMP,0,stClampOpen); break;  // z
-        case 115: set_output(Simul,CLAMP,0,stClampClosed); printf("%f\n",((float)MAX_DIST_CAPT) - ((float)Simul->robot->dist_captors[0].measure()) * MAX_DIST_CAPT / ((float)RANGE_DIST_CAPT));  break;  // s 
         default: break; //printf("%d\n",event.key.keysym.sym);
       }
     if(event.type==SDL_KEYUP)

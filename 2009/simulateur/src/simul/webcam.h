@@ -20,7 +20,6 @@ class webcam_t : public params_t
   bool done;
     
   static void make_scene();
-  static void make_table();
     
   public:
   int W,H;  

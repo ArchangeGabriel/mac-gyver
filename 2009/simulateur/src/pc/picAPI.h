@@ -23,37 +23,6 @@ Renvoie 0 en cas de succès, un nombre non nul sinon
 */
 int picMotorsPower(float pwleft, float pwright);
 
-/*
-Envoie la puissance du moteur de courroie
-Comprise entre -1 (vers l'intérieur) et 1 (vers l'extérieur)
-Renvoie 0 en cas de succès, un nombre non nul sinon
-*/
-int picMotorBeltPower(int pw);
-
-/*
-Envoie la position horizontale de la pince (cf common/comm.h)
-Renvoie NULL en cas d'échec, un pointeur sur un mutex vérouillé sinon.
-Le mutex sera dévérouillé lorsque la confirmation sera reçue
-*/
-pthread_mutex_t* picClampHPos(int pos);
-
-
-/*
-Envoie la position verticale de la pince, en mm
-0 mm signifie la position la plus basse, et de manière générale
-h mm signifie que le bas du palet le plus bas sera à hauteur h
-Renvoie NULL en cas d'échec, un pointeur sur un mutex vérouillé sinon.
-Le mutex sera dévérouillé lorsque la confirmation sera reçue
-*/
-pthread_mutex_t* picClampVPos(int pos);
-
-/*
-Envoie l'état de la pince (cf common/comm.h)
-Renvoie NULL en cas d'échec, un pointeur sur un mutex vérouillé sinon.
-Le mutex sera dévérouillé lorsque la confirmation sera reçue
-*/
-pthread_mutex_t* picClampState(int state);
-
 
 /*
 Demande la valeur des capteurs de distance indiqués par Flag (cf common/comm.h)
@@ -80,11 +49,6 @@ void picOnRecvCoder(void (*fun)(int /*coder_left*/, int /*coder_right*/));
 Réception de la valeur des capteurs de distance
 */
 void picOnRecvDistCaptors(void (*fun)(int /*n*/, float* /*dist*/));
-
-/*
-Réception de la valeur des capteurs de couleur
-*/
-void picOnRecvCoulCaptors(void (*fun)(int /*n*/, float* /*coul*/));
 
 /*
 Fonction à appeler en cas de reconnection intempestive avec le pic

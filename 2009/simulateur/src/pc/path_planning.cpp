@@ -36,7 +36,7 @@ using namespace std;
 #define SLOWER_ZONE  0.20     // Largeur de la zone de ralentissement (on ralentit près des bords).
 
 #define MAX_DANGER_SPEED  0.7  // Vitesse max en zone de danger
-#define MAX_SLOWER_SPEED  1.  // Vitesse max en zone de ralentissement
+#define MAX_SLOWER_SPEED  1.   // Vitesse max en zone de ralentissement
 #define MAX_FREE_SPEED    1.3  // Vitesse max en zone libre
 
 #define DISTRIB_OFFSET    0.24 // En mètre: espace entre le centre du robot et le bord quand collé au distrib
@@ -389,7 +389,7 @@ pthread_mutex_t* pp_add_step(position_t pos)
 //------------------------------------------------------------------------------
 void calc_path(position_t from, position_t to, int type, bool append, bool do_approach, bool do_leave, pthread_mutex_t **approach, pthread_mutex_t **leave)
 {
-  vector_t c = vector_t(_LONGUEUR_TER/2., _LARGEUR_TER/2.);
+ /* vector_t c = vector_t(_LONGUEUR_TER/2., _LARGEUR_TER/2.);
   vector_t u = to.v() - from.v();
   vector_t v = c - from.v();
   
@@ -508,7 +508,7 @@ void calc_path(position_t from, position_t to, int type, bool append, bool do_ap
       calc_path(pos , to , type      , true  , do_approach, false, approach, leave);      
       return;
     }
-  }
+  }*/
       
   // si on arrive içi, la ligne droite est sure.
   if(!append)
@@ -529,83 +529,6 @@ position_t pp_get_dest()
 void pp_clear_path()
 {
   path.clear();
-}
-//------------------------------------------------------------------------------
-pthread_mutex_t* pp_go_to_distrib(int distrib,int type, bool append, bool do_approach, bool do_leave, pthread_mutex_t **approach, pthread_mutex_t **leave)
-{
-  //FIXME
-  //Faire ca mieux en gérant les zones
-  
-  // Pour le vert
-  position_t pos;
-  switch(distrib)
-  {
-    case distribGrandCote:
-    pos.x = _LONGUEUR_TER - 0.289;
-    pos.y = _LARGEUR_TER - DISTRIB_OFFSET;
-    pos.a = M_PI_2;
-    break;
-    case distribPetitCoteRobot:
-    pos.x = _LONGUEUR_TER - DISTRIB_OFFSET;
-    pos.y = _LARGEUR_TER/2. - 0.25;
-    pos.a = 0;
-    break;    
-    case distribPetitCoteDepot:
-    pos.x = _LONGUEUR_TER - DISTRIB_OFFSET;
-    pos.y = _LARGEUR_TER/2. + 0.25;
-    pos.a = 0;
-    break;        
-  }
- 
-  if(strat_get_color() == clRED)
-  {
-    pos.x = _LONGUEUR_TER - pos.x;
-    pos.a = M_PI - pos.a;
-  }
-  
-  return pp_go_to(pos, type, append, do_approach, do_leave, approach, leave);
-}
-//------------------------------------------------------------------------------
-pthread_mutex_t* pp_go_to_drop(int zone, int id_bande, vector_t pos)
-{
-  //FIXME
-  //Faire ca mieux en gérant les zones
-  
-  position_t pos2;
-  switch(zone)
-  {
-    case zone0:
-    if(id_bande<0) id_bande = 0;
-    if(id_bande>7) id_bande = 7;    
-    pos2.y = _LARGEUR_TER - 0.1 - DROP_OFFSET;
-    pos2.a = M_PI_2;
-    if(id_bande<4)
-      pos2.x = _LONGUEUR_TER/2. - 0.795 + id_bande * 0.13;
-    else
-      pos2.x = _LONGUEUR_TER/2. + 0.795 - (7-id_bande) * 0.13;
-    break;
-    case zone1:
-    if(id_bande<0) id_bande = 0;
-    if(id_bande>3) id_bande = 3;  
-    pos2.x = _LONGUEUR_TER/2. - 0.195 + id_bande * 0.13;         
-    pos2.y = _LARGEUR_TER - 0.1 - DROP_OFFSET;
-    pos2.a = M_PI_2;
-    break;
-    case zone2:
-    {
-      vector_t p;
-      vector_t c = vector_t(_LONGUEUR_TER/2., _LARGEUR_TER/2.);
-      vector_t d = pos - c;
-      d = d/d.norme();
-      p = c + d*(0.15+DROP_OFFSET);
-      pos2.x = p.x;
-      pos2.y = p.y;
-      pos2.a = M_PI + d.to_angle();
-    }
-    break;
-  }
-  
-  return pp_go_to(pos2);
 }
 //------------------------------------------------------------------------------
 void ppMainLoop()

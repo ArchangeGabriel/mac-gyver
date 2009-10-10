@@ -4,6 +4,7 @@
 #include <GL/glut.h>
 
 #include "webcam.h"
+#include "../the_cup/the_playground.h"
 
 simul_info_t* webcam_t::info;  
 
@@ -48,15 +49,25 @@ void webcam_t::init_scene(simul_info_t* _info)
   
   info = _info;
 
-  GLfloat ambient[]   = {0.1, 0.1, 0.1, 1.};
-  GLfloat diffuse[]   = {0.5, 0.5, 0.5, 0.5};
-  GLfloat position0[]  = {0, 0, -3., 1.};        
-  GLfloat position1[]  = {info->longueur_terrain/2., 0, -3., 1.};  
-  GLfloat position2[]  = {0, info->largeur_terrain/2., -3., 1.};  
-  GLfloat position3[]  = {info->longueur_terrain/2., info->largeur_terrain/2., -3., 1.}; 
-  
-  glEnable(GL_DEPTH_TEST);  
-  
+  GLfloat ambient[]   = {0.15, 0.15, 0.15, 1.0};
+  GLfloat diffuse[]   = {0.2, 0.2, 0.2, 1.0};
+  GLfloat position0[]  = { 1.,  1., 5., 0.};        
+  GLfloat position1[]  = { 1., -1., 5., 0.};  
+  GLfloat position2[]  = {-1.,  1., 5., 0.};  
+  GLfloat position3[]  = {-1., -1., 5., 0.}; 
+
+  glEnable(GL_DEPTH_TEST);   	
+//  glEnable(GL_BLEND);  
+//  glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+//  glEnable(GL_POLYGON_SMOOTH); 
+
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
+
+  glEnable(GL_COLOR_MATERIAL);  
+  glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+     
+  glEnable(GL_LIGHTING); 
   glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
   glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
   glLightfv(GL_LIGHT0, GL_POSITION, position0);  
@@ -73,17 +84,7 @@ void webcam_t::init_scene(simul_info_t* _info)
   glLightfv(GL_LIGHT3, GL_DIFFUSE, diffuse);
   glLightfv(GL_LIGHT3, GL_POSITION, position3);  
   glEnable(GL_LIGHT3);
-
-  glEnable(GL_LIGHTING); 
-  
-  glEnable(GL_COLOR_MATERIAL);  
-  glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
-  
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_FRONT);
-	
-  glReadBuffer(GL_FRONT);
-     
+	   
   printf("ok\n");
   fflush(stdout);  
 }
@@ -144,7 +145,6 @@ void webcam_t::display()
 //------------------------------------------------------------------------------
 void webcam_t::no_display()
 {
- 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 	//Efface le frame buffer et le Z-buffer
   glMatrixMode(GL_MODELVIEW); 	                        //Choisit la matrice MODELVIEW
   glLoadIdentity(); 	                                  //Réinitialise la matrice
@@ -175,10 +175,6 @@ void webcam_t::make_scene()
   GLfloat dz = -WC->direction[2];    
   
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 	//Efface le frame buffer et le Z-buffer
-
-  glEnable(GL_BLEND);  
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-//  glEnable(GL_POLYGON_SMOOTH);  
   	
   glMatrixMode(GL_MODELVIEW); 	                        //Choisit la matrice MODELVIEW
   glLoadIdentity(); 	                                  //Réinitialise la matrice
@@ -186,132 +182,23 @@ void webcam_t::make_scene()
             x+dx,y+dy,z+dz,
             0.,0.,-1.);
             
-  make_table();
+  draw_playground_3D();
   
-  for(unsigned int i=0;i<info->objets_mobiles.size();i++)
-    if(info->objets_mobiles[i]->type != OBJ_ROBOT)
+ for(unsigned int i=0;i<info->objets_mobiles.size();i++)
+    if(info->objets_mobiles[i]->type != OBJ_ROBOT &&
+       !info->objets_mobiles[i]->hide)
       info->objets_mobiles[i]->draw3D();  
 
   for(unsigned int i=0;i<info->objets_mobiles.size();i++)
-    if(info->objets_mobiles[i]->type == OBJ_ROBOT)
+    if(info->objets_mobiles[i]->type == OBJ_ROBOT &&
+       !info->objets_mobiles[i]->hide)    
       info->objets_mobiles[i]->draw3D();   
 
   for(unsigned int i=0;i<info->objets_fixes.size();i++)
-    if(!info->objets_fixes[i]->inverse)
+    if(!info->objets_fixes[i]->hide)    
       info->objets_fixes[i]->draw3D();     
-      
-  glReadBuffer(GL_BACK);
-
-  glReadPixels(0,0,WC->W,WC->H,GL_RGB,
-                  GL_UNSIGNED_BYTE,
-                  WC->pixels);  
-                  
+                       
   WC->done = true;
-}
-//------------------------------------------------------------------------------
-void webcam_t::make_table()
-{
-  GLfloat w = info->longueur_terrain;
-  GLfloat h = info->largeur_terrain;
-  GLfloat e = 0.03;
-  GLfloat z = 0.07;
-  
-  /* Table bleue */
-  glColor3f(0.204, 0.380, 0.714);  
-  glNormal3f(0., 0., -1.);  
-  glBegin(GL_QUADS); 
-  glVertex3f(0.,0.,0.);   glVertex3f(w,0.,0.);   glVertex3f(w,h,0.);   glVertex3f(0.,h,0.);  
-  glEnd();     
-  
-  /* Marquages au sol */
-  glPushMatrix(); 
-  /* Départs rouge et vert */
-  glTranslatef(0.,0.,-0.0001); 
-  glColor3f(0.318, 0.659, 0.278);   
-  glRectf(0., 0., 0.5, 0.5);
-  glColor3f(0.776, 0., 0.);   
-  glRectf(w-0.5, 0., w, 0.5);
-  
-  /* Zones de niveau 1 */
-  glColor3f(0.392, 0.275, 0.157); 
-  glRectf(w/2.-0.9, h-0.1, w/2.+0.9, h);
-  
-  /* Bande de guidage */  
-  glColor3f(0., 0., 0.);   
-  for(int i=0;i<3;i++)
-    for(int j=0;j<4;j++)  
-    {
-      GLfloat x0 = w/2-0.9+0.105-0.0075+i*0.6+j*0.13;
-      glRectf(x0, h-0.35, x0+0.015, h-0.1);
-    }
-
-  for(int i=0;i<4;i++)     
-  {
-    GLfloat x0 = w/2-0.6-0.0075+i*0.4;
-    glRectf(x0, 0, x0+0.015, 0.25);
-  }  
-  
-  for(int i=0;i<3;i++)              
-    for(int j=0;j<4;j++)  
-    {
-      const int n = 4;
-      GLfloat cx1 = w/2-0.4-i*0.25;
-      GLfloat cx2 = w/2+0.4+i*0.25;
-      GLfloat cy = h/2+0.125-j*0.2;
-      GLfloat r  = 0.005;
-      GLfloat x0,y0;
-      glBegin(GL_POLYGON);
-      for(int k = 0; k< n; k++)
-      {
-        x0 = r * cos(2*k*M_PI/n) + cx1;
-        y0 = r * sin(2*k*M_PI/n) + cy; 
-        glVertex3f(x0,y0,0.);       
-      }
-      glEnd();
-      glBegin(GL_POLYGON);
-      for(int k = 0; k< n; k++)
-      {
-        x0 = r * cos(2*k*M_PI/n) + cx2;
-        y0 = r * sin(2*k*M_PI/n) + cy; 
-        glVertex3f(x0,y0,0.);       
-      }
-      glEnd();                   
-    }        
-  glPopMatrix();   
-
-  glColor3f(1., 1., 1.);
-  
-  glBegin(GL_QUADS); 
-  glNormal3f(0., 0., -1.);
-  glVertex3f(0.,0.,-z);  glVertex3f(0.,-e,-z);  glVertex3f(w,-e,-z);    glVertex3f(w,0.,-z);      
-  glVertex3f(0.,h,-z);   glVertex3f(w,h,-z);    glVertex3f(w,h+e,-z);   glVertex3f(0.,h+e,-z); 
-  glVertex3f(w,-e,-z);   glVertex3f(w+e,-e,-z); glVertex3f(w+e,h+e,-z); glVertex3f(w,h+e,-z);
-  glVertex3f(0.,-e,-z);  glVertex3f(0.,h+e,-z); glVertex3f(-e,h+e,-z);  glVertex3f(-e,-e,-z);
-  glEnd(); 
-
-  glBegin(GL_QUADS); 
-  glNormal3f(0., 1., 0.);
-  glVertex3f(0.,0.,0.);  glVertex3f(0.,0.,-z);  glVertex3f(w,0.,-z);    glVertex3f(w,0.,0.);
-  glVertex3f(-e,h+e,0.); glVertex3f(-e,h+e,-z); glVertex3f(w+e,h+e,-z); glVertex3f(w+e,h+e,0.);       
-  glEnd();   
-
-  glBegin(GL_QUADS); 
-  glNormal3f(0., -1., 0.);
-  glVertex3f(-e,-e,0.);  glVertex3f(w+e,-e,0.); glVertex3f(w+e,-e,-z);  glVertex3f(-e,-e,-z);  
-  glVertex3f(0.,h,0.);   glVertex3f(w,h,0.);    glVertex3f(w,h,-z);     glVertex3f(0.,h,-z);   
-  glEnd();     
-   
-  glBegin(GL_QUADS); 
-  glNormal3f(1., 0., 0.); 
-  glVertex3f(w+e,-e,-z); glVertex3f(w+e,-e,0.); glVertex3f(w+e,h+e,0.); glVertex3f(w+e,h+e,-z);  
-  glVertex3f(0.,0.,0.);  glVertex3f(0.,h,0.);   glVertex3f(0.,h,-z);    glVertex3f(0.,0.,-z);
-  glEnd(); 
-  
-  glBegin(GL_QUADS); 
-  glNormal3f(-1., 0., 0.);   
-  glVertex3f(w,0.,0.);   glVertex3f(w,0.,-z);   glVertex3f(w,h,-z);     glVertex3f(w,h,0.);
-  glVertex3f(-e,-e,-z);  glVertex3f(-e,h+e,-z); glVertex3f(-e,h+e,0.);  glVertex3f(-e,-e,0.); 
-  glEnd();    
 }
 //------------------------------------------------------------------------------
 void webcam_t::makePicture()
