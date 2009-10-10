@@ -10,6 +10,9 @@
 #include "pc_main.h"
 #include "main.h"
 
+// A décommenter pour utiliser la console
+#define CONSOLE
+
 pthread_t IAThread;
 void* start_IA(void*);
 
@@ -19,23 +22,17 @@ void* start_PP(void*);
 pthread_t ACThread;
 void* start_AC(void*);
 
-
+#ifdef USE_SDL_CLIENT
 pthread_t SDLThread;
 void* start_SDL(void*);
-
-// A décommenter pour utiliser la console
-#define CONSOLE
+#endif
 
 #ifdef CONSOLE
 pthread_t ConsoleThread;
 #endif
 
 //------------------------------------------------------------------------------
-#ifdef SIMULATION
 int pc_main(int argc, char **argv)
-#else
-int main(int argc, char **argv)
-#endif
 { 
   int color = -1; 
   int i;
@@ -70,7 +67,7 @@ int main(int argc, char **argv)
   initSDL();
   SDL_First_Background();
   Load_SDL_Background();  
-  pthread_create(&SDLThread, NULL, start_SDL, NULL);   // Anti Collision  
+  pthread_create(&SDLThread, NULL, start_SDL, NULL);   // Affichage SDL
   #endif
 
   picOnRecvJack(strat_lets_go); // Point d'entrée pour démarrer le jeu ici
@@ -85,7 +82,7 @@ int main(int argc, char **argv)
   
   #ifdef CONSOLE
   atexit(exiting);
-  pthread_create(&ConsoleThread, NULL, console, NULL);   // Anti Collision 
+  pthread_create(&ConsoleThread, NULL, console, NULL);   // Console
   #endif
   
   picMainLoop();
@@ -116,5 +113,12 @@ void* start_SDL(void*)
   SDL_Draw_Robot(); 
   return NULL;
 }
+//------------------------------------------------------------------------------
+#ifndef SIMULATION
+int main(int argc, char **argv)
+{
+  return pc_main(argc,argv);
+}
+#endif
 //------------------------------------------------------------------------------
 

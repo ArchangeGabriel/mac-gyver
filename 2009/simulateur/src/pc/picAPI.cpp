@@ -231,48 +231,6 @@ void* pic2_handle_msg(void *)
           printf("from pic %d: %d\n",2,msg->value);
         }
         break;
-        case VPOS:
-        if(mut_vpos)
-        {
-          if(true /*msg->msg_id == msg_id_vpos*/)
-          {            
-            msg_id_vpos = 0;
-            pthread_mutex_unlock(mut_vpos);              
-            mut_vpos = NULL;              
-          }
-        }
-        else
-          fprintf(stderr,"<picInterface.cpp> PIC2: Unmatched ACK VPOS.\n");
-          fflush(stdout);             
-        break;
-        case HPOS:
-        if(mut_hpos)
-        {            
-          if(true /*msg->msg_id == msg_id_hpos*/)
-          {
-            msg_id_hpos = 0;
-            pthread_mutex_unlock(mut_hpos);              
-            mut_hpos = NULL;              
-          } 
-        }
-        else
-          fprintf(stderr,"<picInterface.cpp> PIC2: Unmatched ACK HPOS.\n");
-          fflush(stdout);             
-        break;
-        case CLAMP:
-        /*if(mut_clamp)
-        {            
-          if(msg->msg_id == msg_id_clamp)
-          {    
-            msg_id_clamp = 0;
-            pthread_mutex_unlock(mut_clamp);              
-            mut_clamp = NULL;            
-          }   
-        }
-        else
-          printf("<picInterface.cpp> PIC2: Unmatched ACK CLAMP.\n");
-          fflush(stdout); */            
-        break;                            
         case DIST:
         if(callbackRecvDistCaptors)
         {
@@ -287,8 +245,9 @@ void* pic2_handle_msg(void *)
           for(int i=0; i<msg->n; i++)
           {
             tab[i] = COEFF_A_DIST * pow(COEFF_B_DIST, ((double)(values[i]>>6)));
-            if(tab[i]<0.) tab[i] = 0.;
+            if(tab[i]<0.) tab[i] = 0.;        
           }
+          
           #ifdef SIMULATION
           float tmp = tab[1];
           values[1] = tab[2];
@@ -373,149 +332,6 @@ int picMotorsPower(float pwleft, float pwright)
   buff[1] = ((unsigned char)(pwright*127.)) + 128; 
   return write_usb(PIC1, buff, 2);  
   #endif
-}
-//------------------------------------------------------------------------------
-int picMotorBeltPower(int pw)
-{
-  #ifdef SIMULATION
-  if(pw>1) pw = 1;
-  if(pw<-1) pw = -1; 
-  MSG_INT1_t msg;
-  msg.type   = BELT;
-  msg.msg_id = msg_id++;
-  msg.value = pw;
-  
-  return write_usb(PIC2, &msg, sizeof(msg));
-  return 0;
-  #else
-  unsigned char data[3];
-  data[0] = MOTEURS;
-  data[1] = 0;
-  data[2] = ACTIV_MOTEUR_3;
-  if(pw>2) pw = 2;
-  if(pw<0) pw = 0;   
-  pw = pw << 4;
-  data[2] += pw;
-  return write_usb(PIC2, data, 3);  
-  #endif
-}
-//------------------------------------------------------------------------------
-pthread_mutex_t* picClampHPos(int pos)
-{
-  #ifdef SIMULATION
-  MSG_INT1_t msg;
-  msg.type   = HPOS;
-  msg.msg_id = msg_id++;
-  msg.value = pos;
-
-  if(write_usb(PIC2, &msg, sizeof(msg))<0)  
-  #else
-  unsigned char data[3];
-  data[0] = MOTEURS;
-  data[1] = 0;
-  data[2] = ACTIV_MOTEUR_2;
-  if(pos>2) pos = 2;
-  if(pos<0) pos = 0;  
-  data[2] += pos;
-  if(write_usb(PIC2, data, 3)<0)    
-  #endif 
-  {
-    fprintf(stderr,"erreur transmission HPOS\n"); 
-    return NULL;
-  }
-  else
-  {
-    if(mut_hpos != NULL)
-    {
-      fprintf(stderr,"<picInterface.cpp> HPos mutex already locked.\n");
-      fflush(stdout);
-      pthread_mutex_unlock(mut_hpos);
-    }
-    mut_hpos = new pthread_mutex_t;
-    pthread_mutex_init(mut_hpos,NULL);
-    pthread_mutex_lock(mut_hpos);        
-    //msg_id_hpos = msg.msg_id;
-    return mut_hpos;
-  }
-}
-//------------------------------------------------------------------------------
-pthread_mutex_t* picClampVPos(int pos)
-{
-  #ifdef SIMULATION
-  MSG_INT1_t msg;
-  msg.type   = VPOS;
-  msg.msg_id = msg_id++;
-  msg.value = pos;
-  
-  if(write_usb(PIC2, &msg, sizeof(msg))<0)
-  #else
-  unsigned char data[3];
-  data[0] = MOTEURS;
-  data[1] = ACTIV_MOTEUR_1;
-  data[2] = 0;
-  if(pos>165) pos = 165;
-  if(pos<0) pos = 0;
-  pos = ((unsigned char)((float)pos) * 63. / 165.); 
-  data[1] += pos;
-  if(write_usb(PIC2, data, 3)<0)    
-  #endif    
-    return NULL;
-  else
-  {
-    if(mut_vpos != NULL)
-    {
-      fprintf(stderr,"<picInterface.cpp> VPos mutex already locked.\n");
-      fflush(stdout);
-      pthread_mutex_unlock(mut_vpos);
-    }
-    mut_vpos = new pthread_mutex_t;
-    pthread_mutex_init(mut_vpos,NULL);
-    pthread_mutex_lock(mut_vpos);    
-    //msg_id_vpos = msg.msg_id;
-    return mut_vpos;
-  }
-}
-//------------------------------------------------------------------------------
-pthread_mutex_t* picClampState(int state)
-{  
-  #ifdef SIMULATION
-  MSG_INT1_t msg;
-  msg.type   = CLAMP;
-  msg.msg_id = msg_id++;
-  msg.value = state;
-  
-  if(write_usb(PIC2, &msg, sizeof(msg))<0)
-  #else
-  unsigned char data[2];
-  data[0]=SERVO;
-  if(state == stClampOpen)
-    data[1] = CLAMP_OPEN_SERVO;
-  else if(state == stClampLintel)
-    data[1] = CLAMP_LINTEL_SERVO;
-  else
-    data[1] = CLAMP_CLOSE_SERVO;
-      
-  if(write_usb(PIC2, data, 2)<0)  
-  #endif
-    return NULL;
-  else
-  {
-    /*if(mut_clamp != NULL)
-    {
-      printf("<picInterface.cpp> Clamp mutex already locked.\n");
-      fflush(stdout);
-      pthread_mutex_unlock(mut_clamp);
-    }
-    mut_clamp = new pthread_mutex_t;
-    pthread_mutex_init(mut_clamp,NULL);
-    pthread_mutex_lock(mut_clamp);        
-    msg_id_clamp = msg.msg_id;
-    return mut_clamp;*/
-    usleep(1000);
-    pthread_mutex_t *mutex = new pthread_mutex_t;
-    pthread_mutex_init(mutex,NULL);
-    return mutex;
-  }
 }
 //------------------------------------------------------------------------------
 int picDistCaptors()

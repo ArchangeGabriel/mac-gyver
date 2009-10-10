@@ -1,6 +1,4 @@
-CC=g++
-CFLAGS=-W -Wall -pedantic `sdl-config --cflags` -g 
-LDFLAGS=`sdl-config --libs` -lncurses -lusb -lIL -lILU
+include ../makeopt
 EXEC=client
 
 all: $(EXEC)

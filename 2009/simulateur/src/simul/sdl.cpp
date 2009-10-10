@@ -3,7 +3,6 @@
 SDL_Surface* affichage=NULL;
 SDL_Surface* background=NULL;
 Uint32 *back_pixels;
-Uint32 colors[NBR_COLORS];
 
 //------------------------------------------------------------------------------
 void initSDL(int Width,int Height)
@@ -27,27 +26,6 @@ void initSDL(int Width,int Height)
   SDL_WM_SetCaption("Simulateur de robot -- vincent.delaitre@ens-lyon.org", NULL);
   printf("ok\n");
   fflush(stdout);  
-  Load_SDL_Colors(); 
-}
-//------------------------------------------------------------------------------
-void Load_SDL_Colors()
-{  
-  printf("Creating colors...              ");
-  fflush(stdout); 
-  colors[clBlack]=makeColorSDL(0x00,0x00,0x00);
-  colors[clDarkGray]=makeColorSDL(90,90,90);    
-  colors[clGray]=makeColorSDL(180,180,180);  
-  colors[clLightGray]=makeColorSDL(190,190,190);    
-  colors[clWhite]=makeColorSDL(0xFF,0xFF,0xFF);
-  colors[clGround]=makeColorSDL(52,97,182);
-  colors[clRed]=makeColorSDL(198,0,0);
-  colors[clGreen]=makeColorSDL(81,168,71);
-  colors[clDarkRed]=makeColorSDL(158,0,0);
-  colors[clDarkGreen]=makeColorSDL(64,134,56);  
-  colors[clDarkBrown]=makeColorSDL(47,28,22);  
-  colors[clBrown]=makeColorSDL(100,70,40);     
-  printf("ok\n");
-  fflush(stdout);
 }
 //------------------------------------------------------------------------------
 bool is_SDL_ready()
@@ -106,9 +84,14 @@ Uint32 makeColorSDL(char *color)
   return makeColorSDL(r,g,b);
 }
 //------------------------------------------------------------------------------
-Uint32 getColorSDL(int color_id)
+inline Uint32 makeColorSDL(int c)
 {
-  return colors[color_id];
+  int R = c & 255;
+  c = c >> 8;
+  int G = c & 255;
+  c = c >> 8;
+  int B = c & 255;
+  return SDL_MapRGB(affichage->format, R, G, B);
 }
 //------------------------------------------------------------------------------
 inline void setPixel(int x, int y, Uint32 coul)

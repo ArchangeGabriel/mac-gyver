@@ -1,0 +1,111 @@
+\documentclass[10pt,a4paper]{llncs}
+
+%\usepackage{macros} \usepackage{url}
+%\usepackage{array}
+%\RequirePackage[table]{xcolor}% for colored tabular rows 
+%\usepackage{microtype}% optimized spacing
+\usepackage{amsmath}
+\usepackage[tight,footnotesize]{subfigure}% subfloats
+\usepackage[francais]{babel}
+\usepackage[utf8x]{inputenc}
+
+\title{Modélisation des liaisons mécaniques simples dans le simulateur}  
+\subtitle{}
+\institute{}
+\author{Mac-Gyver}  
+
+
+\newcommand{\vect}[1]{\overrightarrow{#1}} 
+
+% ===============================================================================%
+\begin{document} 
+\maketitle
+\section{Qu'est-ce qu'une liaison simple?}
+D'après wikipédia: "Une liaison mécanique simple, est une liaison obtenue par un contact entre une surface simple unique d'une pièce avec celle, simple et aussi unique d'une autre pièce".
+
+Il y a essentiellement une chose à remarquer: une liaison contraint certains degrés de liberté. Conséquence: les efforts (forces et couples) se transmettent suivant ces degrés de liberté.
+Ainsi, pour une certaine liaison $\mathcal{L}$, on peut définir deux matrices diagonales $[T^\mathcal{L}]$ et $[R^\mathcal{L}]$ indiquant quelles translations et quelles rotations sont contraintes.
+
+Exemple pour une liaison pivot:
+
+\begin{center}
+\begin{tabular}{ccc}
+$[T^\mathcal{L}] = 
+\begin{pmatrix}
+1&0&0\\
+0&1&0\\
+0&0&1\\
+\end{pmatrix}$
+& \hspace{1cm} &
+$[R^\mathcal{L}] = 
+\begin{pmatrix}
+1&0&0\\
+0&1&0\\
+0&0&0\\
+\end{pmatrix}$
+\end{tabular}
+\end{center}
+
+Ainsi, supposons que l'on a un objet 1 et un objet 2 reliés par une liaison $\mathcal{L}$. Si l'on applique une force $\vect{F}$
+et un couple $\vect{C}$ à l'objet 1, l'objet 2 reçoit une force $[T^\mathcal{L}] \vect{F}$ et un couple $[R^\mathcal{L}] \vect{C}$.
+
+\section{Cas de deux objets liés} 
+
+On considère le cas de deux objets 1 et 2 liés par une liaison $\mathcal{L}$.
+On note $G_i$ le barycentre de l'objet $i \in \{1,2\}$.
+Soit $L$ le point de contact de la liaison. On cherche à déterminer $\vect{F_L}$ et $\vect{\mathcal{M}_L}$,
+c'est-à-dire respectivement la force et le moment appliqués par l'objet 1 sur l'objet 2 au point $L$.
+
+On note respectivement $\vect{F_i}$ et $\vect{\mathcal{M}^A_i}$ la somme des forces
+et des moments des forces en $A$ pour l'objet $i \in \{1,2\}$ (on ne compte ni 
+$\vect{F_P}$ ni $\vect{\mathcal{M}_P}$ dans ces sommes). On note respectivement
+$m_i$, $[J_i]$, $\vect{a_i}(P)$ et $\vect{\Omega_i}$ la masse, la matrice d'inertie,
+l'accélération du point $P$ et le vecteur rotation instantanée pour l'objet $i \in \{1,2\}$.
+Pour un solide fixe, on prendra $m = \infty$ et $[J] = \infty Id$.
+
+\vspace{0.3cm}
+On cherche à déterminer $\vect{F_L}$ en fonction $\vect{\mathcal{M}_L}$, $\vect{F_i}$, $\vect{\mathcal{M}^A_i}$,
+$m_i$, $[J_i]$, $\vect{a_i}(P)$ et $\vect{\Omega_i}$ pour $i \in \{1,2\}$.
+Le PDF et le TMC permettent d'écrire:
+
+\begin{equation}
+\label{PDF_TMC}
+\begin{array}{c}
+m_1\vect{a_1}(G_1) = \vect{F_1} - \vect{F_L} \\
+m_2\vect{a_2}(G_2) = \vect{F_2} + \vect{F_L} \\
+~[J_1]\dot{\vect{\Omega_1}} = \vect{\mathcal{M}^{G_1}_1} - \vect{\mathcal{M}_L}\\
+~[J_2]\dot{\vect{\Omega_2}} = \vect{\mathcal{M}^{G_2}_2} + \vect{\mathcal{M}_L}\\
+\end{array}
+\end{equation}
+
+
+Suivant la nature de la liaison certain degré de liberté sont contraints, d'autres non.
+
+$a\vect{X}$ pour une glissière. On a:
+\begin{equation}
+\label{diff_acc}
+\vect{a_1}(L) - \vect{a_2}(L) = \vect{a_L}
+\end{equation}
+
+Enfin, la loi des champs de vitesse des points d'un objet donne:
+\begin{equation}
+\vect{v_i}(L) = \vect{v_i}(G) + \vect{\Omega_i} \wedge \vect{GL} 
+\end{equation}
+
+D'où en dérivant:
+\begin{equation}
+\label{acc_P}
+\vect{a_i}(L) = \vect{a_i}(G_i) + \dot{\vect{\Omega_i}} \wedge \vect{G_iL} + \vect{\Omega_i} \wedge (\vect{\Omega_i} \wedge \vect{G_iL}) 
+\end{equation}
+
+En remplaçant (\ref{acc_P}) et (\ref{PDF_TMC}) dans (\ref{diff_acc}) on obtient:
+\begin{equation}
+\label{diff_acc}
+\begin{array}{l}
+\vect{a_1}(G_1) + \dot{\vect{\Omega_1}} \wedge \vect{G_1L} + \vect{\Omega_1} \wedge (\vect{\Omega_1} \wedge \vect{G_1L}) - \\
+\vect{a_2}(G_2) + \dot{\vect{\Omega_2}} \wedge \vect{G_2L} + \vect{\Omega_2} \wedge (\vect{\Omega_2} \wedge \vect{G_2L}) = \vect{a_L}
+\end{array}
+\end{equation}
+
+
+\end{document}

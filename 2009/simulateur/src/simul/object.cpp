@@ -26,10 +26,8 @@ simul_info_t::~simul_info_t()
 void simul_info_t::init_params()
 {
   dt               = double_param_value("dt")*0.001;
-  scale            = double_param_value("scale");
-  longueur_terrain = double_param_value("longueur_terrain");
-  largeur_terrain  = double_param_value("largeur_terrain");    
-  config_palets    = int_param_value("config_palets");  
+  scale            = double_param_value("scale");   
+  config_terrain   = int_param_value("config_terrain");  
   nbr_robots       = int_param_value("nbr_robots"); 
   coeff_frott[mBois][mBois]   = double_param_value("coeff_frott_bois_bois");
   coeff_frott[mMetal][mBois]  = double_param_value("coeff_frott_bois_metal");
@@ -211,6 +209,7 @@ void simul_info_t::clean_coll_of(int i)
 //----------------------------------------------------------------------------//
 object_t::object_t()
 {
+  hide=false;
   fixe=false;
   linked=false;
   inverse=false;
@@ -411,9 +410,6 @@ void object_t::calc_position()
 bool object_t::check_collision_with(object_t* obj)
 {
   // On peut décider rapidement si la collision n'a pas lieu
-  if((type==OBJ_PALET && obj->type==OBJ_DISTRIB) ||
-     (type==OBJ_DISTRIB && obj->type==OBJ_PALET))
-    return false;
   bool is_coll;
   if(obj->inverse)
     is_coll=obj->fast_collision_check(this);
@@ -439,7 +435,6 @@ bool object_t::slow_collision_check(object_t*)
 //---------------------------------------------------------------------------
 bool object_t::calc_impulsion(vector_t &N_vect, vector_t &p1, object_t *obj,vector_t &p2)
 {
-  if(type==OBJ_PALET && obj->type==OBJ_PINCE_OUVERTE) return false;
   if((obj->z-obj->hauteur/2.) >= (z + hauteur/2.))
     return false;
   if((z-hauteur/2.) >= (obj->z + obj->hauteur/2.))
@@ -561,14 +556,14 @@ vector_t object_t::get_normal(vector_t &)
 
 //----------------------------------------------------------------------------//
 //                                                                            //
-//                              Objets rectangulaires                         //
+//                                      Pavé                                  //
 //                                                                            //
 //----------------------------------------------------------------------------//
-rect_obj_t::~rect_obj_t()
+ObjBox::~ObjBox()
 {
 }
 //---------------------------------------------------------------------------
-void rect_obj_t::init_params()
+void ObjBox::init_params()
 {
   G_init.x   = double_param_value("centre_gravite_x");  
   G_init.y   = double_param_value("centre_gravite_y");  
@@ -593,7 +588,7 @@ void rect_obj_t::init_params()
   maj_const_vars();
 }
 //---------------------------------------------------------------------------
-void rect_obj_t::maj_const_vars()
+void ObjBox::maj_const_vars()
 {
   last_position=position;
   last_angle=angle;
@@ -613,7 +608,7 @@ void rect_obj_t::maj_const_vars()
   maj_dyn_vars();
 }
 //---------------------------------------------------------------------------
-void rect_obj_t::maj_dyn_vars()
+void ObjBox::maj_dyn_vars()
 {
   cosinus=cos(angle);
   sinus=sin(angle);
@@ -626,7 +621,7 @@ void rect_obj_t::maj_dyn_vars()
     coins_rot[i]=coins[i].rotate_spec(cosinus,sinus);
 }
 //---------------------------------------------------------------------------
-void rect_obj_t::draw()
+void ObjBox::draw()
 {
   vector_t coins_pos[4];
   point_t point[4];
@@ -640,13 +635,17 @@ void rect_obj_t::draw()
   PolylineSDL(point, 4, couleur);  
 }
 //---------------------------------------------------------------------------
-void rect_obj_t::draw3D() 
+void ObjBox::draw3D() 
 {  
   GLfloat B = ((GLfloat)(couleur & 255))/255.;
   GLfloat G = ((GLfloat)((couleur>>8) & 255))/255.;
   GLfloat R = ((GLfloat)((couleur>>16) & 255))/255.;  
 
   glColor3f(R,G,B); 
+
+  GLfloat spec[] = {0.3,0.3,0.3,1.0};
+  glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, spec);
+  glMateriali(GL_FRONT_AND_BACK, GL_SHININESS, 20);
   
   GLfloat cz = -z; 
   GLfloat dz = hauteur/2.;      
@@ -662,22 +661,22 @@ void rect_obj_t::draw3D()
     
   glBegin(GL_QUADS); 
   glNormal3f(0., 0., 1.);   
-  glVertex3f(x[0],y[0],z[0]); glVertex3f(x[1],y[1],z[1]); glVertex3f(x[2],y[2],z[2]); glVertex3f(x[3],y[3],z[3]);
+  glVertex3f(x[0],y[0],z[0]); glVertex3f(x[3],y[3],z[3]); glVertex3f(x[2],y[2],z[2]); glVertex3f(x[1],y[1],z[1]); 
   glNormal3f(0., 0., -1.);   
-  glVertex3f(x[4],y[4],z[4]); glVertex3f(x[7],y[7],z[7]); glVertex3f(x[6],y[6],z[6]); glVertex3f(x[5],y[5],z[5]);      
+  glVertex3f(x[4],y[4],z[4]); glVertex3f(x[5],y[5],z[5]); glVertex3f(x[6],y[6],z[6]); glVertex3f(x[7],y[7],z[7]); 
   glNormal3f(T.x, T.y, 0);   
-  glVertex3f(x[0],y[0],z[0]); glVertex3f(x[3],y[3],z[3]); glVertex3f(x[7],y[7],z[7]); glVertex3f(x[4],y[4],z[4]);
+  glVertex3f(x[0],y[0],z[0]); glVertex3f(x[4],y[4],z[4]); glVertex3f(x[7],y[7],z[7]); glVertex3f(x[3],y[3],z[3]); 
   glNormal3f(-T.x, -T.y, 0);    
-  glVertex3f(x[1],y[1],z[1]); glVertex3f(x[5],y[5],z[5]); glVertex3f(x[6],y[6],z[6]); glVertex3f(x[2],y[2],z[2]);
+  glVertex3f(x[1],y[1],z[1]); glVertex3f(x[2],y[2],z[2]); glVertex3f(x[6],y[6],z[6]); glVertex3f(x[5],y[5],z[5]); 
   glNormal3f(N.x, N.y, 0);   
-  glVertex3f(x[1],y[1],z[1]); glVertex3f(x[0],y[0],z[0]); glVertex3f(x[4],y[4],z[4]); glVertex3f(x[5],y[5],z[5]);
+  glVertex3f(x[1],y[1],z[1]); glVertex3f(x[5],y[5],z[5]); glVertex3f(x[4],y[4],z[4]); glVertex3f(x[0],y[0],z[0]); 
   glNormal3f(-N.x, -N.y, 0);  
-  glVertex3f(x[3],y[3],z[3]); glVertex3f(x[2],y[2],z[2]); glVertex3f(x[6],y[6],z[6]); glVertex3f(x[7],y[7],z[7]);
+  glVertex3f(x[3],y[3],z[3]); glVertex3f(x[7],y[7],z[7]); glVertex3f(x[6],y[6],z[6]); glVertex3f(x[2],y[2],z[2]);
 
   glEnd();
 }
 //---------------------------------------------------------------------------
-bool rect_obj_t::is_point_in_obj(vector_t &point,object_t* &ss_obj)
+bool ObjBox::is_point_in_obj(vector_t &point,object_t* &ss_obj)
 {
   ss_obj=this;
   vector_t v=point.rotate_spec(cosinus,-sinus);
@@ -686,7 +685,7 @@ bool rect_obj_t::is_point_in_obj(vector_t &point,object_t* &ss_obj)
   else return fabsl(v.x)<dimX/2. && fabsl(v.y)<dimY/2.;
 }
 //---------------------------------------------------------------------------
-double rect_obj_t::dist_of_obj(vector_t &point, vector_t &u,object_t* &ss_obj)
+double ObjBox::dist_of_obj(vector_t &point, vector_t &u,object_t* &ss_obj)
 {
   ss_obj=this;
   vector_t v=point.rotate_spec(cosinus,-sinus);
@@ -753,7 +752,7 @@ double rect_obj_t::dist_of_obj(vector_t &point, vector_t &u,object_t* &ss_obj)
   }
 }
 //---------------------------------------------------------------------------
-void rect_obj_t::get_overlapping_interval(vector_t &O, vector_t &Dir,double *min, double *max)
+void ObjBox::get_overlapping_interval(vector_t &O, vector_t &Dir,double *min, double *max)
 {
   double proj1=(position-G_rot-O)|Dir;
   double proj2=fabsl(N|Dir)*dimX/2.+fabsl(T|Dir)*dimY/2.;
@@ -761,7 +760,7 @@ void rect_obj_t::get_overlapping_interval(vector_t &O, vector_t &Dir,double *min
   *max=proj1+proj2;
 }
 //---------------------------------------------------------------------------
-bool rect_obj_t::fast_collision_check(object_t *obj)
+bool ObjBox::fast_collision_check(object_t *obj)
 {
   vector_t p;
   double min,max;
@@ -788,7 +787,7 @@ bool rect_obj_t::fast_collision_check(object_t *obj)
   }
 }
 //---------------------------------------------------------------------------
-bool rect_obj_t::slow_collision_check(object_t *obj)
+bool ObjBox::slow_collision_check(object_t *obj)
 {
   object_t *ss_obj;
   vector_t p;
@@ -806,7 +805,7 @@ bool rect_obj_t::slow_collision_check(object_t *obj)
   return is_coll;
 }
 //---------------------------------------------------------------------------
-double rect_obj_t::distance_to(vector_t &point, vector_t &dir, double capt_z)
+double ObjBox::distance_to(vector_t &point, vector_t &dir, double capt_z)
 {
   // on vérifie rapidement que l'objet intersecte le rayon
   if(z + hauteur/2. < capt_z || z - hauteur/2. > capt_z)
@@ -851,7 +850,7 @@ double rect_obj_t::distance_to(vector_t &point, vector_t &dir, double capt_z)
   return dist;
 }
 //---------------------------------------------------------------------------
-vector_t rect_obj_t::get_normal(vector_t &point)
+vector_t ObjBox::get_normal(vector_t &point)
 {
   vector_t n;
   vector_t v=point.rotate_spec(cosinus,-sinus);
@@ -886,14 +885,14 @@ vector_t rect_obj_t::get_normal(vector_t &point)
 
 //----------------------------------------------------------------------------//
 //                                                                            //
-//                              Objets circulaires                            //
+//                                     Cylindre                               //
 //                                                                            //
 //----------------------------------------------------------------------------//
-circle_obj_t::~circle_obj_t()
+ObjCylinder::~ObjCylinder()
 {
 }
 //---------------------------------------------------------------------------
-void circle_obj_t::init_params()
+void ObjCylinder::init_params()
 {
   G_init.x   = double_param_value("centre_gravite_x");  
   G_init.y   = double_param_value("centre_gravite_y");  
@@ -918,7 +917,7 @@ void circle_obj_t::init_params()
   maj_const_vars();
 }
 //---------------------------------------------------------------------------
-void circle_obj_t::draw()
+void ObjCylinder::draw()
 {
   vector_t centre=position-G_rot;
   vector_t radius;
@@ -930,7 +929,7 @@ void circle_obj_t::draw()
   LigneSDL(((int)(centre.x+radius.x)),((int)(centre.y+radius.y)),((int)(centre.x-radius.x)),((int)(centre.y-radius.y)),couleur);
 }
 //---------------------------------------------------------------------------
-void circle_obj_t::draw3D() 
+void ObjCylinder::draw3D() 
 {
   int n = 200. * rayon * M_PI;
   vector_t centre=position-G_rot;  
@@ -943,10 +942,11 @@ void circle_obj_t::draw3D()
   GLfloat G = ((GLfloat)((couleur>>8) & 255))/255.;
   GLfloat R = ((GLfloat)((couleur>>16) & 255))/255.;  
 
-  if(type == OBJ_DISTRIB || type == OBJ_PINCE_FERMEE || type == OBJ_PINCE_OUVERTE)
-    glColor4f(R,G,B,0.7); 
-  else
-    glColor4f(R,G,B,1.); 
+  glColor3f(R,G,B); 
+
+  GLfloat spec[] = {0.4,0.4,0.4,1.0};
+  glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, spec);
+  glMateriali(GL_FRONT_AND_BACK, GL_SHININESS, 40);  
   
   for(int i=0; i<n; i++)
   {
@@ -958,7 +958,7 @@ void circle_obj_t::draw3D()
   
   glBegin(GL_POLYGON);  
   glNormal3f(0., 0., 1.);
-  for(int i=n-1; i>=0; i--)
+  for(int i=0; i<n; i++)
   {
     glVertex3f(x[i],y[i],-z+hauteur/2.);
   }
@@ -966,20 +966,19 @@ void circle_obj_t::draw3D()
 
   glBegin(GL_POLYGON);  
   glNormal3f(0., 0., -1.);
-  for(int i=0; i<n; i++)
+  for(int i=n-1; i>=0; i--)
     glVertex3f(x[i],y[i],-z-hauteur/2.);
   glEnd();
   
   glBegin(GL_QUADS);
   for(int i=0; i<n; i++)
   {
-    glNormal3f(nx[i], ny[i], 0.);  
+    glNormal3f(nx[i], ny[i], 0.);
+    glVertex3f(x[i],y[i],-z+hauteur/2.);       
     glVertex3f(x[i],y[i],-z-hauteur/2.);
-    glVertex3f(x[i],y[i],-z+hauteur/2.); 
-    
-    glNormal3f(nx[(i+1)%n], ny[(i+1)%n], 0.);      
-    glVertex3f(x[(i+1)%n],y[(i+1)%n],-z+hauteur/2.);    
-    glVertex3f(x[(i+1)%n],y[(i+1)%n],-z-hauteur/2.);       
+    glNormal3f(nx[(i+1)%n], ny[(i+1)%n], 0.);          
+    glVertex3f(x[(i+1)%n],y[(i+1)%n],-z-hauteur/2.);  
+    glVertex3f(x[(i+1)%n],y[(i+1)%n],-z+hauteur/2.);     
   }
   glEnd();
       
@@ -987,14 +986,14 @@ void circle_obj_t::draw3D()
   free(y);
 }
 //---------------------------------------------------------------------------
-bool circle_obj_t::is_point_in_obj(vector_t &point,object_t* &ss_obj)
+bool ObjCylinder::is_point_in_obj(vector_t &point,object_t* &ss_obj)
 {
   ss_obj=this;
   vector_t v=point+G_rot;
   if(inverse) return v.norme()>rayon; else return v.norme()<rayon;
 }
 //---------------------------------------------------------------------------
-double circle_obj_t::dist_of_obj(vector_t &point, vector_t &u,object_t* &ss_obj)
+double ObjCylinder::dist_of_obj(vector_t &point, vector_t &u,object_t* &ss_obj)
 {
   ss_obj=this;
   u=point+G_rot;
@@ -1029,7 +1028,7 @@ double circle_obj_t::dist_of_obj(vector_t &point, vector_t &u,object_t* &ss_obj)
   }
 }
 //---------------------------------------------------------------------------
-void circle_obj_t::get_overlapping_interval(vector_t &O, vector_t &Dir,double *min, double *max)
+void ObjCylinder::get_overlapping_interval(vector_t &O, vector_t &Dir,double *min, double *max)
 {
   double proj;
   proj=(position-G_rot-O)|Dir;
@@ -1037,7 +1036,7 @@ void circle_obj_t::get_overlapping_interval(vector_t &O, vector_t &Dir,double *m
   *max=proj+rayon;  
 }
 //---------------------------------------------------------------------------
-bool circle_obj_t::fast_collision_check(object_t *obj)
+bool ObjCylinder::fast_collision_check(object_t *obj)
 {
   vector_t p;
   double min,max;
@@ -1051,7 +1050,7 @@ bool circle_obj_t::fast_collision_check(object_t *obj)
   return true;  
 }
 //---------------------------------------------------------------------------
-bool circle_obj_t::slow_collision_check(object_t *obj)
+bool ObjCylinder::slow_collision_check(object_t *obj)
 {
   object_t *ss_obj=this;
   vector_t p;
@@ -1072,7 +1071,7 @@ bool circle_obj_t::slow_collision_check(object_t *obj)
     return false;
 }
 //---------------------------------------------------------------------------
-double circle_obj_t::distance_to(vector_t &point, vector_t &dir, double capt_z)
+double ObjCylinder::distance_to(vector_t &point, vector_t &dir, double capt_z)
 {
   // on vérifie rapidement que l'objet intersecte le rayon
   if(z + hauteur/2. < capt_z || z - hauteur/2. > capt_z)
@@ -1093,7 +1092,197 @@ double circle_obj_t::distance_to(vector_t &point, vector_t &dir, double capt_z)
   }
 }
 //---------------------------------------------------------------------------    
-vector_t circle_obj_t::get_normal(vector_t &point)
+vector_t ObjCylinder::get_normal(vector_t &point)
+{
+  vector_t n=point+G_init;
+  if(n.x==0. && n.y==0.)
+  {
+    if(inverse) return -N;
+    else return N;
+  }
+  else
+  {
+    n=n/n.norme();
+    if(inverse) return -n;    
+    else return n;
+  }
+}
+//---------------------------------------------------------------------------
+
+
+
+//----------------------------------------------------------------------------//
+//                                                                            //
+//                                     Sphère                                 //
+//                                                                            //
+//----------------------------------------------------------------------------//
+ObjSphere::~ObjSphere()
+{
+}
+//---------------------------------------------------------------------------
+void ObjSphere::init_params()
+{
+  G_init.x   = double_param_value("centre_gravite_x");  
+  G_init.y   = double_param_value("centre_gravite_y");  
+  masse      = double_param_value("masse");
+  J          = double_param_value("moment");  
+  matiere    = int_param_value("matiere");
+  position.x = double_param_value("position_x");  
+  position.y = double_param_value("position_y");
+  speed.x    = double_param_value("vitesse_x");      
+  speed.y    = double_param_value("vitesse_y");        
+  angle      = double_param_value("angle")*M_PI/180.;    omega      = double_param_value("omega")*M_PI/180.;
+  rayon      = double_param_value("rayon");
+  hauteur    = double_param_value("rayon");
+
+  if(matiere>=NBR_MATIERES) 
+  {
+    matiere=0;
+    printf("Erreur au chargement de l'objet: matière incorrecte, remplacée par du bois...\n");
+  }
+  last_position=position;
+  last_angle=angle;   
+  maj_const_vars();
+}
+//---------------------------------------------------------------------------
+void ObjSphere::draw()
+{
+  vector_t centre=position-G_rot;
+  vector_t radius;
+  radius.x=rayon;
+  radius=radius.rotate_spec(cosinus,sinus);
+  centre*=simul_info->scale;
+  radius*=simul_info->scale;
+  CercleSDL(((int)centre.x),((int)centre.y),((int)(rayon*simul_info->scale)),couleur);
+  LigneSDL(((int)(centre.x+radius.x)),((int)(centre.y+radius.y)),((int)(centre.x-radius.x)),((int)(centre.y-radius.y)),couleur);
+}
+//---------------------------------------------------------------------------
+void ObjSphere::draw3D() 
+{
+  vector_t centre=position-G_rot;
+
+  GLfloat B = ((GLfloat)(couleur & 255))/255.;
+  GLfloat G = ((GLfloat)((couleur>>8) & 255))/255.;
+  GLfloat R = ((GLfloat)((couleur>>16) & 255))/255.;  
+  glColor3f(R,G,B); 
+  
+  GLfloat spec[] = {0.5,0.5,0.5,1.0};
+  glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, spec);
+  glMateriali(GL_FRONT_AND_BACK, GL_SHININESS, 40);
+  
+  glPushMatrix(); 
+  glTranslatef(centre.x,centre.y,-z); 
+  glutSolidSphere(rayon,50,50);
+  glPopMatrix();   
+}
+//---------------------------------------------------------------------------
+bool ObjSphere::is_point_in_obj(vector_t &point,object_t* &ss_obj)
+{
+  ss_obj=this;
+  vector_t v=point+G_rot;
+  if(inverse) return v.norme()>rayon; else return v.norme()<rayon;
+}
+//---------------------------------------------------------------------------
+double ObjSphere::dist_of_obj(vector_t &point, vector_t &u,object_t* &ss_obj)
+{
+  ss_obj=this;
+  u=point+G_rot;
+  double d=u.norme();
+  if(!inverse)
+  {
+    if(d>rayon)
+    {
+      u=(-u)/u.norme();
+      return d-rayon;
+    }
+    else
+    {
+      u.x=0.;
+      u.y=0.;
+      return 0.;
+    }
+  }
+  else
+  {
+    if(d<rayon)
+    {
+      u=u/u.norme();
+      return rayon-d;
+    }
+    else
+    {
+      u.x=0;
+      u.y=0;
+      return 0.;
+    }
+  }
+}
+//---------------------------------------------------------------------------
+void ObjSphere::get_overlapping_interval(vector_t &O, vector_t &Dir,double *min, double *max)
+{
+  double proj;
+  proj=(position-G_rot-O)|Dir;
+  *min=proj-rayon;
+  *max=proj+rayon;  
+}
+//---------------------------------------------------------------------------
+bool ObjSphere::fast_collision_check(object_t *obj)
+{
+  vector_t p;
+  double min,max;
+  p=position-G_rot; 
+  obj->get_overlapping_interval(p,N,&min,&max);
+  if(min>=rayon || max<=-rayon)
+    return obj->inverse||inverse;
+  obj->get_overlapping_interval(p,T,&min,&max);
+  if(min>=rayon || max<=-rayon)
+    return obj->inverse||inverse;
+  return true;  
+}
+//---------------------------------------------------------------------------
+bool ObjSphere::slow_collision_check(object_t *obj)
+{
+  object_t *ss_obj=this;
+  vector_t p;
+  vector_t v;
+  vector_t n;
+  v=position-G_rot-obj->position;
+  double d=obj->dist_of_obj(v,n,ss_obj);
+  if(ss_obj==NULL)
+    return d>0.;
+  else if(d<rayon)
+  {
+    v+=n*d;
+    p=n*d-G_rot;
+    n = ss_obj->get_normal(v);
+    return calc_impulsion(n,p,ss_obj,v);
+  }
+  else
+    return false;
+}
+//---------------------------------------------------------------------------
+double ObjSphere::distance_to(vector_t &point, vector_t &dir, double capt_z)
+{
+  // on vérifie rapidement que l'objet intersecte le rayon
+  if(z + hauteur/2. < capt_z || z - hauteur/2. > capt_z)
+    return -1.;  
+  vector_t t = dir.rotate_spec(0.,1.);  // Rotation de PI sur 2
+  double min,max;
+  get_overlapping_interval(point,t,&min,&max);   
+  if(min>0. || max<0.)
+    return -1.;
+  
+  vector_t C = position - G_rot - point;
+  double distC = C|dir;
+  if(distC < 0) return -1;
+  else
+  {
+    double _sinus = C ^ dir;
+    return distC - sqrt(rayon*rayon - _sinus * _sinus);
+  }
+}
+//---------------------------------------------------------------------------    
+vector_t ObjSphere::get_normal(vector_t &point)
 {
   vector_t n=point+G_init;
   if(n.x==0. && n.y==0.)
@@ -1243,13 +1432,7 @@ void union_obj_t::maj_dyn_vars()
 bool union_obj_t::fast_collision_check(object_t *obj)
 {
   for(unsigned int i=0; i<objects.size(); i++)
-  {
-    if(objects[i]->type==OBJ_PINCE_OUVERTE && obj->type==OBJ_PALET) continue;
-    if((objects[i]->type==OBJ_PINCE_OUVERTE || objects[i]->type==OBJ_PINCE_FERMEE) &&
-      (objects[i]->z-objects[i]->hauteur/2.) >= (obj->z + obj->hauteur/2.))
-      continue;
     if(objects[i]->fast_collision_check(obj)) return true;
-  }    
   return false;    
 }
 //---------------------------------------------------------------------------
@@ -1257,13 +1440,7 @@ bool union_obj_t::slow_collision_check(object_t *obj)
 {
   bool is_coll=false;
   for(unsigned int i=0; i<objects.size(); i++)
-  {
-    if(objects[i]->type==OBJ_PINCE_OUVERTE && obj->type==OBJ_PALET) continue;
-    if((objects[i]->type==OBJ_PINCE_OUVERTE || objects[i]->type==OBJ_PINCE_FERMEE) &&
-      (objects[i]->z-objects[i]->hauteur/2.) >= (obj->z + obj->hauteur/2.))
-      continue;    
     if(objects[i]->slow_collision_check(obj)) is_coll=true;
-  }
   return is_coll;
 }
 //---------------------------------------------------------------------------

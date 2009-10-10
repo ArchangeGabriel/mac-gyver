@@ -37,15 +37,6 @@ float strat_elapsed_time();
 
 //------------------------------------------------------------------------------
 /*
-Renvoie/regle les config, -1 sur inconnues
-*/
-int strat_config_distrib();
-int strat_config_palets();
-void strat_set_config_distrib(int c);
-void strat_set_config_palets(int c);
-
-//------------------------------------------------------------------------------
-/*
 Appelé à la fin de 1min30
 */
 void strat_game_over();
@@ -55,20 +46,6 @@ void strat_game_over();
 Boucle principale de la strategie
 */
 void stratMainLoop();
-
-//------------------------------------------------------------------------------
-/*
-Collecte les palets
-Renvoie -1 si le boulot n'est pas fini, 0 sinon
-*/
-int strat_collecte();
-
-//------------------------------------------------------------------------------
-/*
-Dépose les palets
-Renvoie -1 si le boulot n'est pas fini, 0 sinon
-*/
-int strat_depose();
 
 //------------------------------------------------------------------------------
 /*

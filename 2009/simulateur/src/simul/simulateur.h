@@ -33,7 +33,6 @@ class simulateur_t
   void load_params(const char *file);
   void load_simul();  
   void add_object(object_t *obj);
-  void add_palet(object_t *obj);  
   void clear_objects();  
   void add_robot(robot_t *robot,void* (*func1)(void*), void* (*func2)(void*) = NULL);  
 /*  void lock_robots();

@@ -1,0 +1,3 @@
+CC=g++
+CFLAGS=-W -Wall -pedantic `sdl-config --cflags` -g
+LDFLAGS=`sdl-config --libs` -lncurses -lGL -lGLU -lglut -lusb -lIL -lILU

@@ -3,7 +3,6 @@ Paquets Debian à installer
 ---------------------------
 g++
 libsdl-dev
-libglut-dev
 libncurses5-dev
 freeglut3-dev
 libusb-dev

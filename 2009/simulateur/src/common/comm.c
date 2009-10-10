@@ -31,17 +31,12 @@ int get_msg_header_size(char *msg)
     break;
     case QUERY:    
     case ACK:
-    case BELT:
-    case VPOS:
-    case HPOS: 
-    case CLAMP: 
     case MOTORS:
     case CODER:    
     case PRINTF:
       return sizeof(int);
     break;
-    case DIST: 
-    case COUL:     
+    case DIST:     
       return 2*sizeof(int);
     break;  
     default:
@@ -74,10 +69,6 @@ int get_msg_data_size(char *msg)
     break;    
     case QUERY:
     case ACK:
-    case BELT:
-    case VPOS:
-    case HPOS: 
-    case CLAMP:     
     case PRINTF:
       return sizeof(MSG_INT1_t) - 2*sizeof(int);
     break;
@@ -85,8 +76,7 @@ int get_msg_data_size(char *msg)
     case CODER: 
       return sizeof(MSG_INT2_t) - 2*sizeof(int);
     break;
-    case DIST: 
-    case COUL:     
+    case DIST:   
       return sizeof(int)*((MSG_INTn_t*)msg)->n;
     break;  
     default:

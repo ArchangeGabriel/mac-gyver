@@ -9,6 +9,7 @@ make_pc:
 clean:
 	rm -f *.c~ *.h~ *.cpp~ ini/*.ini~ *.o makefile~ bin/*
 	rm -f simulateur client params.ini
+	make -s -C src/the_cup clean
 	make -s -C src/simul clean
 	make -s -C src/pic  clean	
 	make -s -C src/pc  clean

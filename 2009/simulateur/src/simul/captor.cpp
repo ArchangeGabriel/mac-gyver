@@ -67,7 +67,7 @@ void color_captor_t::draw()
   
   DisqueSDL(((int)(robot->simul_info->scale*p.x)),
             ((int)(robot->simul_info->scale*p.y)),
-            1,measure()==0?getColorSDL(clBlack):getColorSDL(clWhite));
+            1,measure()==0?makeColorSDL(0,0,0):makeColorSDL(255,255,255));
 }
 //----------------------------------------------------------------------------
 
@@ -107,6 +107,7 @@ int dist_captor_t::measure()
       if(tmp != -1. && tmp<dist)
         dist = tmp;  
     }
+    
   return ((int)(logf(dist / COEFF_A_DIST) / logf(COEFF_B_DIST))) << 6;
 } 
 //----------------------------------------------------------------------------
