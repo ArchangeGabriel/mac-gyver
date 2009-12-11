@@ -51,6 +51,7 @@ Voici quelques commandes svn pour développer:
   * '?' : SVN ne connait pas ce fichier, utilisez 'svn add mon_fichier' pour l'ajouter au dépot.
   * 'A' : Le fichier a été ajouté. Tout va bien.
   * 'D' : Le fichier sera supprimé dans la prochaine version.
+  * 'M' : Le fichier a été modifié.
   * 'C' : Le fichier est en conflit, voir 'resolution des conflits'
   * 'G' : Le fichier a été fusionné avec la dernière version (après avoir fait 'svn up')
 - vous voulez déplacer ou supprimer un fichier du dépot? Utilisez 'svn mv mon_fichier' ou 'svn rm mon_fichier'
@@ -75,7 +76,3 @@ Vous devez:
    - Supprimer les fichiers .r42, .r43 et .mine.
    - Retenter le 'svn ci -m "blabla"'
 
- 
-Voila, je sais pas si c'est clair, si vous avez des difficultés ou des questions, mailez-moi !
-
-Geekou
