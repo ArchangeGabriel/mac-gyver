@@ -1,0 +1,9 @@
+---------------------------
+Paquets Debian à installer
+---------------------------
+g++
+libsdl-dev
+libncurses5-dev
+freeglut3-dev
+libusb-dev
+libdevil-dev
