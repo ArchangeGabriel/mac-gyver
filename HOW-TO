@@ -1,0 +1,81 @@
+
+Salut à tous!
+
+Aujourd'hui au programme: comment récupérer les archives de l'année dernière et celles de cette année? Vous y trouverez entre autres des modèles Solidworks du robot de 2009, le simulateur 2009 et 2010, les cartes élec, le code du pic... (la page du projet est là: http://code.google.com/p/mac-gyver/)
+
+Pour récupérer ces sources, c'est facile, on va utiliser le gestionnaire de version SVN de Google Project (ca permet à tous le monde de coder dans son coin et de fusionner le code sans effort). C'est parti:
+
+1°) Si vous n'avez pas de compte Google, créez en un compte avec n'importe quelle adresse:
+https://www.google.com/accounts/NewAccount
+
+2°) Envoyez moi l'adresse de votre compte Google à 'vincent.delaitre@ens-lyon.org' pour que je vous donne les droits d'écriture sur le dépot SVN.
+
+3°) Si vous n'avez pas Linux: installez cygwin (http://www.cygwin.com/)
+
+4°) Sous Linux ou sous cygwin, installez subversion (SVN), ça devrait ressembler à ça:
+sudo apt-get install subversion
+
+5°) Récupérez les archives MacGyver:
+Pour cela, ouvrez un terminal et allez dans le répertoire où vous voulez installer les archives.
+
+Tapez (en n'oubliant pas de remplacer 'votre_adresse_google'):
+svn checkout https://mac-gyver.googlecode.com/svn/ mac-gyver --username votre_adresse_google
+
+On va vous demandez un mot de passe: c'est votre mot de passe google project qui est généré automatiquement. Vous le trouvez sur cette page:
+https://code.google.com/hosting/settings (en étant connecté à votre compte google)
+
+Les archives sont assez dodues (70 Mo) donc ça va prendre un peu de temps.
+
+6°) Une description du répertoire:
+- 2009/elec : les cartes électriques de 2009
+- 2009/pic : le code du pic
+- 2009/simulateur : le simulateur 2009
+- 2009/solidworks : le modèle solidworks du robot 2009 (l'assemblage final est dans 2009/solidworks/robot/robot.SLDASM, mais ne marchera peut-être pas complètement car SolidWorks utilise parfois des chemins absolus pour inclure les fichiers pièces)
+- 2009/usb : la lib usb utilisée
+- 2009/webcam/3ds : un projet 3ds max pour générer des images de la table pour tester la webcam
+- 2009/webcam/detect : le code de detection par webcam (plus ou moins intégré au simulateur maintenant)
+
+- 2010/simulateur : le simulateur 2010
+
+7°) COMMENT UTILISER SVN POUR CONTRIBUER AU PROJET?
+* SVN comment ça marche? 
+L'idée est d'avoir plusieurs versions du projet. Tous les versions sont stockées sur les serveurs de google et ce que vous récupérez c'est une copie de la dernière version. Vous pouvez modifier cette version comme bon vous semble puis poster une nouvelle version. Si d'autres personnes ont aussi fait des changements sur la dernière version, SVN s'efforce de fusionner ces changements du mieux qu'il peut.
+
+* SVN comment on l'utilise?
+Une fois que avez fais le 'svn checkout blala' de l'étape 5°), vous n'aurez à priori plus à le refaire, SVN se souvient de tout pour vous et vous avez récupéré la dernière version du projet.
+
+Voici quelques commandes svn pour développer:
+- vous avez créé un nouveau fichier? Vous devez dire à SVN de l'inclure dans le dépot en faisant 'svn add mon_fichier' (marche aussi avec les répertoires)
+- d'autres personnes que vous ont posté une nouvelle version et vous voulez la télécharger? Tapez 'svn up'. Parfois, il peut arriver qu'il y ait des conflits, voir 'resolution des conflits'
+- vous voulez voir ce que SVN connait des fichiers inclus dans le répertoire courant? Tapez 'svn st'. SVN affiche alors la liste des fichiers précédés d'une lettre:
+  * '?' : SVN ne connait pas ce fichier, utilisez 'svn add mon_fichier' pour l'ajouter au dépot.
+  * 'A' : Le fichier a été ajouté. Tout va bien.
+  * 'D' : Le fichier sera supprimé dans la prochaine version.
+  * 'C' : Le fichier est en conflit, voir 'resolution des conflits'
+  * 'G' : Le fichier a été fusionné avec la dernière version (après avoir fait 'svn up')
+- vous voulez déplacer ou supprimer un fichier du dépot? Utilisez 'svn mv mon_fichier' ou 'svn rm mon_fichier'
+- vous avez développé une version stable du projet et vous voulez la poster sur le serveur:
+     - vérifiez que vous avez inclus tous vos fichier au dépôt (faire 'make clean' pour le simulateur et vérifiez qu'il n'y a pas de '?' en faisant 'svn st')
+     - vérifiez que vous avez la dernière version en tapant 'svn up'
+     - s'il y a des conflits, réglez-les.
+     - Tapez 'svn ci -m "mon message pour dire ce que j'ai fait"' pour envoyer votre nouvelle version
+
+* Résolution des conflits
+Parfois, deux personnes changent du code au même endroit et SVN ne peut pas fusionner les deux versions du même fichier. Dans ce cas SVN crée 3 fichiers:
+   - mon_fichier.cpp.mine : votre fichier 
+   - mon_fichier.cpp.r42 : la version du fichier avant vos modifications (c'est pas forcément 'r42', 42 est le numéro de la révision)
+   - mon_fichier.cpp.r43 : la version du fichier la plus récente dans le dépot
+
+D'autre part, mon_fichier.cpp va être modifié par SVN: il signale les zones en conflit par des "<====", "=====>" en indiquant à chaque fois votre code et celui le plus récent.
+
+Vous devez:
+   - Réparer mon_fichier.cpp en regardant les changements que l'autre utilisateur a fait et en les gardant si nécessaire (on espère que c'est nécessaire). 
+   - Rétablir vos changements à vous s'ils sont encore d'actualité étant donné les changements de l'autre utilisateur.
+   - Vous assurer que tout compile bien.
+   - Supprimer les fichiers .r42, .r43 et .mine.
+   - Retenter le 'svn ci -m "blabla"'
+
+ 
+Voila, je sais pas si c'est clair, si vous avez des difficultés ou des questions, mailez-moi !
+
+Geekou
