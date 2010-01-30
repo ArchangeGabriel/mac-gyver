@@ -4,7 +4,7 @@
 #define _COMM_H
 
 void set_speed(unsigned char vitesse1, unsigned char vitesse2); // change la vitesse des moteurs en ces valeurs (0 ne change rien, 1 arriere toute, 128 arret, 255 avant toute)
-void get_codeuses(int *codeuse1, unsigned char *sens1, int *codeuse2, unsigned char *sens2); // met les valeurs courantes des codeuses dans codeuse1 et codeuse2, et les sens dans sens1 et sens2
+unsigned char get_codeuses(int *codeuse1, unsigned char *sens1, int *codeuse2, unsigned char *sens2); // met les valeurs courantes des codeuses dans codeuse1 et codeuse2, et les sens dans sens1 et sens2 / Retourne l'indice de l'echange usb (il s'incremente tous les pas de temps, au cas ou on a rate une trame usb)
 
 unsigned char get_digital_in(void); // retourne les 7 entrees numeriques (le bit de poids fort sera nul)
 void get_analog_in(unsigned short *result, unsigned char length); // rempli result des length (1-7) premieres entrees analogiques
