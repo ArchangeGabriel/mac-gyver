@@ -1,0 +1,77 @@
+EESchema-DOCLIB  Version 2.0  ven. 29 janv. 2010 20:01:37 CET
+#
+$CMP 74LS74
+D Dual D FlipFlop, Set & Reset
+K TTL DFF
+F 74xx/74hc_hct74.pdf
+$ENDCMP
+#
+$CMP 7805
+D Linear Regulator +5V
+K POWER REGUL
+F regulator/lm78*.*
+$ENDCMP
+#
+$CMP BRIDGE
+D Pont de Diodes
+K Pont Diode
+$ENDCMP
+#
+$CMP C
+D Condensateur non polarise
+$ENDCMP
+#
+$CMP CONN_2
+D Symbole general de connecteur
+K CONN
+$ENDCMP
+#
+$CMP CONN_3
+D Symbole general de connecteur
+K CONN
+$ENDCMP
+#
+$CMP CONN_5
+D Symbole general de connecteur
+K CONN
+$ENDCMP
+#
+$CMP CONN_7X2
+D Symbole general de connecteur
+K CONN
+$ENDCMP
+#
+$CMP CP
+D Condensateur polarise
+$ENDCMP
+#
+$CMP DIODE
+D Diode simple
+K DEV DIODE
+$ENDCMP
+#
+$CMP LED
+K LED
+$ENDCMP
+#
+$CMP R
+D Resistance
+K R DEV
+$ENDCMP
+#
+$CMP SW_PUSH
+D Push Button
+K Switch
+$ENDCMP
+#
+$CMP SWITCH_INV
+D Switch inverseur
+K switch
+$ENDCMP
+#
+$CMP USB_2
+D USB Connector
+K USB usb CONNECTOR connector
+$ENDCMP
+#
+#End Doc Library
