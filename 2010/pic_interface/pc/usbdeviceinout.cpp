@@ -39,7 +39,7 @@ USBDeviceInOut::USBDeviceInOut(struct usb_device *dev)
     if(c)
     {
         usb_close(dh);
-        throw "Unable to set configuration on motors device.";
+        throw "Unable to set configuration on inout device.";
     }
 }
 
@@ -165,6 +165,7 @@ void USBDeviceInOut::motors_order(unsigned char order)
             throw "I/O error on MOTORS command.";
         }
     }
+    motors_last_order = order;
 }
 
 unsigned char USBDeviceInOut::get_digital_in()
