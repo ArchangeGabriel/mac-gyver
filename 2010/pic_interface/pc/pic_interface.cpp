@@ -41,20 +41,24 @@ unsigned char find_usb(unsigned char but)
 {
     unsigned char resultat;
     struct usb_bus *busses;
+    cout << "find_usb" << endl;
     resultat = 0;
     usb_init();
     usb_find_busses();
     usb_find_devices();
     busses = usb_get_busses();
+    cout << "busses bot" << endl;
     for (struct usb_bus *bus = busses; bus; bus = bus->next)
     {
         struct usb_device *dev;
 
         for (dev = bus->devices; dev; dev = dev->next)
         {
+            cout << "device";
             /* Look for matching devices */
             if (dev->descriptor.idVendor  == MACGYVERID)
             {
+                cout << "matching";
                 if((but & DEVICEMOTEUR) && (dev->descriptor.idProduct == MOTORID))
                 {
                     // Carte moteur trouvee !
@@ -62,10 +66,10 @@ unsigned char find_usb(unsigned char but)
                     try 
                     {
                         devicemoteur = new USBDeviceMoteur(dev);
+                        resultat |= DEVICEMOTEUR;
                     }
                     catch (char const* msg)
                     {
-                        resultat |= DEVICEMOTEUR;
                         cerr << msg << endl; 
                     }
                 }
@@ -76,16 +80,18 @@ unsigned char find_usb(unsigned char but)
                     try 
                     {
                         deviceinout = new USBDeviceInOut(dev);
+                        resultat |= DEVICEINOUT;
                     }
                     catch (char const* msg)
                     {
-                        resultat |= DEVICEINOUT;
                         cerr << msg << endl; 
                     }
                 }
             }
+            cout << endl;
         }
     }
+    cout << "fin de find_usb" << (int)resultat << endl;
     return resultat;
 }
 
@@ -93,10 +99,14 @@ int setup_usb_connexions()
 {
     unsigned char c;
     c = find_usb(DEVICEMOTEUR | DEVICEINOUT);
-    if(c != 0)
+    if(c == 0)
     {
+        if(!(c & DEVICEMOTEUR)) cout << "DEVICEMOTEUR absent" << endl;
+        if(!(c & DEVICEINOUT)) cout << "DEVICEINOUT absent" << endl;
+        cout << "setup returns -1" << endl;
         return -1;
     }
+    cout << "setup returns 1" << endl;
     return 1;
 }
 
@@ -160,12 +170,12 @@ int init_analog_in(unsigned char number)
 int set_DC_motor(unsigned char number, char sens)
 {
     unsigned char ordre, msk;
-    if(sens > 0) ordre = 0x01;
-    else if(sens == 0) ordre = 0;
-    else ordre = 0x02;
+    if(sens > 0) ordre = 0x55;    // 01010101
+    else if(sens == 0) ordre = 0; // 00000000
+    else ordre = 0xaa;            // 10101010
     msk = 3<<(number<<1);
-    deviceinout->motors_last_order = (ordre & msk) | (deviceinout->motors_last_order & (0xff-msk));
-    catcherror(deviceinout->motors_order(deviceinout->motors_last_order));
+    ordre = (ordre & msk) | (deviceinout->motors_last_order & (0xff-msk));
+    catcherror(deviceinout->motors_order(ordre));
 }
 
 int set_servo(unsigned char number, unsigned char position)

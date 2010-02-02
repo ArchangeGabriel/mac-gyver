@@ -3,7 +3,6 @@
 #include <pic18fregs.h>
 #include "common_types.h"
 #include "ep2.h"
-//#include "../../../io/commandes.h"
 #include "moteurs.h"
 #include "pining.h"
 

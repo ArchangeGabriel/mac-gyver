@@ -6,12 +6,13 @@
 #include "proto.h"
 #include "pining.h"
 
-#define NB_DIG (16-NB_ANALOGS) // Pour registres (voir analogs.c)
+#define NB_DIG (16-NB_ANALOGS) // Pour les registres de conf
+#define SIZE_AN_DATA ((2*NB_ANALOGS) + 2)
 
 //unsigned char send_an[128];//2*NB_ANALOGS + 1];
 unsigned char* an;
 unsigned char compteur_an;
-unsigned char an_data[28];
+unsigned char an_data[SIZE_AN_DATA];
 unsigned char number_an;
 
 unsigned char configured = 0;
@@ -37,17 +38,17 @@ void send_an_data(unsigned char number)
 void setup_adconversion(void) // Configure AD...
 {
     set_antris();
-    if(!configured)
+    for(compteur_an=0;compteur_an<SIZE_AN_DATA;compteur_an++) an_data[compteur_an]=0;
+    compteur_an = 0;
+    if(configured)
     {
         OSCCONbits.IDLEN = 1; //|= 0x80; // 10000000 : IDLEN = 1 : pas de SLEEP (pour AD conversion)
         OSCCONbits.SCS = 0; // &= 0xfc; // 11111100 : SCS = 0 : primary clock source (on ne sait jamais !)
-        ADCON1 = NB_DIG; // 00 0 0 1000 : nU, Vref- = VSS, Vref+ = VDD, nb d'analogs
+        ADCON1 = NB_DIG; // 00 0 0 xxxx : nU, Vref- = VSS, Vref+ = VDD, nb d'analogs
         ADCON0 = 0x00; // 00 0000 0 0 : nU, ANinput = AN0, idle, ADOFF
         ADCON2 = 0x2E; // 0 0 101 110 : left justified, nU, 12 Tac d'acquisition, freq de Fosc/64
         ADCON0 |= 0x01; // xx xxxx x 1 : ADON
         an = &(an_data[2]);
-        for(compteur_an=0;compteur_an<28;compteur_an++) an_data[compteur_an]=0;
-        compteur_an = 0;
         PIE1bits.ADIE = 1;
     }    
     else
@@ -59,8 +60,6 @@ void setup_adconversion(void) // Configure AD...
 
 void init_adconversion(unsigned char number)
 {
-    for(compteur_an=0;compteur_an<28;compteur_an++) an_data[compteur_an]=0;
-    compteur_an = 0;
     number_an = number;
     ADCON0bits.GO = 1;  // Lance la convertion
     configured = 1;
