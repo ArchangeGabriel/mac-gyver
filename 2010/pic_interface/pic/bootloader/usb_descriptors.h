@@ -123,7 +123,7 @@ typedef struct
  * USB Endpoints callbacks
  *****************************************************************************/
 extern const USB_Device_Descriptor boot_device_descriptor;
-extern const uchar * const boot_configuration_descriptor[];
+extern const uchar code * const boot_configuration_descriptor[];
 extern const uchar * const boot_string_descriptor[];
 extern const uchar str0[];
 extern const uchar str1[];

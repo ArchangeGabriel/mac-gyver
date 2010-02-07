@@ -5,8 +5,9 @@
 #include "config.h"
 #include "common_types.h"
 #include "usb_descriptors.h"
+#include "application_iface.h"
 
-typedef struct {
+/*typedef struct {
     uchar invalid;                   // != 0 when the application is not valid
     void* device_descriptor;
     void** configuration_descriptor; // pointer to an array of pointer to configuration descriptors
@@ -20,9 +21,9 @@ typedef struct {
     void (*wakeup) (void);
     char (*set_device_remote_wakeup)(void);
     char (*clear_device_remote_wakeup)(void);
-} ApplicationData;
+} ApplicationData;*/
 
-const ApplicationData __at(APPLICATION_DATA_ADDRESS) application_data = {
+const ApplicationData code __at(APPLICATION_DATA_ADDRESS) application_data = {
     0xFF,           // Application is not valid by default
     NULL,           // no device descriptor
     NULL,           // no configuration descriptor

@@ -21,7 +21,7 @@ volatile BufferDescriptorTable __at (0x400) ep_bdt[32];
 uchar * const UEPpoint[] = {&UEP0, &UEP1, &UEP2, &UEP3, &UEP4, &UEP5, &UEP6, &UEP7, &UEP8, &UEP9, &UEP10, &UEP11, &UEP12, &UEP13, &UEP14, &UEP15};
 
 const USB_Device_Descriptor *device_descriptor;
-const void **configuration_descriptor;
+const uchar code * code * configuration_descriptor;
 const uchar* const *string_descriptor;
 void (*** ep_init)(void);
 void (*** ep_in)(void);
