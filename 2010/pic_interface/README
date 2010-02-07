@@ -1,0 +1,4 @@
+
+Voir pc/pic_interface.h pour les fonctions de bas niveaux implémentées.
+
+Le compilateur PIC est sdcc. (sur sourceforge, et dans les dépôts classiques)

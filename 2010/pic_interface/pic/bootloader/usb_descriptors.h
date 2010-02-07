@@ -1,24 +1,6 @@
 /*-------------------------------------------------------------------------
   usb_descriptors.h - USB device, interface, class, ep, string descriptors
-
-             (c) 2006 Pierre Gaufillet <pierre.gaufillet@magic.fr> 
-
-    This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Lesser General Public
-    License as published by the Free Software Foundation; either
-    version 2.1 of the License, or (at your option) any later version.
-
-    This library is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Lesser General Public License for more details.
-
-    You should have received a copy of the GNU Lesser General Public
-    License along with this library; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 -------------------------------------------------------------------------*/
-
-/* $Id: usb_descriptors.h,v 1.3 2006/04/08 17:29:00 gaufille Exp $ */
 
 #ifndef USB_DESCRIPTORS_H_
 #define USB_DESCRIPTORS_H_
@@ -56,7 +38,6 @@
 /* bEndpointAddress : direction */
 #define IN_EP  0x80
 #define OUT_EP 0x00
-
 
 /******************************************************************************
  * USB Device Descriptor (table 9-8)
@@ -138,11 +119,9 @@ typedef struct
     USB_Endpoint_Descriptor       ep_dsc[2];                
 } USB_Flash_Composite_Descriptor;
 
-
 /******************************************************************************
  * USB Endpoints callbacks
  *****************************************************************************/
-
 extern const USB_Device_Descriptor boot_device_descriptor;
 extern const uchar * const boot_configuration_descriptor[];
 extern const uchar * const boot_string_descriptor[];

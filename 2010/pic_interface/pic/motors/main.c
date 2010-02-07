@@ -5,14 +5,12 @@
 #include <pic18fregs.h>
 #include "common_types.h"
 #include "boot_iface.h"
+#include "usb_status.h"
 
 #include "codeuses.h"
 #include "alim.h"
 #include "pining.h"
 
-#define ftoggle_A4() { PORTAbits.RA4 = !PORTAbits.RA4; }
-
-/******************************************************************/
 
 // beware : this is not a C main function, but the application
 // entry point called from the boot.
@@ -44,6 +42,8 @@ void application_main(void)
     init_pwm();
     init_codeuses();
     
+    SET_DEVICE_STATUS(DEVICE_BUS_POWERED | REMOTE_WAKEUP_DIS);
+
     // Interruptions
     
     PIE2bits.USBIE = 0; // Interrupt USB off : on ne touche pas a la gestion de l'USB !!
@@ -62,7 +62,7 @@ void application_main(void)
 
 
 /* Interrupt vectors */
-#pragma code high_priority_isr 0x2020
+#pragma code high_priority_isr 0x2030
 void high_priority_isr(void) interrupt
 {
     if(INTCONbits.TMR0IF)

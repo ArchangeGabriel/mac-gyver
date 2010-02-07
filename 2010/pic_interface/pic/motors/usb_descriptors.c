@@ -2,7 +2,7 @@
   usb_descriptors.c - USB device, interface, class, ep, string descriptors
 -------------------------------------------------------------------------*/
 
-#include "usb_descriptors.h"
+#include "app_usb_descriptors.h"
 #include "boot_iface.h"
 #include "ep1.h"
 #include "ep2.h"

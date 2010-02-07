@@ -18,6 +18,8 @@ volatile BufferDescriptorTable __at (0x400) ep_bdt[32];
 //volatile uchar __at(0x500) ep1_OutBuffer[EP1_BUFFER_SIZE];
 //volatile uchar __at(0x540) ep2_InBuffer[EP2_BUFFER_SIZE];
 
+uchar * const UEPpoint[] = {&UEP0, &UEP1, &UEP2, &UEP3, &UEP4, &UEP5, &UEP6, &UEP7, &UEP8, &UEP9, &UEP10, &UEP11, &UEP12, &UEP13, &UEP14, &UEP15};
+
 const USB_Device_Descriptor *device_descriptor;
 const void **configuration_descriptor;
 const uchar* const *string_descriptor;
@@ -27,6 +29,9 @@ void (*** ep_out)(void);
 void (*** ep_setup)(void);
 void (*suspend)(void);
 void (*wakeup)(void);
+char (*set_device_remote_wakeup)(void);
+char (*clear_device_remote_wakeup)(void);
+uchar (*get_device_status)(void);
 
 #pragma udata access usb_device_state
 uchar __at(0x005f) usb_device_state;
@@ -63,9 +68,9 @@ void reset_usb(void)
     UADDR = 0x00;
     
     while(UIRbits.TRNIF)
-        {
-         UIRbits.TRNIF = 0;
-        }
+    {
+        UIRbits.TRNIF = 0;
+    }
         
     // Put the device in default state
     SET_DEVICE_STATE(DEFAULT_STATE);
@@ -78,7 +83,7 @@ void reset_usb(void)
     UEP4  = 0; UEP5  = 0; UEP6  = 0; UEP7  = 0;
     UEP8  = 0; UEP9  = 0; UEP10 = 0; UEP11 = 0;
     UEP12 = 0; UEP13 = 0; UEP14 = 0; UEP15 = 0;
-    
+
     UCONbits.PKTDIS = 0;
     
     for(i = 0; i < 16; i++)
@@ -108,13 +113,13 @@ void usb_sleep(void)
 void dispatch_usb_event(void)
 {
     // USB activity interrupt
-    if(UIEbits.ACTIVIE && UIRbits.ACTIVIF)
+    if(UIEbits.ACTVIE && UIRbits.ACTVIF)
     {
         UCONbits.SUSPND = 0;
-        UIEbits.ACTIVIE = 0;
-        while(UIRbits.ACTIVIF)
+        UIEbits.ACTVIE = 0;
+        while(UIRbits.ACTVIF)
         {
-            UIRbits.ACTIVIF = 0;
+            UIRbits.ACTVIF = 0;
         }
         wakeup();
     }
@@ -128,7 +133,7 @@ void dispatch_usb_event(void)
     // USB idle interrupt
     if(UIEbits.IDLEIE && UIRbits.IDLEIF)
     {
-        UIEbits.ACTIVIE = 1;
+        UIEbits.ACTVIE = 1;
         UIRbits.IDLEIF  = 0;
         UCONbits.SUSPND = 1;
         suspend();
@@ -136,8 +141,8 @@ void dispatch_usb_event(void)
     
     // USB stall interrupt
     if(UIEbits.STALLIE && UIRbits.STALLIF)
-    // to be verified. Is it really required ?
-    // should EPx be processed ?
+    // to be verified. Is it really required ? Yes
+    // should EPx be processed ?               No
     {
         if(UEP0bits.EPSTALL == 1)
         {
