@@ -1,24 +1,6 @@
 /*-------------------------------------------------------------------------
   usb_std_req.h - USB Standard SETUP requests
-  
-             (c) 2006 Pierre Gaufillet <pierre.gaufillet@magic.fr> 
-
-    This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Lesser General Public
-    License as published by the Free Software Foundation; either
-    version 2.1 of the License, or (at your option) any later version.
-
-    This library is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Lesser General Public License for more details.
-
-    You should have received a copy of the GNU Lesser General Public
-    License along with this library; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 -------------------------------------------------------------------------*/
-
-/* $Id: usb_std_req.h,v 1.4 2006/04/17 20:36:15 gaufille Exp $ */
 
 #ifndef USB_STD_REQ_H_
 #define USB_STD_REQ_H_
@@ -30,14 +12,22 @@
 #define HOST_TO_DEVICE      0
 #define DEVICE_TO_HOST      1
 
-#define STANDARD            0x00
-#define CLASS               0x01
-#define VENDOR              0x02
+#define STANDARD            0
+#define CLASS               1
+#define VENDOR              2
 
 #define RECIPIENT_DEVICE    0
 #define RECIPIENT_INTERFACE 1
 #define RECIPIENT_ENDPOINT  2
 #define RECIPIENT_OTHER     3
+
+/******************************************************************************
+ * wValue Standard Feature Selector
+ * USB 2.0 Spec Ref Table 9-6
+ *****************************************************************************/
+#define ENDPOINT_HALT          0
+#define DEVICE_REMOTE_WAKEUP   1
+#define TEST_MODE              2
 
 /******************************************************************************
  * bRequest Standard Device Requests

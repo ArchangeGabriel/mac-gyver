@@ -3,12 +3,14 @@
 -------------------------------------------------------------------------*/
 
 #include "common_types.h"
-#include "usb_descriptors.h"
+#include "app_usb_descriptors.h"
 #include "alim.h"
+
+#include "application_iface.h"
 
 void application_main(void);
 
-typedef struct {
+/*typedef struct {
     uchar invalid;                   // != 0 when the application is not valid
     void* device_descriptor;
     void** configuration_descriptor; // pointer to an array of pointer to configuration descriptors
@@ -20,7 +22,9 @@ typedef struct {
     void (*main) (void);
     void (*suspend) (void);
     void (*wakeup) (void);
-} ApplicationData;
+    char (*set_device_remote_wakeup)(void);
+    char (*clear_device_remote_wakeup)(void);
+} ApplicationData;*/
 
 const ApplicationData __at(0x2000) application_data = {
     0x00,                          // Application is valid
@@ -33,5 +37,7 @@ const ApplicationData __at(0x2000) application_data = {
     ep_setup,                      // ep_setup
     application_main,              // application main
     application_suspend,           // application suspend procedure
-    application_wakeup             // application wakeup procedure
+    application_wakeup,            // application wakeup procedure
+    NULL,                          // application set_device_remote_wakeup procedure
+    NULL                           // application clear_device_remote_wakeup procedure
 };

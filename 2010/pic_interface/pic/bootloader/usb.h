@@ -1,24 +1,6 @@
 /*-------------------------------------------------------------------------
   usb.h - Main USB functions
-
-             (c) 2006 Pierre Gaufillet <pierre.gaufillet@magic.fr> 
-
-    This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Lesser General Public
-    License as published by the Free Software Foundation; either
-    version 2.1 of the License, or (at your option) any later version.
-
-    This library is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Lesser General Public License for more details.
-
-    You should have received a copy of the GNU Lesser General Public
-    License along with this library; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 -------------------------------------------------------------------------*/
-
-/* $Id: usb.h,v 1.6 2006/06/03 14:17:03 gaufille Exp $ */
 
 #ifndef USB_H_
 #define USB_H_
@@ -49,7 +31,7 @@
 #define BOOT_CONFIGURATION     1
 #define FLASH_CONFIGURATION    2
 
-/* Current interface accessors */
+/* Current interface accessors */ // Vraiment n'importe quoi ca !!
 #define SET_ACTIVE_ALTERNATE_SETTING(x)     { usb_active_alt_setting = x; }
 #define GET_ACTIVE_ALTERNATE_SETTING()      (usb_active_alt_setting)
 
@@ -141,13 +123,15 @@ typedef union
 /* Buffer descriptors Table */
 extern volatile BufferDescriptorTable __at (0x400) ep_bdt[32];
 
-
 //extern volatile uchar __at(0x500) ep1_OutBuffer[EP1_BUFFER_SIZE];
 //extern volatile uchar __at(0x540) ep2_InBuffer[EP2_BUFFER_SIZE];
 
 extern uchar __at(0x005f) usb_device_state;
 extern uchar __at(0x005e) usb_active_cfg;
 extern uchar __at(0x005d) usb_active_alt_setting;
+
+extern uchar * const UEPpoint[];
+#define UEP *UEPpoint
 
 extern const USB_Device_Descriptor *device_descriptor;
 extern const void **configuration_descriptor;
@@ -158,6 +142,9 @@ extern void (*** ep_out)(void);
 extern void (*** ep_setup)(void);
 extern void (*suspend)(void);
 extern void (*wakeup)(void);
+extern char (*set_device_remote_wakeup)(void);
+extern char (*clear_device_remote_wakeup)(void);
+extern uchar (*get_device_status)(void);
 
 void init_usb(void);
 void reset_usb(void);

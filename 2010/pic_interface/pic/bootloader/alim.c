@@ -15,3 +15,8 @@ void boot_wakeup(void)
 {
     PINDEBUG = memory;
 }
+
+char boot_device_remote_wakeup(void)
+{
+    return TRUE; // Remote wakeup unavailable
+}

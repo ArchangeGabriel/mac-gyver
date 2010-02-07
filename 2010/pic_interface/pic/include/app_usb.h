@@ -1,24 +1,6 @@
 /*-------------------------------------------------------------------------
   usb.h - Main USB functions
-
-             (c) 2006 Pierre Gaufillet <pierre.gaufillet@magic.fr> 
-
-    This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Lesser General Public
-    License as published by the Free Software Foundation; either
-    version 2.1 of the License, or (at your option) any later version.
-
-    This library is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Lesser General Public License for more details.
-
-    You should have received a copy of the GNU Lesser General Public
-    License along with this library; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 -------------------------------------------------------------------------*/
-
-/* $Id: usb.h,v 1.6 2006/06/03 14:17:03 gaufille Exp $ */
 
 #ifndef USB_H_
 #define USB_H_
@@ -43,6 +25,16 @@
 /* Current configuration accessors */
 #define SET_ACTIVE_CONFIGURATION(x) { usb_active_cfg = x; }
 #define GET_ACTIVE_CONFIGURATION()  (usb_active_cfg)
+
+/* Current device status accessors */
+#define SET_DEVICE_STATUS(x)  { usb_device_status = x; }
+#define GET_DEVICE_STATUS()  (usb_device_status)
+
+/* USB device statuses */
+#define REMOTE_WAKEUP_DIS 0x00
+#define REMOTE_WAKEUP_EN  0x02
+#define BUS_POWERED       0x00
+#define SELF_POWERED      0x01
 
 /* Default configurations */
 #define DEFAULT_CONFIGURATION  0
@@ -144,11 +136,12 @@ extern volatile BufferDescriptorTable __at (0x400) ep_bdt[32];
 //extern volatile uchar __at(0x500) ep1_OutBuffer[MY_EP1_BUFFER_SIZE];
 //extern volatile uchar __at(0x540) ep2_InBuffer[MY_EP2_BUFFER_SIZE];
 
-/*extern uchar __at(0x005f) usb_device_state;
+extern uchar __at(0x005f) usb_device_state;
 extern uchar __at(0x005e) usb_active_cfg;
 extern uchar __at(0x005d) usb_active_alt_setting;
+extern uchar __at(0x005c) usb_device_status;
 
-extern const USB_Device_Descriptor *device_descriptor;
+/*extern const USB_Device_Descriptor *device_descriptor;
 extern const void **configuration_descriptor;
 extern const uchar* const *string_descriptor;
 extern void (*** ep_init)(void);

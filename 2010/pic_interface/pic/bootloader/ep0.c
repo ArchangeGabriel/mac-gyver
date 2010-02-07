@@ -1,30 +1,13 @@
 /*-------------------------------------------------------------------------
   ep0.c - USB endpoint 0 callbacks
-
-             (c) 2006 Pierre Gaufillet <pierre.gaufillet@magic.fr> 
-
-    This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Lesser General Public
-    License as published by the Free Software Foundation; either
-    version 2.1 of the License, or (at your option) any later version.
-
-    This library is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Lesser General Public License for more details.
-
-    You should have received a copy of the GNU Lesser General Public
-    License along with this library; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 -------------------------------------------------------------------------*/
-
-/* $Id: ep0.c,v 1.9 2006/06/10 12:02:30 gaufille Exp $ */
 
 #include "ep0.h"
 #include "application_iface.h"
 #include "usb_descriptors.h"
 #include "usb_std_req.h"
 #include "usb.h"
+#include "usb_status.h"
 #include <pic18fregs.h>
 
 /* Control Transfer States */
@@ -43,22 +26,77 @@ static uint  num_bytes_to_be_send;
 static uchar *sourceData;
 static uchar coming_cfg;
 
+static uchar status[2];
+
 uchar ep0_usb_std_request(void)
 {   
     // hack to avoid register allocation bug in sdcc
     static uchar unknown_request; 
-    
+
     unknown_request = FALSE;
 
     if(SetupBuffer.request_type != STANDARD) 
     {
         return FALSE;
     }
-    
+
     switch(SetupBuffer.bRequest)
     {
+        case SET_FEATURE:
+            switch(SetupBuffer.wValue) // par moi
+            {
+                case ENDPOINT_HALT:
+                    if((SetupBuffer.recipient != RECIPIENT_ENDPOINT)                               // bad recipient
+                       || ((GET_DEVICE_STATE() < CONFIGURED_STATE) && (SetupBuffer.wIndex != 0))   // in address state but EP != 0
+                       || ((GET_DEVICE_STATE() == CONFIGURED_STATE)                                // Configured...
+                         && (                                                                      // but...
+                           (!(UEP[SetupBuffer.wIndex] & (EPINEN_EN | EPOUTEN_EN)))                 // EP does not exist
+                           || (UEP[SetupBuffer.wIndex] & EPSTALL_EN)                               // EP is already stalled
+                            )
+                          )
+                      )
+                    {
+                        unknown_request = TRUE; // Invalid request
+                        break;
+                    }
+                    // request is valid !
+                    UEP[SetupBuffer.wIndex] |= EPSTALL_EN; // Stall EP
+                    break;
+                case DEVICE_REMOTE_WAKEUP:
+                    unknown_request = (SetupBuffer.recipient != RECIPIENT_DEVICE) || set_device_remote_wakeup();
+                    break;
+                default: // case TEST_MODE should only be available on high-speed capable devices. This device is not.
+                    unknown_request = TRUE;
+                    break;
+            }
+            break;
         case CLEAR_FEATURE:
-            // TODO not implemented
+            switch(SetupBuffer.wValue) // par moi
+            {
+                case ENDPOINT_HALT:
+                    if((SetupBuffer.recipient != RECIPIENT_ENDPOINT)                               // bad recipient
+                       || ((GET_DEVICE_STATE() < CONFIGURED_STATE) && (SetupBuffer.wIndex != 0))   // in address state but EP != 0
+                       || ((GET_DEVICE_STATE() == CONFIGURED_STATE)                                // Configured...
+                         && (                                                                      // but...
+                           (!(UEP[SetupBuffer.wIndex] & (EPINEN_EN | EPOUTEN_EN)))                 // EP does not exist
+                           || (!(UEP[SetupBuffer.wIndex] & EPSTALL_EN))                            // EP is not stalled
+                            )
+                          )
+                      )
+                    {
+                        unknown_request = TRUE; // Invalid request
+                        break;
+                    }
+                    // request is valid !
+                    ep_init[GET_ACTIVE_CONFIGURATION()][SetupBuffer.wIndex](); // Reset EP
+                    break;
+                case DEVICE_REMOTE_WAKEUP:
+                    unknown_request = (SetupBuffer.recipient != RECIPIENT_DEVICE) || clear_device_remote_wakeup();
+                    break;
+                default: // case TEST_MODE is not needed (see above).
+                    unknown_request = TRUE;
+                    break;
+            }
             break;
         case GET_CONFIGURATION:
             sourceData = &GET_ACTIVE_CONFIGURATION();
@@ -90,7 +128,43 @@ uchar ep0_usb_std_request(void)
             // TODO not implemented
             break;
         case GET_STATUS:
-            // TODO not implemented
+            sourceData = status;
+            num_bytes_to_be_send = 2;
+            status[1] = 0;
+            switch(SetupBuffer.recipient)
+            {
+                case RECIPIENT_DEVICE:
+                    status[0] = GET_DEVICE_STATUS();
+                    break;
+                case RECIPIENT_INTERFACE:
+     /*               if(((GET_DEVICE_STATE() < CONFIGURED_STATE) && (SetupBuffer.wIndex != 0))
+                      || ((GET_DEVICE_STATE() == CONFIGURED_STATE)
+                        && (SetupBuffer.wIndex >= ((USB_Configuration_Descriptor**)configuration_descriptor)[GET_ACTIVE_CONFIGURATION()]->bNumInterfaces))) // interface does not exist*/
+                    if(SetupBuffer.wIndex !=0) // Only for single interfaced devices
+                    {
+                        unknown_request = TRUE;
+                    }
+                    else
+                    {
+                        status[0] = 0;
+                    }
+                    break;
+                case RECIPIENT_ENDPOINT:
+                    if(((GET_DEVICE_STATE() < CONFIGURED_STATE) && (SetupBuffer.wIndex != 0))
+                      || ((GET_DEVICE_STATE() == CONFIGURED_STATE)
+                        && (!(UEP[SetupBuffer.wIndex] & (EPINEN_EN | EPOUTEN_EN)))))                 // EP does not exist
+                    {
+                        unknown_request = TRUE;
+                    }
+                    else
+                    {
+                        status[0] = UEP[SetupBuffer.wIndex] & EPSTALL_EN;
+                    }
+                    break;
+                default:
+                    unknown_request = TRUE;
+                    break;
+            }
             break;
         case SET_ADDRESS:
             SET_DEVICE_STATE(ADDRESS_PENDING_STATE);
@@ -108,9 +182,6 @@ uchar ep0_usb_std_request(void)
                 unknown_request = TRUE;
             }
             
-            break;
-        case SET_FEATURE:
-            // TODO not implemented
             break;
         case SET_INTERFACE:
             // TODO not implemented
