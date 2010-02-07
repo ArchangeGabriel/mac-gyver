@@ -57,7 +57,7 @@ void init_boot(void)
     { 
         // use boot descriptors
         device_descriptor          = &boot_device_descriptor;
-        configuration_descriptor   = (void**)boot_configuration_descriptor;
+        configuration_descriptor   = boot_configuration_descriptor;
         string_descriptor          = boot_string_descriptor;
         suspend                    = boot_suspend;
         wakeup                     = boot_wakeup;

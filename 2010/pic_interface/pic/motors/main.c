@@ -8,7 +8,7 @@
 #include "usb_status.h"
 
 #include "codeuses.h"
-#include "alim.h"
+#include "suspend.h"
 #include "pining.h"
 
 

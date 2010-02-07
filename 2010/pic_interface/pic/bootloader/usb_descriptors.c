@@ -84,7 +84,7 @@ const USB_Flash_Composite_Descriptor boot_flash_cfg = {
      0}}   // not used for full speed bulk EP
 };
 
-const uchar * const boot_configuration_descriptor[] = {
+const uchar code * const boot_configuration_descriptor[] = {
     (const uchar*) &boot_default_cfg,
     (const uchar*) &boot_flash_cfg
 };

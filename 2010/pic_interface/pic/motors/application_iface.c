@@ -4,7 +4,7 @@
 
 #include "common_types.h"
 #include "app_usb_descriptors.h"
-#include "alim.h"
+#include "suspend.h"
 
 #include "application_iface.h"
 
@@ -38,6 +38,6 @@ const ApplicationData __at(0x2000) application_data = {
     application_main,              // application main
     application_suspend,           // application suspend procedure
     application_wakeup,            // application wakeup procedure
-    NULL,                          // application set_device_remote_wakeup procedure
-    NULL                           // application clear_device_remote_wakeup procedure
+    set_device_remote_wakeup,      // application set_device_remote_wakeup procedure
+    clear_device_remote_wakeup     // application clear_device_remote_wakeup procedure
 };

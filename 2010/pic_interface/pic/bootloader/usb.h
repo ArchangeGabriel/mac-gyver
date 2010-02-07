@@ -134,7 +134,7 @@ extern uchar * const UEPpoint[];
 #define UEP *UEPpoint
 
 extern const USB_Device_Descriptor *device_descriptor;
-extern const void **configuration_descriptor;
+extern const uchar code * code * configuration_descriptor;
 extern const uchar* const *string_descriptor;
 extern void (*** ep_init)(void);
 extern void (*** ep_in)(void);

@@ -8,7 +8,7 @@ lkr_PIC_TYPE = 18f4550
 
 application_hex_OBJECTS = application_iface.o \
 	main.o usb_descriptors.o\
-	ep1.o ep2.o codeuses.o alim.o usb_status.o
+	ep1.o ep2.o codeuses.o suspend.o usb_status.o
 
 COMPILE = $(SDCC) -mpic16 $(DEBUG) -p$(sdcc_PIC_TYPE) -I$(INCLUDE) -c
 LINK = $(SDCC) -o  motors $(DEBUG) $(LDFLAGS) --no-crt -Wl-s$(lkr_PIC_TYPE).lkr,-m \
@@ -20,7 +20,7 @@ all:
 	$(COMPILE) -c usb_descriptors.c
 	$(COMPILE) -c usb_status.c
 	$(COMPILE) -c codeuses.c
-	$(COMPILE) -c alim.c
+	$(COMPILE) -c suspend.c
 	$(COMPILE) -c ep1.c
 	$(COMPILE) -c ep2.c
 	$(LINK) $(application_hex_OBJECTS)
