@@ -8,7 +8,7 @@ lkr_PIC_TYPE = 18f4550
 
 application_hex_OBJECTS = application_iface.o \
 	main.o usb_descriptors.o\
-	ep1.o ep2.o moteurs.o alim.o\
+	ep1.o ep2.o moteurs.o suspend.o\
 	analogs.o servos.o digitals.o usb_status.o
 
 
@@ -22,7 +22,7 @@ all:
 	$(COMPILE) -c usb_descriptors.c
 	$(COMPILE) -c usb_status.c
 	$(COMPILE) -c moteurs.c
-	$(COMPILE) -c alim.c
+	$(COMPILE) -c suspend.c
 	$(COMPILE) -c ep1.c
 	$(COMPILE) -c ep2.c
 	$(COMPILE) -c analogs.c

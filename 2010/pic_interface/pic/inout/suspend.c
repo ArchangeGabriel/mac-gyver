@@ -25,3 +25,13 @@ void application_wakeup(void)
     CCPR1L = 0x80; // Rapport cyclique 1 = 1/2
     CCPR2L = 0x80; // Rapport cyclique 2 = 1/2
 }
+
+char set_device_remote_wakeup(void)
+{
+    return TRUE; // Remote wakeup unavailable
+}
+
+char clear_device_remote_wakeup(void)
+{
+    return TRUE; // Remote wakeup unavailable
+}

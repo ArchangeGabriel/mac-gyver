@@ -129,7 +129,7 @@ const USB_Application_Composite_Descriptor application_cfg = {
 };
 
 
-const uchar * const configuration_descriptor[] = {
+const uchar code * const configuration_descriptor[] = {
     (const uchar*) &default_cfg,
     (const uchar*) &flash_cfg,
     (const uchar*) &application_cfg
