@@ -26,16 +26,6 @@
 #define SET_ACTIVE_CONFIGURATION(x) { usb_active_cfg = x; }
 #define GET_ACTIVE_CONFIGURATION()  (usb_active_cfg)
 
-/* Current device status accessors */
-#define SET_DEVICE_STATUS(x)  { usb_device_status = x; }
-#define GET_DEVICE_STATUS()  (usb_device_status)
-
-/* USB device statuses */
-#define REMOTE_WAKEUP_DIS 0x00
-#define REMOTE_WAKEUP_EN  0x02
-#define BUS_POWERED       0x00
-#define SELF_POWERED      0x01
-
 /* Default configurations */
 #define DEFAULT_CONFIGURATION  0
 #define BOOT_CONFIGURATION     1
