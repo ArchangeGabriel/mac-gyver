@@ -1,14 +1,18 @@
-all: make_src make_pc
+include makeopt
 
-make_src:
-	make -C src/simul
+all: simulateur pc
 
-make_pc:
-	make -C src/pc
+simulateur:
+	make -C simulateur
+	
+pc:
+	make -C pc
 
 clean:
-	rm -f *.c~ *.h~ *.cpp~ ini/*.ini~ *.o makefile~ bin/*
+	rm -f *.c~ *.h~ *.cpp~ ini/*.ini~ *.o makefile~
 	rm -f simulateur client params.ini
+	make -s -C pc clean
+	make -s -C simulateur clean
 	make -s -C src/the_cup clean
 	make -s -C src/simul clean
 	make -s -C src/pic  clean	
