@@ -4,7 +4,7 @@
 #include "utils.hpp"
 #define PC_INCLUDE
 #include "../common/const.h"
-#include "../the_cup/webcam_list.h"
+#include "../simulateur/the_cup/webcam_list.h"
 #include "cinematik.h"
 
 webcam_t video_front(WEBCAM1,640,480);

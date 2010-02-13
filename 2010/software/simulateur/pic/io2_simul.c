@@ -1,7 +1,7 @@
 #include <pthread.h>
 
 #include "io2.h"
-#include "../common/comm.h"
+#include "../../common/comm.h"
 
 
 //------------------------------------------------------------------------------

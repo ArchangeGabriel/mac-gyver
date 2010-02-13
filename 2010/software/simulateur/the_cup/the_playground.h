@@ -4,7 +4,7 @@
 #define pgWidth   3
 #define pgHeight  2.622
 
-#include "../simul/object.h"
+#include "../object.h"
 
 void add_obstacles(simul_info_t *info);
 

@@ -5,7 +5,6 @@
 
 #define COLOR_GL(R,G,B)  (double(R)/255.),(double(G)/255.),(double(B)/255.)
 
-
 #define clWhite COLOR_SDL(255,255,255)
 #define glWhite COLOR_GL(255,255,255)
 #define clBlack COLOR_SDL(0,0,0)

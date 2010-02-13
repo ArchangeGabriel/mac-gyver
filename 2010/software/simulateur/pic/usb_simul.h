@@ -3,8 +3,8 @@
 
 #include <stdio.h>
 #include <errno.h>
-#include "../simul/server.h"
-#include "../common/comm.h"
+#include "../server.h"
+#include "../../common/comm.h"
 
 // se connecte au pc
 void connect_to_pc(int robot_id, int pic_id, int *comm_id);

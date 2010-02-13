@@ -5,11 +5,11 @@
 #include <time.h>
 #include <sys/time.h>
 
-#include "../pic/simul.h"
-#include "../pic/pic_main1.h"
-#include "../pic/pic_main2.h"
-#include "../the_cup/colors.h"
-#include "../the_cup/the_playground.h"
+#include "pic/simul.h"
+#include "pic/pic_main1.h"
+#include "pic/pic_main2.h"
+#include "the_cup/colors.h"
+#include "the_cup/the_playground.h"
 #include "keycontrol.h"
 
 #include "simulateur.h"

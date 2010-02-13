@@ -1,4 +1,4 @@
-#include "../common/simul.h"
+#include "../../common/simul.h"
 
 #ifdef SIMULATION
 #include "usb_simul.h"

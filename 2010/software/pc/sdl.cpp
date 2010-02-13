@@ -12,7 +12,6 @@
 SDL_Surface* affichage=NULL;
 SDL_Surface* background=NULL;
 Uint32 *back_pixels;
-Uint32 colors[NBR_COLORS];
 
 //------------------------------------------------------------------------------
 void initSDL()
@@ -41,22 +40,7 @@ void initSDL()
 //------------------------------------------------------------------------------
 void Load_SDL_Colors()
 {  
-  printf("Creating colors...              ");
-  fflush(stdout); 
-  colors[clBlack]=makeColorSDL(0x00,0x00,0x00);
-  colors[clDarkGray]=makeColorSDL(90,90,90);    
-  colors[clGray]=makeColorSDL(180,180,180);  
-  colors[clLightGray]=makeColorSDL(190,190,190);    
-  colors[clWhite]=makeColorSDL(0xFF,0xFF,0xFF);
-  colors[clGround]=makeColorSDL(52,97,182);
-  colors[clRed]=makeColorSDL(198,0,0);
-  colors[clGreen]=makeColorSDL(81,168,71);
-  colors[clDarkRed]=makeColorSDL(158,0,0);
-  colors[clDarkGreen]=makeColorSDL(64,134,56);  
-  colors[clDarkBrown]=makeColorSDL(47,28,22);  
-  colors[clBrown]=makeColorSDL(100,70,40);     
-  printf("ok\n");
-  fflush(stdout);
+ 
 }
 //------------------------------------------------------------------------------
 bool is_SDL_ready()
@@ -113,11 +97,6 @@ Uint32 makeColorSDL(char *color)
   if('A'<=color[5] && color[5]<='F') b+=(color[5]-'A'+10);  
   if('a'<=color[5] && color[5]<='f') b+=(color[5]-'a'+10);            
   return makeColorSDL(r,g,b);
-}
-//------------------------------------------------------------------------------
-Uint32 getColorSDL(int color_id)
-{
-  return colors[color_id];
 }
 //------------------------------------------------------------------------------
 inline void setPixel(int x, int y, Uint32 coul)
@@ -320,79 +299,29 @@ void SDL_First_Background()
 {
   printf("Creating background...          ");
   fflush(stdout);
-
-  FillRectSDL(0,0,((int)(_SCALE_SDL*_LONGUEUR_TER)),
-                  ((int)(_SCALE_SDL*_LARGEUR_TER)),getColorSDL(clGround));  
-  FillRectSDL(0,0,((int)(_SCALE_SDL*0.5)),
-                  ((int)(_SCALE_SDL*0.5)),getColorSDL(clDarkGreen));
-  FillRectSDL(((int)(_SCALE_SDL*(_LONGUEUR_TER-0.5))),
-              0,
-              ((int)(_SCALE_SDL*0.5)),
-              ((int)(_SCALE_SDL*0.5)),getColorSDL(clDarkRed));
+  // sol
+  FillRectSDL(0,0,int(_SCALE_SDL*_LONGUEUR_TER),int(_SCALE_SDL*_LARGEUR_TER),clGround);  
+  // départ 1
+  FillRectSDL(0,0,int(_SCALE_SDL*0.5),int(_SCALE_SDL*0.5),clTeam1);
+  FillRectSDL(int(_SCALE_SDL*(_LONGUEUR_TER-0.5)),int(_SCALE_SDL*(_LARGEUR_TER-0.522)),int(_SCALE_SDL*0.5),int(_SCALE_SDL*0.522),clDeposeTeam1);  
+  // départ 2
+  FillRectSDL(int(_SCALE_SDL*(_LONGUEUR_TER-0.5)),0,int(_SCALE_SDL*0.5),int(_SCALE_SDL*0.5),clTeam2);
+  FillRectSDL(0.,int(_SCALE_SDL*(_LARGEUR_TER-0.522)),int(_SCALE_SDL*0.5),int(_SCALE_SDL*0.522),clDeposeTeam2);  
+  // Hors Terrain
+  FillRectSDL(int(_SCALE_SDL*0.5),int(_SCALE_SDL*2.122),int(_SCALE_SDL*2.),int(_SCALE_SDL*0.5),clBlack);
+  // Mur Bas
+  FillRectSDL(int(_SCALE_SDL*0.5),int(_SCALE_SDL*2.1),int(_SCALE_SDL*2.),int(_SCALE_SDL*0.022),clWall);    
+  FillRectSDL(int(_SCALE_SDL*0.5),int(_SCALE_SDL*2.122),int(_SCALE_SDL*0.022),int(_SCALE_SDL*0.5),clWall);         
+  FillRectSDL(int(_SCALE_SDL*(_LONGUEUR_TER-0.522)),int(_SCALE_SDL*2.122),int(_SCALE_SDL*0.022),int(_SCALE_SDL*0.5),clWall);                         
+  // Colline
+  FillRectSDL(int(_SCALE_SDL*0.67),0,int(_SCALE_SDL*1.66),int(_SCALE_SDL*0.5),clHill);
+  // Mur colline
+  FillRectSDL(int(_SCALE_SDL*0.74),int(_SCALE_SDL*0.5),int(_SCALE_SDL*1.52),int(_SCALE_SDL*0.022),clWall); 
+  LigneVerticaleSDL(int(_SCALE_SDL*0.74), 0, int(_SCALE_SDL*0.5), clBlack);               
+  LigneVerticaleSDL(int(_SCALE_SDL*(_LONGUEUR_TER-0.74)), 0, int(_SCALE_SDL*0.5), clBlack);                 
+  LigneVerticaleSDL(int(_SCALE_SDL*1.24), 0, int(_SCALE_SDL*0.5), clBlack);                                    
+  LigneVerticaleSDL(int(_SCALE_SDL*(_LONGUEUR_TER-1.24)), 0, int(_SCALE_SDL*0.5), clBlack); 
   
-  FillRectSDL(((int)(_SCALE_SDL*(_LONGUEUR_TER/2-0.9))),
-              ((int)(_SCALE_SDL*(_LARGEUR_TER-0.1))),
-              ((int)(_SCALE_SDL*1.8)),
-              ((int)(_SCALE_SDL*0.1)),getColorSDL(clBrown));
-  FillRectSDL(((int)(_SCALE_SDL*(_LONGUEUR_TER/2-0.3))),
-              ((int)(_SCALE_SDL*(_LARGEUR_TER-0.1))),
-              ((int)(_SCALE_SDL*0.6)),
-              ((int)(_SCALE_SDL*0.1)),getColorSDL(clDarkBrown));                          
-  DisqueSDL(((int)(_SCALE_SDL*_LONGUEUR_TER/2)),
-            ((int)(_SCALE_SDL*_LARGEUR_TER/2)),
-            ((int)(_SCALE_SDL*0.15)),getColorSDL(clDarkBrown));
-            
-  FillRectSDL(((int)(_SCALE_SDL*(0.578))),
-              ((int)(_SCALE_SDL*(_LARGEUR_TER-0.1))),
-              ((int)(_SCALE_SDL*0.022)),
-              ((int)(_SCALE_SDL*0.1)),getColorSDL(clWhite));
-  FillRectSDL(((int)(_SCALE_SDL*(_LONGUEUR_TER-0.6))),
-              ((int)(_SCALE_SDL*(_LARGEUR_TER-0.1))),
-              ((int)(_SCALE_SDL*0.022)),
-              ((int)(_SCALE_SDL*0.1)),getColorSDL(clWhite));                                      
-  
-  DisqueSDL(((int)(_SCALE_SDL*0.289)),
-            ((int)(_SCALE_SDL*(_LARGEUR_TER-0.04))),
-            ((int)(_SCALE_SDL*0.04)),getColorSDL(clGray));
-  DisqueSDL(((int)(_SCALE_SDL*(_LONGUEUR_TER-0.289))),
-            ((int)(_SCALE_SDL*(_LARGEUR_TER-0.04))),
-            ((int)(_SCALE_SDL*0.04)),getColorSDL(clGray));
-  DisqueSDL(((int)(_SCALE_SDL*0.04)),
-            ((int)(_SCALE_SDL*(_LARGEUR_TER/2-0.25))),
-            ((int)(_SCALE_SDL*0.04)),getColorSDL(clGray));
-  DisqueSDL(((int)(_SCALE_SDL*(_LONGUEUR_TER-0.04))),
-            ((int)(_SCALE_SDL*(_LARGEUR_TER/2-0.25))),
-            ((int)(_SCALE_SDL*0.04)),getColorSDL(clGray));                                      
-  DisqueSDL(((int)(_SCALE_SDL*0.04)),
-            ((int)(_SCALE_SDL*(_LARGEUR_TER/2+0.25))),
-            ((int)(_SCALE_SDL*0.04)),getColorSDL(clGray));
-  DisqueSDL(((int)(_SCALE_SDL*(_LONGUEUR_TER-0.04))),
-            ((int)(_SCALE_SDL*(_LARGEUR_TER/2+0.25))),
-            ((int)(_SCALE_SDL*0.04)),getColorSDL(clGray)); 
-
-  for(int i=0;i<3;i++)
-    for(int j=0;j<4;j++)    
-      FillRectSDL(((int)(_SCALE_SDL*(_LONGUEUR_TER/2-0.9+0.105-0.0075+i*0.6+j*0.13))),
-              ((int)(_SCALE_SDL*(_LARGEUR_TER-0.35))),
-              ((int)(_SCALE_SDL*0.015)),
-              ((int)(_SCALE_SDL*0.25)),getColorSDL(clBlack));
-
-  for(int i=0;i<4;i++)         
-    FillRectSDL(((int)(_SCALE_SDL*(_LONGUEUR_TER/2-0.6-0.0075+i*0.4))),
-                0,
-                ((int)(_SCALE_SDL*0.015)),
-                ((int)(_SCALE_SDL*0.25)),getColorSDL(clBlack)); 
-                
-  for(int i=0;i<3;i++)              
-    for(int j=0;j<4;j++)  
-    {
-      DisqueSDL(((int)(_SCALE_SDL*(_LONGUEUR_TER/2-0.4-i*0.25))),
-                ((int)(_SCALE_SDL*(_LARGEUR_TER/2+0.125-j*0.2))),
-                ((int)(_SCALE_SDL*0.005)),getColorSDL(clBlack));  
-      DisqueSDL(((int)(_SCALE_SDL*(_LONGUEUR_TER/2+0.4+i*0.25))),
-                ((int)(_SCALE_SDL*(_LARGEUR_TER/2+0.125-j*0.2))),
-                ((int)(_SCALE_SDL*0.005)),getColorSDL(clBlack)); 
-    }                              
   printf("ok\n");
   fflush(stdout);                 
 }
@@ -425,9 +354,9 @@ void SDL_Draw_Robot()
     point[2].y=((int)((pos.y-N.y*_LONGUEUR_ROBOT/2.-T.y*_LARGEUR_ROBOT/2.-v.y)*_SCALE_SDL));
     point[3].x=((int)((pos.x-N.x*_LONGUEUR_ROBOT/2.+T.x*_LARGEUR_ROBOT/2.-v.x)*_SCALE_SDL));
     point[3].y=((int)((pos.y-N.y*_LONGUEUR_ROBOT/2.+T.y*_LARGEUR_ROBOT/2.-v.y)*_SCALE_SDL)); 
-    PolylineSDL(point, 4, getColorSDL(clWhite));
-    LigneSDL(point[2].x, point[2].y, ((int)(pos.x*_SCALE_SDL)), ((int)(pos.y*_SCALE_SDL)), getColorSDL(clWhite)); 
-    LigneSDL(point[3].x, point[3].y, ((int)(pos.x*_SCALE_SDL)), ((int)(pos.y*_SCALE_SDL)), getColorSDL(clWhite));
+    PolylineSDL(point, 4, clRobot);
+    LigneSDL(point[2].x, point[2].y, ((int)(pos.x*_SCALE_SDL)), ((int)(pos.y*_SCALE_SDL)), clRobot); 
+    LigneSDL(point[3].x, point[3].y, ((int)(pos.x*_SCALE_SDL)), ((int)(pos.y*_SCALE_SDL)), clRobot);
 
     // Destination
     N.x=cos(dest.a);
@@ -435,11 +364,11 @@ void SDL_Draw_Robot()
     T.x=-sin(dest.a)*0.03;
     T.y=cos(dest.a)*0.03; 
     LigneSDL(((int)(_SCALE_SDL*dest.x)), ((int)(_SCALE_SDL*dest.y)), 
-             ((int)(_SCALE_SDL*(dest.x+N.x*0.1))), ((int)(_SCALE_SDL*(dest.y+N.y*0.1))), getColorSDL(clBlack));
+             ((int)(_SCALE_SDL*(dest.x+N.x*0.1))), ((int)(_SCALE_SDL*(dest.y+N.y*0.1))), clBlack);
     LigneSDL(((int)(_SCALE_SDL*(dest.x+N.x*0.1))), ((int)(_SCALE_SDL*(dest.y+N.y*0.1))), 
-             ((int)(_SCALE_SDL*(dest.x+N.x*0.07+T.x))), ((int)(_SCALE_SDL*(dest.y+N.y*0.07+T.y))), getColorSDL(clBlack));
+             ((int)(_SCALE_SDL*(dest.x+N.x*0.07+T.x))), ((int)(_SCALE_SDL*(dest.y+N.y*0.07+T.y))), clBlack);
     LigneSDL(((int)(_SCALE_SDL*(dest.x+N.x*0.1))), ((int)(_SCALE_SDL*(dest.y+N.y*0.1))), 
-             ((int)(_SCALE_SDL*(dest.x+N.x*0.07-T.x))), ((int)(_SCALE_SDL*(dest.y+N.y*0.07-T.y))), getColorSDL(clBlack));    
+             ((int)(_SCALE_SDL*(dest.x+N.x*0.07-T.x))), ((int)(_SCALE_SDL*(dest.y+N.y*0.07-T.y))), clBlack);
     
     // Captors
     for(int i=0;i<4;i++)
@@ -448,7 +377,7 @@ void SDL_Draw_Robot()
       Uint32 color;
       switch(captor_get_status(i))
       {
-        case 0: color = getColorSDL(clBlack); break;
+        case 0: color = clBlack; break;
         case 1: color = SDL_MapRGB(affichage->format, 255, 0, 180);  break;
         case 2: color = SDL_MapRGB(affichage->format, 255, 0, 0);  break;
         case 3: color = SDL_MapRGB(affichage->format, 60, 60, 60);  break;

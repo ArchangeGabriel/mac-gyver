@@ -1,7 +1,7 @@
 #ifndef THE_ELEMENTS_H
 #define THE_ELEMENTS_H
 
-#include "../simul/object.h"
+#include "../object.h"
 
 class EltTomato : public ObjSphere
 {
