@@ -1,7 +1,7 @@
 #ifndef SIMULH
 #define SIMULH
 
-#include "../simul/robot.h"
+#include "../robot.h"
 
 typedef struct vect_t
 {

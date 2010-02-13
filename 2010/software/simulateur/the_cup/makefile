@@ -1,4 +1,4 @@
-include ../makeopt
+include ../../makeopt
 
 all: the_elements.o the_playground.o 
 

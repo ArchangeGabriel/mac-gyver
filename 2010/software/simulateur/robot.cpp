@@ -1,5 +1,5 @@
 #include "../common/comm.h"
-#include "../the_cup/colors.h"
+#include "the_cup/colors.h"
 
 #include "robot.h"
 

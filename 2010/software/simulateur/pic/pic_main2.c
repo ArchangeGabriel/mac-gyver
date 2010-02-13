@@ -6,8 +6,8 @@
 #include <semaphore.h>
 #include <stdlib.h>
 
-#include "../common/comm.h"
-#include "../common/simul.h"
+#include "../../common/comm.h"
+#include "../../common/simul.h"
 #include "usb.h"
 #include "io2.h"
 

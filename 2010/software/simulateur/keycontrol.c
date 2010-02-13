@@ -5,7 +5,7 @@
 
 #include "../common/comm.h"
 #include "../common/const.h"
-#include "../pic/simul.h"
+#include "pic/simul.h"
 #include "io.h"
 #include "sdl.h"
 

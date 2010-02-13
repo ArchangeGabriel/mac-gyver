@@ -1,20 +1,18 @@
 include makeopt
 
-all: simulateur pc
+all: do_simul do_pc
+	echo "done"
 
-simulateur:
+do_simul:
 	make -C simulateur
 	
-pc:
+do_pc:
 	make -C pc
 
 clean:
 	rm -f *.c~ *.h~ *.cpp~ ini/*.ini~ *.o makefile~
-	rm -f simulateur client params.ini
+	rm -f simul client params.ini
 	make -s -C pc clean
 	make -s -C simulateur clean
-	make -s -C src/the_cup clean
-	make -s -C src/simul clean
-	make -s -C src/pic  clean	
-	make -s -C src/pc  clean
-	make -s -C src/common clean
+	make -s -C common clean
+

@@ -1,12 +1,7 @@
 include ../makeopt
-EXEC=client
 
-all: $(EXEC)
-
-$(EXEC): make_common main.o
-	$(CC) -o ../../bin/$(EXEC) ../common/console.o ../common/comm.o usb.o cinematik.o webcamAPI.o picAPI.o anticol.o path_planning.o strategie.o sdl.o pc_main.o main.o processing.o utils.o common.o webcam.o $(LDFLAGS)
-	rm -f ../../$(EXEC)
-	ln ../../bin/$(EXEC) ../../$(EXEC)
+all: make_common main.o
+	$(CC) -o ../client ../common/console.o ../common/comm.o usb.o cinematik.o webcamAPI.o picAPI.o anticol.o path_planning.o strategie.o sdl.o pc_main.o main.o processing.o utils.o common.o webcam.o $(LDFLAGS)
 
 make_common:
 	make -C ../common

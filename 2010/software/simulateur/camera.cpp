@@ -4,7 +4,7 @@
 #include <GL/glut.h>
 
 #include "camera.h"
-#include "../the_cup/the_playground.h"
+#include "the_cup/the_playground.h"
 
 simul_info_t* camera_t::info;  
 

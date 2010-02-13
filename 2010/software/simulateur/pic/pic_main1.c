@@ -6,9 +6,9 @@
 #include <stdlib.h>
 #include <semaphore.h>
 
-#include "../common/const.h"
-#include "../common/comm.h"
-#include "../common/simul.h"
+#include "../../common/const.h"
+#include "../../common/comm.h"
+#include "../../common/simul.h"
 #include "usb.h"
 #include "io1.h"
 

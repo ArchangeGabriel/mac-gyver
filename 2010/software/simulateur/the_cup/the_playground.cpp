@@ -5,7 +5,7 @@
 #include "the_playground.h"
 #include "the_elements.h"
 #include "colors.h"
-#include "../simul/sdl.h"
+#include "../sdl.h"
 
 
 

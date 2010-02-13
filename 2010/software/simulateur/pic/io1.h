@@ -1,7 +1,7 @@
 #ifndef IO1H
 #define IO1H
 
-#include "../common/simul.h"
+#include "../../common/simul.h"
 
 #ifdef SIMULATION
 #include "../pic/simul.h"
