@@ -14,8 +14,6 @@
 #include "pindebug.h"
 #include "usb_status.h"
 
-#define NOT_FORCE_BL PORTBbits.RB7
-
 void init_boot(void)
 {
     static ulong count;
