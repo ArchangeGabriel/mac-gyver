@@ -1,0 +1,3 @@
+sudo apt-get install gcc g++ libglut3-dev libode0-dev libusb-dev libdevil-dev libqt4-dev
+
+

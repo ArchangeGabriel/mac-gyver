@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<world>
+
+  <!-- Ground Plane -->
+  <object type="box" dimx="3" dimy="2.1" dimz="0.02">
+    <position x="1.5" y="1.05" z="-0.01"/>
+    <rotation x="0" y="10" z="0"/>
+    <material>
+      <color name="blue"/>
+      <specular r="0" g="0" b="0"/>
+      <shininess value="25"/>
+      <alpha value="1"/>
+    </material>
+  </object>
+
+
+  <!-- A box -->
+<!--  <object type="box" dimx="0.1" dimy="0.1" dimz="0.1"> -->
+  <object type="sphere" radius="0.05"> 
+    <position x="1.5" y="1.05" z="1"/>
+    <rotation x="0" y="0" z="0"/>    
+    <material>
+      <color name="yellow"/>
+      <specular r="0.0" g="0.0" b="0.0"/>
+      <shininess value="25"/>
+      <alpha value="1"/>
+    </material>
+    <dynamics>
+      <lin_velocity x="0" y="0" z="0"/>
+      <ang_velocity x="0" y="0" z="0"/>      
+      <mass value="1"/>
+    </dynamics>
+  </object>
+</world>
