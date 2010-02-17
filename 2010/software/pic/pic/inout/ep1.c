@@ -31,7 +31,7 @@ void my_ep1_out(void)
             case MOTORS: set_motors(ep1_OutBuffer[1]); break;
             case ANALOG: send_an_data(ep1_OutBuffer[1]); break;
             case INITAN: init_adconversion(ep1_OutBuffer[1]); break;
-            case SERVOS: set_servo(ep1_OutBuffer[1], ep1_OutBuffer[2]); break;
+            case SERVOS: set_servo(ep1_OutBuffer[1]-1, ep1_OutBuffer[2]); break;
             case DIGITS: send_digitals_in(); break;
             case ISDEAD: 
                 ep2_num_bytes_to_send = 1;

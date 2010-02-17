@@ -16,8 +16,8 @@ int get_analog_in(unsigned short *result, unsigned char length); // rempli resul
 int set_DC_motor(unsigned char number, char sens); // met le moteur number (1-4) dans le sens sens (-1, 0 arret, 1). Retourne 1 si ok, -1 sinon.
 int set_servo(unsigned char number, unsigned char position); //met le servo number (1-4) en position position (1-255) (position = 0 rend le servo libre). Retourne 1 si ok, -1 sinon
 
-int setup_usb_connexions(); // Initialise les connexions usb avec la carte. Retourne 1 si tout fonctionne, -1 sinon.
+int setup_usb_connexions(); // Initialise les connexions usb avec la carte. Retourne 1 si tout fonctionne, un resultat negatif sinon.
 void shut_usb(); // Ferme proprement les connexions usb.
-int repare_usb(); // Tente de reparer les connexions usb cassees. Retourne 1 si tout fonctionne, -1 si ca ne marche toujours pas.
+int repare_usb(); // Tente de reparer les connexions usb cassees. Retourne 1 si tout fonctionne, un resultat negatif sinon.
 
 #endif // _COMM_H
