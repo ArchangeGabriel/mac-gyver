@@ -58,27 +58,20 @@ void windows_t::init(const QDomDocument &)
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);  
 
-  GLfloat ambient[]    = {0., 0., 0., 1.};
-  GLfloat diffuse[]    = {1., 1., 1., 1.};
-  GLfloat specular[]   = {1., 1., 1., 1.};  
-  GLfloat position0[]  = {1., 1., 1., 0.};  
-  
+  GLfloat ambient[]    = { 0.1, 0.1, 0.1, 1.0};
+  GLfloat diffuse[]    = { 0.1, 0.1, 0.1, 1.0};
+  GLfloat specular[]   = { 0.1, 0.1, 0.1, 1.0};  
+  GLfloat position0[]  = { 1.0, 1.0, 1.0, 0.0};  
+  GLfloat position1[]  = {-1.0,-1.0,-1.0, 0.0};  
+  GLfloat position2[]  = {-1.0, 1.0, 1.0, 0.0};  
+  GLfloat position3[]  = {-1.0,-1.0, 1.0, 0.0}; 
+
+  glEnable(GL_LIGHTING); 
+  glEnable(GL_LIGHT0);  
   glLightfv(GL_LIGHT0, GL_POSITION, position0);  
   glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
   glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
   glLightfv(GL_LIGHT0, GL_SPECULAR, specular);
-  glEnable(GL_LIGHTING); 
-  glEnable(GL_LIGHT0);
-  
-  glEnable(GL_COLOR_MATERIAL);  
-  glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);  
-
-
-
-  /*GLfloat position1[]  = {-1., -1., -1., 0.};  
-  GLfloat position2[]  = {-1.,  1., 1., 0.};  
-  GLfloat position3[]  = {-1., -1., 1., 0.}; 
-
   glLightfv(GL_LIGHT1, GL_AMBIENT, ambient);
   glLightfv(GL_LIGHT1, GL_DIFFUSE, diffuse);
   glLightfv(GL_LIGHT1, GL_POSITION, position1);  
@@ -90,7 +83,10 @@ void windows_t::init(const QDomDocument &)
   glLightfv(GL_LIGHT3, GL_AMBIENT, ambient);
   glLightfv(GL_LIGHT3, GL_DIFFUSE, diffuse);
   glLightfv(GL_LIGHT3, GL_POSITION, position3);  
-  glEnable(GL_LIGHT3); */  
+  glEnable(GL_LIGHT3); 
+  
+  glEnable(GL_COLOR_MATERIAL);  
+  glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);   
 }
 /*----------------------------------------------------------------------------*/
 void windows_t::display()

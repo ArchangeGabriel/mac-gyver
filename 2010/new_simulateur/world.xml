@@ -4,7 +4,7 @@
   <!-- Ground Plane -->
   <object type="box" dimx="3" dimy="2.1" dimz="0.02">
     <position x="1.5" y="1.05" z="-0.01"/>
-    <rotation x="0" y="10" z="0"/>
+    <rotation x="0" y="0" z="0"/>
     <material>
       <color name="blue"/>
       <specular r="0" g="0" b="0"/>
@@ -15,14 +15,14 @@
 
 
   <!-- A box -->
-<!--  <object type="box" dimx="0.1" dimy="0.1" dimz="0.1"> -->
-  <object type="sphere" radius="0.05"> 
+  <object type="box" dimx="0.1" dimy="0.1" dimz="0.1"> 
+<!--  <object type="cylinder" radius="0.05" length="0.2"> -->
     <position x="1.5" y="1.05" z="1"/>
     <rotation x="0" y="0" z="0"/>    
     <material>
       <color name="yellow"/>
       <specular r="0.0" g="0.0" b="0.0"/>
-      <shininess value="25"/>
+      <shininess value="1"/>
       <alpha value="1"/>
     </material>
     <dynamics>
@@ -31,4 +31,21 @@
       <mass value="1"/>
     </dynamics>
   </object>
+
+  <!-- A cylinder -->
+  <object type="cylinder" radius="0.05" length="0.2">
+    <position x="1.5" y="1.05" z="0.3"/>
+    <rotation x="0" y="0" z="0"/>    
+    <material>
+      <color name="red"/>
+      <specular r="0.0" g="0.0" b="0.0"/>
+      <shininess value="25"/>
+      <alpha value="1"/>
+    </material>
+    <dynamics>
+      <lin_velocity x="0" y="0" z="2"/>
+      <ang_velocity x="45" y="10" z="0"/>      
+      <mass value="1"/>
+    </dynamics>
+  </object>  
 </world>

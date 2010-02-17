@@ -63,4 +63,5 @@ class shape_cylinder_t : public shape_t
   void render_shape() const;
 };
 
+
 #endif

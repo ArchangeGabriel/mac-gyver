@@ -17,7 +17,6 @@ simulation_t::simulation_t(int *argc, char **argv, const char* file) : windows(a
 /*----------------------------------------------------------------------------*/
 void simulation_t::start()
 {
-  world.start();
   windows.start();
 }
 /*----------------------------------------------------------------------------*/
