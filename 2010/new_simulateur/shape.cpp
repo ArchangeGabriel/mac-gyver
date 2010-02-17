@@ -2,6 +2,7 @@
 
 #include "shape.h"
 #include "xml.h"
+#include "primitive.h"
 
 /*----------------------------------------------------------------------------*/
 void shape_t::set_material(const QDomElement &mat)
@@ -67,9 +68,8 @@ void shape_t::render() const
   }
   else
     glMultMatrixf(m);
- 
+
   glColor4fv(color); 
-  
   glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, spec);
   glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, shininess);
  
@@ -91,29 +91,9 @@ shape_box_t::shape_box_t(const QDomElement &obj)
   set_pos_rot(obj);
 }
 /*----------------------------------------------------------------------------*/
-void shape_box_t::render_shape() const
+inline void shape_box_t::render_shape() const
 {
-  glScalef(dimX,dimY,dimZ);
-  
-  GLfloat x[8]={ 0.5,-0.5,-0.5, 0.5, 0.5,-0.5,-0.5, 0.5};
-  GLfloat y[8]={ 0.5, 0.5,-0.5,-0.5, 0.5, 0.5,-0.5,-0.5};
-  GLfloat z[8]={ 0.5, 0.5, 0.5, 0.5,-0.5,-0.5,-0.5,-0.5};
-     
-  glBegin(GL_QUADS); 
-  glNormal3f(0.,0.,1.);   
-  glVertex3f(x[0],y[0],z[0]); glVertex3f(x[1],y[1],z[1]); glVertex3f(x[2],y[2],z[2]); glVertex3f(x[3],y[3],z[3]); 
-  glNormal3f(0.,0.,-1.);   
-  glVertex3f(x[4],y[4],z[4]); glVertex3f(x[7],y[7],z[7]); glVertex3f(x[6],y[6],z[6]); glVertex3f(x[5],y[5],z[5]); 
-  glNormal3f(1.,0.,0.);   
-  glVertex3f(x[0],y[0],z[0]); glVertex3f(x[3],y[3],z[3]); glVertex3f(x[7],y[7],z[7]); glVertex3f(x[4],y[4],z[4]); 
-  glNormal3f(-1.,0.,0.);    
-  glVertex3f(x[1],y[1],z[1]); glVertex3f(x[5],y[5],z[5]); glVertex3f(x[6],y[6],z[6]); glVertex3f(x[2],y[2],z[2]); 
-  glNormal3f(0.,1.,0.);   
-  glVertex3f(x[1],y[1],z[1]); glVertex3f(x[0],y[0],z[0]); glVertex3f(x[4],y[4],z[4]); glVertex3f(x[5],y[5],z[5]); 
-  glNormal3f(0.,-1.,0.);  
-  glVertex3f(x[3],y[3],z[3]); glVertex3f(x[2],y[2],z[2]); glVertex3f(x[6],y[6],z[6]); glVertex3f(x[7],y[7],z[7]);
-
-  glEnd();
+  glutSolidBox(dimX,dimY,dimZ);
 }
 /*----------------------------------------------------------------------------*/
 
@@ -127,7 +107,7 @@ shape_sphere_t::shape_sphere_t(const QDomElement &obj)
   set_pos_rot(obj);
 }
 /*----------------------------------------------------------------------------*/
-void shape_sphere_t::render_shape() const
+inline void shape_sphere_t::render_shape() const
 {
   glutSolidSphere(radius,32,32);
 }
@@ -144,52 +124,9 @@ shape_cylinder_t::shape_cylinder_t(const QDomElement &obj)
   set_pos_rot(obj);
 }
 /*----------------------------------------------------------------------------*/
-void shape_cylinder_t::render_shape() const
+inline void shape_cylinder_t::render_shape() const
 {
-  int n = 200. * radius * M_PI;
-  GLfloat *x = (GLfloat*) malloc(sizeof(GLfloat)*n);
-  GLfloat *y = (GLfloat*) malloc(sizeof(GLfloat)*n);
-  GLfloat *nx = (GLfloat*) malloc(sizeof(GLfloat)*n);
-  GLfloat *ny = (GLfloat*) malloc(sizeof(GLfloat)*n);  
- 
-  for(int i=0; i<n; i++)
-  {
-    nx[i] = cos(((double)i)*2.0*M_PI/((double)n));
-    ny[i] = sin(((double)i)*2.0*M_PI/((double)n));    
-    x[i] = radius * nx[i];
-    y[i] = radius * ny[i];    
-  }
-  
-  glBegin(GL_POLYGON);  
-  glNormal3f(0., 0., 1.);
-  for(int i=0; i<n; i++)
-  {
-    glVertex3f(x[i],y[i],+length/2.);
-  }
-  glEnd();
-
-  glBegin(GL_POLYGON);  
-  glNormal3f(0., 0., -1.);
-  for(int i=n-1; i>=0; i--)
-    glVertex3f(x[i],y[i],-length/2.);
-  glEnd();
-  
-  glBegin(GL_QUADS);
-  for(int i=0; i<n; i++)
-  {
-    glNormal3f(nx[i], ny[i], 0.);
-    glVertex3f(x[i],y[i],+length/2.);       
-    glVertex3f(x[i],y[i],-length/2.);
-    glNormal3f(nx[(i+1)%n], ny[(i+1)%n], 0.);          
-    glVertex3f(x[(i+1)%n],y[(i+1)%n],-length/2.);  
-    glVertex3f(x[(i+1)%n],y[(i+1)%n],+length/2.);     
-  }
-  glEnd();
-      
-  free(x);
-  free(y);
-  free(nx);
-  free(ny);
+  glutSolidCylinder(radius, length, 32, 1);
 }
 /*----------------------------------------------------------------------------*/
 

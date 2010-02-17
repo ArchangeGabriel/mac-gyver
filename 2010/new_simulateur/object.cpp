@@ -22,6 +22,9 @@ void object_t::set_dynamic(const dWorldID &worldID, const QDomElement &dyn)
   {
     float x,y,z;
     world_parser_t::get_vector(ang_vel,x,y,z);
+    x *= M_PI/180.;
+    y *= M_PI/180.;
+    z *= M_PI/180.;      
     dBodySetAngularVel(body,x,y,z);
   }
   else
@@ -58,6 +61,7 @@ object_t::object_t(const dWorldID &worldID, const dSpaceID &spaceID, const QDomE
   	geom = dCreateCylinder(spaceID,s->radius,s->length);
   	dMassSetCylinder(&m,1.0f,3,s->radius,s->length);
   }
+  
   
   // Set object dynamic properties
   QDomElement dyn;

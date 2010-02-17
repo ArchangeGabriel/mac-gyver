@@ -75,14 +75,17 @@ void world_t::render()
 }
 /*----------------------------------------------------------------------------*/
 void world_t::start()
-{
-  time.start();
-  simul_started = true;  
+{ 
 }
 /*----------------------------------------------------------------------------*/
 void world_t::simulate()
 {
-  if(!simul_started || !time.elapsed()) return;
+  if(!simul_started)
+  {
+    time.start();
+    simul_started = true; 
+  }
+  if(!time.elapsed()) return;
 
 	float nbSecsElapsed = time.restart()/1000.;
 	int nbStepsToPerform = static_cast<int>(nbSecsElapsed/nbSecondsByStep);
