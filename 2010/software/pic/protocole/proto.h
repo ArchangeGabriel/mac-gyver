@@ -4,9 +4,10 @@
 #ifndef PROTO_H_
 #define PROTO_H_
 
-#define MACGYVERID 0xa5a5
-#define MOTORID    0x0002
-#define INOUTID    0x0003
+#define MACGYVERID   0xa5a5
+#define BOOTLOADERID 0x0001
+#define MOTORID      0x0002
+#define INOUTID      0x0003
 
 #define SETPWM     0x80
 #define CODERS     0x90

@@ -1,9 +1,7 @@
-COMPILER = ../../../../../compiler
 SDCC = sdcc
-#$(COMPILER)/tools/bin/sdcc
 DEBUG = --denable-peeps --obanksel=9 --opt-code-size --optimize-cmp --optimize-df 
-LIBPUF = $(COMPILER)/lib/libpuf.lib
-INCLUDE = ../include
+LIBPUF = ../lib/libpuf.lib
+INCLUDE = ../include -I../../protocole
 sdcc_PIC_TYPE = 18f4550
 lkr_PIC_TYPE = 18f4550
 
@@ -39,4 +37,4 @@ all:
 	$(LINK) $(bootloader_hex_OBJECTS)
 
 clean:
-	rm -f *.o *.lst *.rel *.cod *.map *.asm bootloader.hex
+	rm -f *.o *.lst *.rel *.cod *.map *.asm

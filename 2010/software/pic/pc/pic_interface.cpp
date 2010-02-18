@@ -58,7 +58,7 @@ unsigned char find_usb(unsigned char but)
                 if((but & DEVICEMOTEUR) && (dev->descriptor.idProduct == MOTORID))
                 {
                     // Carte moteur trouvee !
-	            cout << "Carte moteur trouvee !" << endl;
+	            cout << "Carte moteur trouvee a l'emplacement " << bus->dirname << ":" << dev->filename << endl;
                     try 
                     {
                         devicemoteur = new USBDeviceMoteur(dev);
@@ -72,7 +72,7 @@ unsigned char find_usb(unsigned char but)
                 else if((but & DEVICEINOUT) && (dev->descriptor.idProduct == INOUTID))
                 {
                     // Carte InOut trouvee !
-	            cout << "Carte InOut trouvee !" << endl;
+	            cout << "Carte InOut trouvee a l'emplacement " << bus->dirname << ":" << dev->filename << endl;
                     try 
                     {
                         deviceinout = new USBDeviceInOut(dev);
@@ -83,6 +83,10 @@ unsigned char find_usb(unsigned char but)
                         cerr << msg << endl; 
                     }
                 }
+                else if(dev->descriptor.idProduct == BOOTLOADERID)
+                {
+                    cout << "Carte non programmee trouvee a l'emplacement " << bus->dirname << ":" << dev->filename << endl;
+                }
             }
         }
     }
@@ -92,7 +96,7 @@ unsigned char find_usb(unsigned char but)
 int setup_usb_connexions()
 {
     unsigned char c;
-    char res;
+    int res;
     res = 0;
     c = find_usb(DEVICEMOTEUR | DEVICEINOUT);
     if(c != DEVICEMOTEUR | DEVICEINOUT)
@@ -109,7 +113,8 @@ int setup_usb_connexions()
 int repare_usb()
 {
     unsigned char b,c;
-    char res;
+    int res;
+    res = 0;
     c = 0;
     if((devicemoteur == NULL)||(devicemoteur->repare() <= 0)) c = DEVICEMOTEUR;
     if((deviceinout == NULL)||(deviceinout->repare() <= 0)) c |= DEVICEINOUT;
@@ -118,8 +123,8 @@ int repare_usb()
         b = find_usb(c);
         if(b != c)
         {
-            if(!(c & DEVICEMOTEUR)) res = -1;
-            if(!(c & DEVICEINOUT)) res -= 2;
+            if(!(b & DEVICEMOTEUR)) res = -1;
+            if(!(b & DEVICEINOUT)) res -= 2;
             return res;
         //    if(!(b & DEVICEMOTEUR)) cout << "Carte moteur absente" << endl;
         //    if(!(b & DEVICEINOUT)) cout << "Carte InOut absente" << endl;
