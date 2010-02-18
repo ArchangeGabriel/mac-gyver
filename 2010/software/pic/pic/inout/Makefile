@@ -1,7 +1,6 @@
-COMPILER = ../../../../../compiler
 SDCC = sdcc
 DEBUG = --denable-peeps --obanksel=9 --opt-code-size --optimize-cmp --optimize-df 
-LIBPUF = $(COMPILER)/lib/libpuf.lib
+LIBPUF = ../lib/libpuf.lib
 INCLUDE = ../include -I../../protocole
 sdcc_PIC_TYPE = 18f4550
 lkr_PIC_TYPE = 18f4550
@@ -31,4 +30,4 @@ all:
 	$(LINK) $(application_hex_OBJECTS)
 
 clean:
-	rm -f *.o *.lst *.rel *.cod *.map *.asm inout.hex
+	rm -f *.o *.lst *.rel *.cod *.map *.asm
