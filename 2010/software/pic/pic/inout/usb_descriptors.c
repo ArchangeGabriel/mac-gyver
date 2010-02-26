@@ -6,6 +6,7 @@
 #include "boot_iface.h"
 #include "ep1.h"
 #include "ep2.h"
+#include "proto.h"
 
 #define EP0_BUFFER_SIZE 8
 
@@ -18,8 +19,8 @@ const USB_Device_Descriptor device_descriptor =
     0x00,                   // Subclass code
     0xff,                   // Protocol code
     EP0_BUFFER_SIZE,        // Max packet size for EP0
-    0xA5A5,                 // Vendor ID
-    0x0002,                 // Product ID
+    MACGYVERID,             // Vendor ID
+    INOUTID,                // Product ID
     0x0100,                 // Device release number in BCD format
     1,                      // Manufacturer string index
     2,                      // Product string index
@@ -36,8 +37,8 @@ const USB_Default_Composite_Descriptor default_cfg = {
     1,                      // Number of interfaces in this configuration
     1,                      // Index value of this configuration
     4,                      // Configuration string index
-    DEFAULT | SELF_POWERED, // Attributes
-    0},                     // Max power consumption (2X mA)
+    DEFAULT, // Attributes
+    255},                     // Max power consumption (2X mA)
     
     // Boot Interface Descriptor
     {sizeof(USB_Interface_Descriptor),   // Size of this descriptor in bytes
@@ -59,8 +60,8 @@ const USB_Flash_Composite_Descriptor flash_cfg = {
     1,                      // Number of interfaces in this configuration
     2,                      // Index value of this configuration
     5,                      // Configuration string index
-    DEFAULT | SELF_POWERED, // Attributes
-    0},                     // Max power consumption (2X mA)
+    DEFAULT, // Attributes
+    255},                     // Max power consumption (2X mA)
     
     // Flash Interface Descriptor
     {sizeof(USB_Interface_Descriptor),   // Size of this descriptor in bytes
@@ -97,8 +98,8 @@ const USB_Application_Composite_Descriptor application_cfg = {
     1,                      // Number of interfaces in this configuration
     3,                      // Index value of this configuration
     4,                      // Configuration string index
-    DEFAULT | SELF_POWERED, // Attributes
-    0},                     // Max power consumption (2X mA)
+    DEFAULT, // Attributes
+    255},                     // Max power consumption (2X mA)
     
     // Boot Interface Descriptor
     {sizeof(USB_Interface_Descriptor),   // Size of this descriptor in bytes

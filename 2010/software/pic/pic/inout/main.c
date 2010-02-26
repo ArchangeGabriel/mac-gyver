@@ -11,14 +11,15 @@
 #include "ep2.h"
 #include "moteurs.h"
 #include "usb_status.h"
+#include "pindebug.h"
 
 // beware : this is not a C main function, but the application
 // entry point called from the boot.
 
 void application_main(void) 
 {
-    TRISA = 0xEF;
-    PORTA = 0x10;
+    TRISDEBUG = 0;
+    PINDEBUG = 1;
     
     // Reset the Timer0 value
     TMR0H = 0;
@@ -42,6 +43,7 @@ void application_main(void)
         usb_sleep();
         dispatch_usb_event();
     }
+    PINDEBUG = 0;
 //    clear_device_remote_wakeup();
 }
 

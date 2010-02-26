@@ -1,9 +1,9 @@
 // my_usbdevice.cxx //
 
 
-//using namespace std;
+using namespace std;
 
-//#include <iostream>
+#include <iostream>
 #include <exception>
 #include <usb.h>
 #include "usbdevicemoteurs.h"
@@ -26,6 +26,13 @@ USBDeviceMoteur::USBDeviceMoteur(struct usb_device *dev)
     {
         throw "Unable to open device motor.";
     }
+    
+    c = usb_set_configuration(dh,3); //Lance l'application du pic
+    if(c)
+    {
+        usb_close(dh);
+        throw "Unable to set configuration on motors device.";
+    }
 
     c = usb_claim_interface(dh, 0);
     if(c)
@@ -33,17 +40,11 @@ USBDeviceMoteur::USBDeviceMoteur(struct usb_device *dev)
         usb_close(dh);
         throw "Device motor interface 0 unavailable.";
     }
-    
-    c = usb_set_configuration(dh,2); //Lance l'application du pic
-    if(c)
-    {
-        usb_close(dh);
-        throw "Unable to set configuration on motors device.";
-    }
 }
 
 USBDeviceMoteur::~USBDeviceMoteur()
 {
+    usb_set_configuration(dh,1);
     usb_close(dh);
 }
 
@@ -156,11 +157,11 @@ unsigned char USBDeviceMoteur::getcodeuses(int *codeuse1, unsigned char *sens1, 
     //cout << endl;
     if(c==10)
     {
-        *codeuse1 = *((int*)(buffer+sizeof(unsigned char)));
-        *codeuse2 = *((int*)(buffer+sizeof(unsigned char)+sizeof(int)));
+        *codeuse1 = *((int*)(buffer+2*sizeof(unsigned char)));
+        *codeuse2 = *((int*)(buffer+2*sizeof(unsigned char)+sizeof(int)));
         *sens1 = *buffer & MSKSENS0;
         *sens2 = *buffer & MSKSENS1;
-        return buffer[9];
+        return buffer[1];
     }
     else 
     {
