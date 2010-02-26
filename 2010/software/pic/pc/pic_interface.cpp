@@ -147,7 +147,7 @@ int get_codeuses(int *codeuse1, unsigned char *sens1, int *codeuse2, unsigned ch
 
 int set_speed(unsigned char vitesse1, unsigned char vitesse2)
 {
-    catcherror(devicemoteur->sendorder(vitesse1, vitesse1));
+    catcherror(devicemoteur->sendorder(vitesse1, vitesse2));
 }
 
 int get_digital_in(void)

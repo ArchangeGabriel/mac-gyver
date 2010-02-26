@@ -6,6 +6,7 @@
 #include "boot_iface.h"
 #include "ep1.h"
 #include "ep2.h"
+#include "proto.h"
 
 #define EP0_BUFFER_SIZE 8
 
@@ -18,8 +19,8 @@ const USB_Device_Descriptor device_descriptor =
     0x00,                   // Subclass code
     0xff,                   // Protocol code
     EP0_BUFFER_SIZE,        // Max packet size for EP0
-    0xA5A5,                 // Vendor ID
-    0x0003,                 // Product ID
+    MACGYVERID,             // Vendor ID
+    MOTORID,                // Product ID
     0x0100,                 // Device release number in BCD format
     1,                      // Manufacturer string index
     2,                      // Product string index
@@ -95,7 +96,7 @@ const USB_Application_Composite_Descriptor application_cfg = {
     CONFIGURATION_DESCRIPTOR,                 // CONFIGURATION descriptor type
     sizeof(application_cfg),          // Total length of data for this configuration
     1,                      // Number of interfaces in this configuration
-    5,                      // Index value of this configuration
+    3,                      // Index value of this configuration
     4,                      // Configuration string index
     DEFAULT,                // Attributes
     255},                     // Max power consumption (2X mA)

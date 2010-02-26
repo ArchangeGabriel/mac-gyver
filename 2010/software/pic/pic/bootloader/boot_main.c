@@ -20,12 +20,13 @@ void init_boot(void)
 
     ADCON1 = 0x0F;
     CMCON  = 0x07;
-    TRISA  = 0xEF; //IIIOIIII
+    TRISA  = 0xFF; //IIIOIIII
     TRISB  = 0xFF; //IIIIIIII
     TRISC  = 0xFF; //IIIIIIII
     TRISD  = 0xFF; //IIIIIIII
     TRISE  = 0xFF; //IIIIIIII
 
+    TRISDEBUG = 0;
     PINDEBUG = 1;
     
     SET_DEVICE_STATUS(DEVICE_BUS_POWERED | REMOTE_WAKEUP_DIS);

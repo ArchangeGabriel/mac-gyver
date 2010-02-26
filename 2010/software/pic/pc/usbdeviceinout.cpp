@@ -27,6 +27,13 @@ USBDeviceInOut::USBDeviceInOut(struct usb_device *dev)
         throw "Unable to open device InOut.";
     }
 
+    c = usb_set_configuration(dh,3); //Lance l'application du pic
+    if(c)
+    {
+        usb_close(dh);
+        throw "Unable to set configuration on inout device.";
+    }
+    
     c = usb_claim_interface(dh, 0);
     if(c)
     {
@@ -34,17 +41,16 @@ USBDeviceInOut::USBDeviceInOut(struct usb_device *dev)
         throw "Device InOut interface 0 unavailable.";
     }
     motors_last_order = 0;
-    
-    c = usb_set_configuration(dh,2); //Lance l'application du pic
-    if(c)
-    {
-        usb_close(dh);
-        throw "Unable to set configuration on inout device.";
-    }
 }
 
 USBDeviceInOut::~USBDeviceInOut()
 {
+    int c;
+    c = usb_set_configuration(dh,1); //Arrete l'application du pic
+    if(c)
+    {
+        cout << "Unable to set configuration on inout device." << endl;
+    }
     usb_close(dh);
 }
 
@@ -55,7 +61,7 @@ int USBDeviceInOut::repare_epout()
 
     sent_bytes[0] = ISDEAD;
     
-    c = usb_interrupt_write(dh, EP_OUT, (char*)sent_bytes, 1, USB_TIMEOUT);
+    c = usb_bulk_write(dh, EP_OUT, (char*)sent_bytes, 1, USB_TIMEOUT);
     if(c <= 0)
     {
         c = usb_clear_halt(dh, EP_OUT);
@@ -63,7 +69,7 @@ int USBDeviceInOut::repare_epout()
         {
             return -1;
         }
-        c = usb_interrupt_write(dh, EP_OUT, (char*)sent_bytes, 1, USB_TIMEOUT);
+        c = usb_bulk_write(dh, EP_OUT, (char*)sent_bytes, 1, USB_TIMEOUT);
         if(c <= 0)
         {
             return -1;
@@ -82,7 +88,7 @@ int USBDeviceInOut::repare_eps()
     {
         return -1;
     }
-    c = usb_interrupt_read(dh, EP_IN, (char*)buffer, sizeof(buffer), USB_TIMEOUT);
+    c = usb_bulk_read(dh, EP_IN, (char*)buffer, sizeof(buffer), USB_TIMEOUT);
     if(c <= 0)
     {
         c = usb_clear_halt(dh, EP_IN);
@@ -95,7 +101,7 @@ int USBDeviceInOut::repare_eps()
         {
             return -1;
         }
-        c = usb_interrupt_read(dh, EP_IN, (char*)buffer, sizeof(buffer), USB_TIMEOUT);
+        c = usb_bulk_read(dh, EP_IN, (char*)buffer, sizeof(buffer), USB_TIMEOUT);
         if(c <= 0)
         {
             return -1;
@@ -133,11 +139,11 @@ void USBDeviceInOut::servo_order(unsigned char index, unsigned char position)
     sent_bytes[1] = index;
     sent_bytes[2] = position;
 
-    c = usb_interrupt_write(dh, EP_OUT, (char*)sent_bytes, 3, USB_TIMEOUT); 
+    c = usb_bulk_write(dh, EP_OUT, (char*)sent_bytes, 3, USB_TIMEOUT); 
     if(c <= 0)
     {
         // Retry once
-        c = usb_interrupt_write(dh, EP_OUT, (char*)sent_bytes, 3, USB_TIMEOUT); 
+        c = usb_bulk_write(dh, EP_OUT, (char*)sent_bytes, 3, USB_TIMEOUT); 
         if(c <= 0)
         {
             // Raise exception
@@ -154,11 +160,11 @@ void USBDeviceInOut::motors_order(unsigned char order)
     sent_bytes[0] = MOTORS;
     sent_bytes[1] = order;
 
-    c = usb_interrupt_write(dh, EP_OUT, (char*)sent_bytes, 2, USB_TIMEOUT); 
+    c = usb_bulk_write(dh, EP_OUT, (char*)sent_bytes, 2, USB_TIMEOUT); 
     if(c <= 0)
     {
         // Retry once
-        c = usb_interrupt_write(dh, EP_OUT, (char*)sent_bytes, 2, USB_TIMEOUT); 
+        c = usb_bulk_write(dh, EP_OUT, (char*)sent_bytes, 2, USB_TIMEOUT); 
         if(c <= 0)
         {
             // Raise exception
@@ -175,18 +181,19 @@ unsigned char USBDeviceInOut::get_digital_in()
 
     sent_bytes = DIGITS;
 
-    c = usb_interrupt_write(dh, EP_OUT, (char*)&sent_bytes, 1, USB_TIMEOUT); 
+    c = usb_bulk_write(dh, EP_OUT, (char*)&sent_bytes, 1, USB_TIMEOUT); 
     if(c <= 0)
     {
         // Retry once
-        c = usb_interrupt_write(dh, EP_OUT, (char*)&sent_bytes, 1, USB_TIMEOUT); 
+        c = usb_bulk_write(dh, EP_OUT, (char*)&sent_bytes, 1, USB_TIMEOUT); 
         if(c <= 0)
         {
             // Raise exception
+            cout << "toto" << endl;
             throw "I/O error on DIGITS command.";
         }
     }
-    c = usb_interrupt_read(dh, EP_IN, (char*)buffer, sizeof(buffer), USB_TIMEOUT);
+    c = usb_bulk_read(dh, EP_IN, (char*)buffer, sizeof(buffer), USB_TIMEOUT);
     if(c <= 0)
     {
         throw "I/O error on DIGITS command.";
@@ -210,18 +217,18 @@ unsigned char USBDeviceInOut::get_analog_in(unsigned short *result, unsigned cha
     sent_bytes[0] = ANALOG;
     sent_bytes[1] = number;
 
-    c = usb_interrupt_write(dh, EP_OUT, (char*)sent_bytes, 2, USB_TIMEOUT); 
+    c = usb_bulk_write(dh, EP_OUT, (char*)sent_bytes, 2, USB_TIMEOUT); 
     if(c <= 0)
     {
         // Retry once
-        c = usb_interrupt_write(dh, EP_OUT, (char*)sent_bytes, 2, USB_TIMEOUT); 
+        c = usb_bulk_write(dh, EP_OUT, (char*)sent_bytes, 2, USB_TIMEOUT); 
         if(c <= 0)
         {
             // Raise exception
             throw "I/O error on ANALOG command.";
         }
     }
-    c = usb_interrupt_read(dh, EP_IN, (char*)buffer, sizeof(buffer), USB_TIMEOUT);
+    c = usb_bulk_read(dh, EP_IN, (char*)buffer, sizeof(buffer), USB_TIMEOUT);
     if(c <= 0)
     {
         throw "I/O error on ANALOG command.";
@@ -256,11 +263,11 @@ unsigned char USBDeviceInOut::init_analog_in(unsigned char number)
         sent_bytes[1] = number;
     }
 
-    c = usb_interrupt_write(dh, EP_OUT, (char*)sent_bytes, 2, USB_TIMEOUT); 
+    c = usb_bulk_write(dh, EP_OUT, (char*)sent_bytes, 2, USB_TIMEOUT); 
     if(c <= 0)
     {
         // Retry once
-        c = usb_interrupt_write(dh, EP_OUT, (char*)sent_bytes, 2, USB_TIMEOUT); 
+        c = usb_bulk_write(dh, EP_OUT, (char*)sent_bytes, 2, USB_TIMEOUT); 
         if(c <= 0)
         {
             // Raise exception
