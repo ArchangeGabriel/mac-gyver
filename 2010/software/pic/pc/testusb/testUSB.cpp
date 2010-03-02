@@ -104,8 +104,8 @@ void* console(void*)
       printf("- q : pour quitter USBtest\n");
       printf("- setup : initialise les connections usb");
       if(!set_up_inout && !set_up_moteur) printf(" - plus de commandes seront accessibles");
-      printf("\n- shut_usb : ferme les connections usb\n");              
-      printf("- repare_usb : tente de reparer les connections usb\n\n");
+      printf("\n- shut : ferme les connections usb\n");              
+      printf("- repare : tente de reparer les connections usb\n\n");
       
       if(set_up_moteur)
       {
@@ -150,7 +150,7 @@ void* console(void*)
         set_up_moteur = 1;
       }
     }
-    else if(!strcmp(Buff,"shut_usb"))
+    else if(!strcmp(Buff,"shut"))
     {
       set_up_inout = 0;
       set_up_moteur = 0;
@@ -158,7 +158,7 @@ void* console(void*)
       shut_usb();
       printf("Connections USB fermees\n");
     }
-    else if(!strcmp(Buff,"repare_usb"))
+    else if(!strcmp(Buff,"repare"))
     {
       int a;
       a = repare_usb();

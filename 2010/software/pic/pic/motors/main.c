@@ -10,6 +10,7 @@
 #include "codeuses.h"
 #include "suspend.h"
 #include "pining.h"
+#include "pindebug.h"
 
 
 // beware : this is not a C main function, but the application
@@ -28,8 +29,8 @@ void init_pwm(void) // Configure CCP1, CCP2 et Timer2
 
 void application_main(void) 
 {
-    TRISA = 0xEF;
-    PORTA = 0x10;
+    TRISDEBUG = 0;
+    PINDEBUG = 1;
     
     // Reset the Timer0 value
     TMR0H = 0;
@@ -58,6 +59,7 @@ void application_main(void)
         dispatch_usb_event();
     }
     cutalim();
+    PINDEBUG = 0;
 }
 
 

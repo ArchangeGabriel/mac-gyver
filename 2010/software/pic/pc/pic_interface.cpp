@@ -138,6 +138,8 @@ void shut_usb(void)
 {
     if(devicemoteur != NULL) delete devicemoteur;
     if(deviceinout != NULL) delete deviceinout;
+    devicemoteur = NULL;
+    deviceinout = NULL;
 }
 
 int get_codeuses(int *codeuse1, unsigned char *sens1, int *codeuse2, unsigned char *sens2)

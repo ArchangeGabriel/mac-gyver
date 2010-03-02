@@ -24,9 +24,12 @@ void init_codeuses(void)
     INTCON2bits.INTEDG1 = 0;
     INTCONbits.INT0IE = 1;
     INTCON3bits.INT1IE = 1;
-    for(i=1;i<10;i++) mydata[i]=i;//0;//mesdonnees[i]=0;
+//    for(i=1;i<10;i++) mydata[i]=i;//0;//mesdonnees[i]=0;
     mydata[0]=CODERS;
+    mydata[1]=0;
     codeusecnt=(long*)(mydata+(2*sizeof(char)));
+    codeusecnt[0] = 0x01020304;
+    codeusecnt[1] = 0x05060708;
     //mesdonnees[0] = CODER; //mydata..
     //codeusecnt = (long*)(&mydata[8]);
     //codeusecnt = &(mesdonnees[2]);

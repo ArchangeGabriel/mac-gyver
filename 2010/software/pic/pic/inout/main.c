@@ -12,6 +12,7 @@
 #include "moteurs.h"
 #include "usb_status.h"
 #include "pindebug.h"
+#include "suspend.h"
 
 // beware : this is not a C main function, but the application
 // entry point called from the boot.
@@ -43,6 +44,7 @@ void application_main(void)
         usb_sleep();
         dispatch_usb_event();
     }
+    cutalim();
     PINDEBUG = 0;
 //    clear_device_remote_wakeup();
 }

@@ -44,7 +44,11 @@ USBDeviceMoteur::USBDeviceMoteur(struct usb_device *dev)
 
 USBDeviceMoteur::~USBDeviceMoteur()
 {
-    usb_set_configuration(dh,1);
+    int c;
+    c = usb_release_interface(dh,0);
+    if(c) cout << "Unable to release interface on motors device." << endl;
+    c = usb_set_configuration(dh,1);
+    if(c) cout << "Unable to change configuration on motors device." << endl;
     usb_close(dh);
 }
 
