@@ -46,13 +46,13 @@ USBDeviceInOut::USBDeviceInOut(struct usb_device *dev)
 USBDeviceInOut::~USBDeviceInOut()
 {
     int c;
-    c = usb_set_configuration(dh,1); //Arrete l'application du pic
-    if(c)
-    {
-        cout << "Unable to set configuration on inout device." << endl;
-    }
+    c = usb_release_interface(dh,0);
+    if(c) cout << "Unable to release interface on inout device." << endl;
+    c = usb_set_configuration(dh,1);
+    if(c) cout << "Unable to change configuration on inout device." << endl;
     usb_close(dh);
 }
+
 
 int USBDeviceInOut::repare_epout()
 {

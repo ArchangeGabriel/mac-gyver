@@ -14,6 +14,7 @@
 
 #define MSKSENS0   0x01
 #define MSKSENS1   0x02
+#define MSKCODER   0xf0
 
 //////////////////////////////////////
 #define ISDEAD     0xf0

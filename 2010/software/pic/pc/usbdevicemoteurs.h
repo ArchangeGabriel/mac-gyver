@@ -14,6 +14,7 @@ class USBDeviceMoteur
     public:
         USBDeviceMoteur(struct usb_device *dev);
         ~USBDeviceMoteur();
+        void stop_application();
         void sendorder(unsigned char vitesse_gauche, unsigned char vitesse_droite); // envoi les nouvelles vitesses :
 // 1 > arriere toute, 128 > arret, 255 > avant toute / 0 EST INTERDIT !! (l'ordre ne sera pas compris par le pic)
 	unsigned char getcodeuses(int *codeuse1, unsigned char *sens1, int *codeuse, unsigned char *sens2); //retourne l'indice de la transaction

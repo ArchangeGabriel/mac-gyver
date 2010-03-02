@@ -20,6 +20,7 @@ class USBDeviceInOut
     public:
         USBDeviceInOut(struct usb_device *dev);
         ~USBDeviceInOut();
+        void stop_application();
         void servo_order(unsigned char index, unsigned char position);
         void motors_order(unsigned char order);
         unsigned char get_digital_in();
