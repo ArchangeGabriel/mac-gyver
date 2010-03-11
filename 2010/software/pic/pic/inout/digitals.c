@@ -5,11 +5,13 @@
 #include "proto.h"
 #include "pining.h"
 
+#include "app_usb.h"
 
 unsigned char dig_data[2];
 
 void send_digitals_in()
 {
+    while(EP_IN_BD(2).Stat.uc & BDS_USIE); // wait the Uown bit to be cleared
     dig_data[0] = DIGITS;
     dig_data[1] = PORTB;
     ep2_source_data = dig_data;
