@@ -6,30 +6,28 @@
 #include "proto.h"
 #include "pining.h"
 
-#define NB_DIG (16-NB_ANALOGS) // Pour les registres de conf
-#define SIZE_AN_DATA ((2*NB_ANALOGS) + 2)
+#include "app_usb.h"
 
-//unsigned char send_an[128];//2*NB_ANALOGS + 1];
-unsigned char* an;
+#define NB_DIG (16-NB_ANALOGS) // Pour les registres de conf
+#define SIZE_AN (2*NB_ANALOGS)
+
 unsigned char compteur_an;
-unsigned char an_data[SIZE_AN_DATA];
+unsigned char an[SIZE_AN];
+unsigned char an_data[SIZE_AN + 2];
 unsigned char number_an;
 
 unsigned char configured = 0;
 
 void send_an_data(unsigned char number)
 {
+    unsigned char n,i;
+    while(EP_IN_BD(2).Stat.uc & BDS_USIE); // wait the Uown bit to be cleared
+    n = ((number > number_an) ? number_an : number);
+    ep2_num_bytes_to_send = 2 + (n<<1);
+    ep2_source_data = &an_data[2];
+    for(i=0;i<n;i++) ep2_source_data[i] = an[i];
     ep2_source_data = an_data;
-    if(number>number_an)
-    {
-        ep2_num_bytes_to_send = 2 + (number_an<<1);
-        ep2_source_data[1] = number_an;
-    }
-    else
-    {
-        ep2_num_bytes_to_send = 2 + (number<<1);
-        ep2_source_data[1] = number;
-    }
+    ep2_source_data[1] = n;
     ep2_source_data[0] = ANALOG;
     my_prepare_ep2_in();
 }
@@ -38,9 +36,15 @@ void send_an_data(unsigned char number)
 void setup_adconversion(void) // Configure AD...
 {
     set_antris();
-    for(compteur_an=0;compteur_an<SIZE_AN_DATA;compteur_an++) an_data[compteur_an]=0;
+    for(compteur_an=0;compteur_an<SIZE_AN;compteur_an++)
+    {
+        an_data[compteur_an]=0;
+        an[compteur_an]=0;
+    }
+    an_data[SIZE_AN]=0;
+    an_data[SIZE_AN + 1]=0;
     compteur_an = 0;
-    if(configured)
+    if(!configured)
     {
         OSCCONbits.IDLEN = 1; //|= 0x80; // 10000000 : IDLEN = 1 : pas de SLEEP (pour AD conversion)
         OSCCONbits.SCS = 0; // &= 0xfc; // 11111100 : SCS = 0 : primary clock source (on ne sait jamais !)
@@ -48,13 +52,13 @@ void setup_adconversion(void) // Configure AD...
         ADCON0 = 0x00; // 00 0000 0 0 : nU, ANinput = AN0, idle, ADOFF
         ADCON2 = 0x2E; // 0 0 101 110 : left justified, nU, 12 Tac d'acquisition, freq de Fosc/64
         ADCON0 |= 0x01; // xx xxxx x 1 : ADON
-        an = &(an_data[2]);
-        PIE1bits.ADIE = 1;
     }    
     else
     {
         init_adconversion(number_an);
     }
+    PIR1bits.ADIF = 0;
+    PIE1bits.ADIE = 1;
 // il faut attendre un init_adconversion pour lancer la convertion.
 }
 

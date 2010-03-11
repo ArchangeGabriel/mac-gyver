@@ -34,6 +34,7 @@ void my_ep1_out(void)
             case SERVOS: set_servo(ep1_OutBuffer[1]-1, ep1_OutBuffer[2]); break;
             case DIGITS: send_digitals_in(); break;
             case ISDEAD: 
+                while(EP_IN_BD(2).Stat.uc & BDS_USIE); // wait the Uown bit to be cleared
                 ep2_num_bytes_to_send = 1;
                 ep2_source_data = alive;
                 alive[0] = ISDEAD;

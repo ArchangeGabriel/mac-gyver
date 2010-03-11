@@ -12,6 +12,8 @@
 #include "pining.h"
 #include "pindebug.h"
 
+#include "ep2.h"
+#include "app_usb.h"
 
 // beware : this is not a C main function, but the application
 // entry point called from the boot.
@@ -32,13 +34,6 @@ void application_main(void)
     TRISDEBUG = 0;
     PINDEBUG = 1;
     
-    // Reset the Timer0 value
-    TMR0H = 0;
-    TMR0L = 0;
-
-    // Configure the Timer0
-    //T0CON = 0x86; // TMR0ON, 16bits, CLKO, PSA on, 1:256  ie interrupt every 21.8ms
-
     setalim();
     init_pwm();
     init_codeuses();
@@ -49,13 +44,16 @@ void application_main(void)
     
     PIE2bits.USBIE = 0; // Interrupt USB off : on ne touche pas a la gestion de l'USB !!
 
-    INTCONbits.TMR0IE = 1; // Interrupt Timer 0
-    INTCONbits.PEIE = 1; // Interrupts peripheriques (usb, timer 1...)
     INTCONbits.GIE = 1; // Interrupts global
 
     while(usb_active_cfg > 2)
     {
         usb_sleep();
+        if(INTCONbits.TMR0IF)
+        {
+            sendcodeuses();
+            INTCONbits.TMR0IF = 0;
+        }
         dispatch_usb_event();
     }
     cutalim();
@@ -67,23 +65,16 @@ void application_main(void)
 #pragma code high_priority_isr 0x2030
 void high_priority_isr(void) interrupt
 {
-    if(INTCONbits.TMR0IF)
-    {
-	sendcodeuses();
-        INTCONbits.TMR0IF = 0;
-    }
     ////////////////////////////////// Codeuses ////////////////////
     if(INTCON3bits.INT1IF)
     {
         if(PINSSCOD1) codeusecnt[1]++; else codeusecnt[1]--;
-//        if(PIN_SSCOD1) mesdonnees[3]++; else mesdonnees[3]--;
-	INTCON3bits.INT1IF = 0;
+        INTCON3bits.INT1IF = 0;
     }
     if(INTCONbits.INT0IF)
     {
         if(PINSSCOD0) codeusecnt[0]++; else codeusecnt[0]--;
-       // if(PIN_SSCOD0) mesdonnees[2]++; else mesdonnees[2]--;
-	INTCONbits.INT0IF = 0;
+        INTCONbits.INT0IF = 0;
     }
 }
 
@@ -91,4 +82,3 @@ void high_priority_isr(void) interrupt
 void low_priority_isr(void) interrupt
 {
 }
-

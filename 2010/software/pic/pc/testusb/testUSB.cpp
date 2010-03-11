@@ -78,6 +78,7 @@ void* codeuse(void *)
     {
         sem_wait(&my_mutex);
         i = get_codeuses(&codeusegauche,&sensgauche,&codeusedroite,&sensdroit);
+        start_getting();   // Arrete l'acquisition
         if(i == -1)
         {
           stop_getting();   // Arrete l'acquisition

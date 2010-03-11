@@ -3,7 +3,7 @@
 #ifndef CODEUSES_H_
 #define CODEUSES_H_
 
-extern long* codeusecnt;
+extern unsigned long codeusecnt[2];
 //extern long mesdonnees[4];
 
 extern void init_codeuses(void);

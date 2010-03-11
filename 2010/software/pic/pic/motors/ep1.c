@@ -34,6 +34,7 @@ void my_ep1_out(void)
         }
         else if(ep1_OutBuffer[0] == ISDEAD)
         {
+            while(EP_IN_BD(2).Stat.uc & BDS_USIE); // wait the Uown bit to be cleared
             ep2_num_bytes_to_send = 1;
             ep2_source_data = alive;
             alive[0] = ISDEAD;

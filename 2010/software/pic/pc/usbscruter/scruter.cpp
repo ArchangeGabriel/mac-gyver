@@ -77,44 +77,58 @@ void init()
       }
     }
   }
-  input = fopen("./test.mon","r");//fopen("/sys/kernel/debug/usb/usbmon/0u","r");
+  input = fopen("./test.mon","r");
+  //input = fopen("../testusb/toto.mon","r");
+  //input = fopen("/sys/kernel/debug/usb/usbmon/6u","r");
   output = fopen("./raw.mon","w");
   printf("Initialization finished\n");
 }
 
 void parse_ctrl_setup(struct usbmon_line *line)
 {
-  if(line->data[0]=='s')
+  switch(line->urb_status)
   {
-    struct usb_ctrl_setup setup;
-    sscanf(&line->data[2],"%x %x %x %x %x",&setup.bRequestType,&setup.bRequest,&setup.wValue,&setup.wIndex,&setup.wLength);
-    switch(setup.bRequest)
-    {
-      case USB_REQ_SET_CONFIGURATION :
-        printf("SET_CONFIGURATION(%d)\n",setup.wValue);
-        break;
-      case USB_REQ_CLEAR_FEATURE :
-        printf("CLEAR_FEATURE:");
-        switch(setup.wValue)
-        {
-          case 0: //ENDPOINT_HALT :
-            printf("ENDPOINT_HALT(EP%d)\n",setup.wIndex);
-            break;
-          default:
-            printf(" %s\n",line->data);
-            break;
-        }
-        break;
-      case USB_REQ_GET_DESCRIPTOR :
-        printf("GET_DESCRIPTOR: %s\n",line->data);
-        break;
-      default:
-        printf("Unknown setup: %s\n",line->data);
-        break;
-    }
+    case ACK:
+      printf("ACK and answers: %s\n",line->data);
+      break;
+    case SETUP:
+      struct usb_ctrl_setup setup;
+      sscanf(line->data,"%x %x %x %x %x",&setup.bRequestType,&setup.bRequest,&setup.wValue,&setup.wIndex,&setup.wLength);
+      switch(setup.bRequest)
+      {
+        case USB_REQ_SET_CONFIGURATION :
+          printf("SET_CONFIGURATION(%d)\n",setup.wValue);
+          break;
+        case USB_REQ_CLEAR_FEATURE :
+          printf("CLEAR_FEATURE:");
+          switch(setup.wValue)
+          {
+            case 0: //ENDPOINT_HALT :
+              printf("ENDPOINT_HALT(EP%d)\n",setup.wIndex);
+              break;
+            default:
+              printf(" Unknown Clear Failure Request: %s\n",line->data);
+              break;
+          }
+          break;
+        case USB_REQ_GET_DESCRIPTOR :
+          printf("GET_DESCRIPTOR: %s\n",line->data);
+          break;
+        default:
+          printf("Unknown Setup Request: %s\n",line->data);
+          break;
+      }
+      break;
+    case -EPIPE:
+      printf("\e[0;31mBroken Pipe: %s\n",line->data); // In red
+      break;
+    case -EINPROGRESS:
+      printf("In Progress: %s\n",line->data);
+      break;
+    default:
+      printf("Unknown Error: %s\n",line->data);
+      break;
   }
-  else if(line->data[0]=='0') printf("ACK and answers: %s\n",&line->data[2]);
-  else printf("Unknown Error: %s\n",line->data);
 }
 
 void treatlinemotor(struct usbmon_line * line)
@@ -123,12 +137,12 @@ void treatlinemotor(struct usbmon_line * line)
   int length,databegin;
   int i;
   char datatag, datacontent[10];
-  content = strchr(line->data,' ');
-  sscanf(content," %d %c%n",&length,&datatag,&databegin);
+  //content = strchr(line->data,' ');
+  sscanf(line->data," %d %c%n",&length,&datatag,&databegin);
   if(datatag=='=')
   {
     if(length > 10) length = 10;
-    content = &content[databegin];
+    content = &line->data[databegin];
     for(i=0;i<length;i++)
     {
       sscanf(content,"%2x%n",&datacontent[i],&databegin);
@@ -143,6 +157,7 @@ void treatlinemotor(struct usbmon_line * line)
       nbtrame++;
       printf("\r");
     }
+    else if((length==3)&&(datacontent[0]==SETPWM)) printf("Set_speed(%d,%d)\n",datacontent[1],datacontent[2]);
     else printf("Unknown data: %s\n",line->data);
   }
   else if(line->event_type==SUBMISSION) printf("\r");
@@ -218,9 +233,29 @@ void print_forhead(struct usbmon_line *line)
   printf(" %c EP%d:%c ",line->event_type,line->endpoint,line->transfer_type); 
 }
 
+void parse_status(struct usbmon_line *line)
+{
+  int databegin;
+  if(line->data[0] == 's')
+  {
+    line->urb_status = 1;
+    line->data = &line->data[1];
+  }
+  else
+  {
+    sscanf(line->data,"%d%n",&line->urb_status,&databegin);
+    if(line->data[databegin] == ':')
+    {
+      line->data = &line->data[databegin+1];
+      sscanf(line->data,"%d%n",&line->interval,&databegin);
+    }
+    line->data = &line->data[databegin];
+  }
+}
+
 int main(int argc, char**argv)
 {
-  int firstline,databegin;
+  int firstline,databegin,curseur;
   unsigned long int timereference;
   char stringline[128];
 
@@ -252,6 +287,7 @@ int main(int argc, char**argv)
       fprintf(output,"%s\n",stringline);
       fflush(output);
       sscanf(&stringline[16],"%d %c %c%c:%d:%d:%d %n",&line.timestamp,&line.event_type,&line.transfer_type,&line.transfer_direction,&line.bus,&line.device,&line.endpoint,&databegin);
+      line.data = &stringline[databegin+16];
       if(firstline)
       {
         firstline = 0;
@@ -262,18 +298,23 @@ int main(int argc, char**argv)
       {
         line.timestamp -= timereference;
       }
-      line.data = &stringline[databegin+16];
       if((line.bus == motorbus)&&(line.device == motordevice)) // concerne la carte moteur
       {
+        printf("\e[0;33m"); // Yellow
+        parse_status(&line);
         print_forhead(&line);
         if(line.transfer_type==CONTROL) parse_ctrl_setup(&line);
         else treatlinemotor(&line);
+        printf("\e[0m");    // Reset colors
       }
       else if((line.bus == inoutbus)&&(line.device == inoutdevice)) // concerne la carte inout
       {
+        printf("\e[0;34m"); // blue
+        parse_status(&line);
         print_forhead(&line);
         if(line.transfer_type==CONTROL) parse_ctrl_setup(&line);
         else treatlineinout(&line);
+        printf("\e[0m");    // Reset colors
       }
       else // ne nous concerne pas
       {

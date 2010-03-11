@@ -48,7 +48,8 @@ void my_prepare_ep2_in(void)
 
 void my_ep2_in(void)
 {
-    if(UEIEbits.BTOEE && UEIRbits.BTOEF)
+    return;
+/*    if(UEIEbits.BTOEE && UEIRbits.BTOEF)
     {
         // Error during last transfert. Redoing it.
         UEIRbits.BTOEF = 0;
@@ -80,6 +81,6 @@ void my_ep2_in(void)
         {
             EP_IN_BD(2).Stat.uc = BDS_USIE | BDS_DAT0 | BDS_DTSEN;
         }
-    }
+    }*/
 }
 
