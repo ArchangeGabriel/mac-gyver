@@ -8,6 +8,7 @@
 
 int set_speed(unsigned char vitesse1, unsigned char vitesse2); // change la vitesse des moteurs en ces valeurs (0 ne change rien, 1 arriere toute, 128 arret, 255 avant toute). Retourne 1 si ok, -1 sinon
 int get_codeuses(int *codeuse1, unsigned char *sens1, int *codeuse2, unsigned char *sens2); // met les valeurs courantes des codeuses dans codeuse1 et codeuse2, et les sens dans sens1 et sens2 / Retourne l'indice de l'echange usb (il s'incremente tous les pas de temps, au cas ou on a rate une trame usb) si ok, -1 sinon
+// cette fonction est destinee a etre appelee en boucle dans un thread (cf testusb.cpp)
 
 int get_digital_in(void); // retourne de 0 à 127 (ie les 7 entrees numeriques) si ok, -1 sinon
 int init_analog_in(unsigned char number); // defini le nombre NB_ANALOG d'entrees analogiques. Retourne min(number, NB max d'analogiques de la carte) si ok, -1 sinon. Doit etre appelee avant le premier get_analog_in.
