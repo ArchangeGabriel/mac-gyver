@@ -47,7 +47,7 @@
 
 #define _POS_INIT_X     0.2
 #define _POS_INIT_Y     0.2
-#define _POS_INIT_A     90.
+#define _POS_INIT_A     45.
 #define _RAYON_ROUE     0.025
 #define _FREQ_CODER     (500./(2.*M_PI))
 #define _MOTOR_K        19.

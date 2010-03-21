@@ -1,25 +1,7 @@
 #ifndef __webcam__
 #define __webcam__
 
-#include <stdint.h>
-#include <cstddef>
-#include <cstdlib>
-#include <cstdio>
-#include <cstring>
-#include <string>
-#include <cassert>
-#include <vector>
-#include <algorithm>
-#include <cmath>
-#include <fcntl.h>              /* low-level i/o */
-#include <unistd.h>
-#include <errno.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <sys/time.h>
-#include <sys/mman.h>
-#include <sys/ioctl.h>
-#include <asm/types.h>          /* for videodev2.h */
+        
 #include <linux/videodev2.h>
 
 #include "common.hpp"

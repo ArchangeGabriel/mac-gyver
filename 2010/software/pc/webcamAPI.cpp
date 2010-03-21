@@ -12,11 +12,6 @@ webcam_t video_top(WEBCAM2,640,480);
 
 rectangle_t video_top_detect_rect;
 
-unsigned char* get_webcam_picture(int webcam_id)
-{
-    return NULL;
-}
-
 void init_webcam_api()
 {
     init_utils();

@@ -20,8 +20,6 @@ yy de 0 à 9: configuration des palets, voir réglement
 Renvoie -1 en cas d'échec
 */
 
-unsigned char* get_webcam_picture(int webcam_id);
-
 int wc_reco_config();
 
 bool teste_palet_en_place(bool vert);

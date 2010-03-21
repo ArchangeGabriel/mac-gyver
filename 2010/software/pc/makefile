@@ -6,10 +6,10 @@ all: make_common main.o
 make_common:
 	make -C ../common
 	
-usb.o: usb.cpp usb.h usb_simul.cpp usb_real.cpp ../common/comm.h ../common/simul.h
+usb.o: usb.cpp usb.h simul/usb.cpp ../common/comm.h ../common/simul.h
 	$(CC) -o usb.o -c usb.cpp $(CFLAGS)
 
-cinematik.o: cinematik.cpp cinematik.h
+cinematik.o: cinematik.cpp cinematik.h ../common/const.h
 	$(CC) -o cinematik.o -c cinematik.cpp $(CFLAGS)
 
 webcamAPI.o: webcamAPI.cpp webcamAPI.h ../common/simul.h webcam.o processing.o utils.o

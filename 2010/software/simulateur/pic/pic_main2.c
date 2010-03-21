@@ -20,7 +20,7 @@
 #ifdef SIMULATION
 int query_webcam = -1;
 int msg_webcam;
-unsigned char *pixels;
+uint16_t *pixels;
 #endif
 
 //------------------------------------------------------------------------------
@@ -57,22 +57,22 @@ void* pic_main2(void *)
       #ifdef SIMULATION
       if(query_webcam != -1)
       {
-        int size = Simul->robot->webcams[query_webcam].getPicture(&pixels);
+        int size = Simul->robot->webcams[query_webcam].getPicture(&pixels);  
         if(size != -1)
-        {
-          char *msg = (char*) malloc(sizeof(MSG_INT1_t) + size);
-          ((MSG_INT1_t*)msg)->type = WEBCAM;
-          ((MSG_INT1_t*)msg)->msg_id = msg_webcam;
-          ((MSG_INT1_t*)msg)->value = size;
-          int *ptr = (int*) &msg[sizeof(MSG_INT1_t)];
-          ptr++;
+        {   
+          char *msg = (char*) malloc(sizeof(MSG_INT2_t) + size);
+          ((MSG_INT2_t*)msg)->type = WEBCAM;
+          ((MSG_INT2_t*)msg)->msg_id = msg_webcam;
+          ((MSG_INT2_t*)msg)->value1 = Simul->robot->webcams[query_webcam].W;
+          ((MSG_INT2_t*)msg)->value2 = Simul->robot->webcams[query_webcam].H;
+          uint16_t *ptr = (uint16_t*)&msg[sizeof(MSG_INT2_t)];
           memcpy(ptr,pixels,size); 
-          if(write_usb(comm_id,msg,sizeof(MSG_INT1_t)+size)<0)
+          if(write_usb(comm_id,msg,sizeof(MSG_INT2_t)+size)<0)
             close_connection(&comm_id);  
           else
-            query_webcam=-1;            
+            query_webcam=-1;       
           free(pixels);
-          free(msg);
+          free(msg);  
         }
       }
       #endif         

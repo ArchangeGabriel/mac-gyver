@@ -38,17 +38,17 @@ int pc_main(int argc, char **argv)
   int i;
 
   optind = 1;
-  while((i = getopt(argc, argv, "rg")) > 0)
+  while((i = getopt(argc, argv, "by")) > 0)
   {
     switch(i)
     {
       case 'r':
-      color = clRED;
-      fprintf(stderr,"Je suis rouge!\n");      
+      color = clBLUE;
+      fprintf(stderr,"Je suis bleu!\n");      
       break;
       case 'g':
-      color = clGREEN;
-      fprintf(stderr,"Je suis vert!\n");
+      color = clYELLOW;
+      fprintf(stderr,"Je suis jaune!\n");
       break;
       default:
       break;
@@ -57,8 +57,8 @@ int pc_main(int argc, char **argv)
   
   if(color == -1)
   {
-    color = clGREEN;
-    fprintf(stderr,"Pas de couleur spécifiée, supposé vert. (Utiliser -r ou -g pour spécifier la coleur)\n");
+    color = clBLUE;
+    fprintf(stderr,"Pas de couleur spécifiée, supposé blue. (Utiliser -b ou -y pour spécifier la couleur)\n");
   }
 
   strat_set_color(color);

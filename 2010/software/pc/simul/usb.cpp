@@ -5,9 +5,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include "../common/comm.h"
-
-#include "usb.h"
+#include "../../common/comm.h"
 
 int socket_id[2] = {-1, -1};
 bool connected[2] = {false, false};
@@ -128,7 +126,9 @@ char* read_usb(int picID)
   len=len_type+len_header+len_data;  
   char *msg=new char[len]; 
   memcpy(msg,buff,len_type+len_header);   
-  if(len_data>0 && read(socket_id[picID],&msg[len_type+len_header],len_data)<0)
+  int r = read(socket_id[picID],&msg[len_type+len_header],len_data);
+  printf("r = %d, l = %d\n",r, len_data);
+  if(len_data>0 && r<0)
     return NULL;
   return msg;    
 }

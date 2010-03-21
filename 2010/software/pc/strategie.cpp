@@ -17,6 +17,7 @@ using namespace std;
 #include "strategie.h"
 #include "usb.h"
 #include "../common/comm.h"
+#include "webcam.hpp"
 
 // Couleur du robot
 int color;
@@ -85,9 +86,13 @@ void stratMainLoop()
 {
   fprintf(stderr,"Let's go!\n");  fflush(stdout);
   
-  pthread_mutex_t *mutPos; 
-  mutPos = pp_go_to(symetrize(position_t(2.6,1.3,M_PI)),tpDEST,false,false,false);
-  wait_for_it(mutPos);
+  webcam_t WC("0", 640, 480);
+  WC.start();
+  WC.do_capture();
+  image_t img = WC.get_image2();
+ 
+  
+  wait_for_it(pp_go_to(symetrize(position_t(2.6,1.3,M_PI)),tpDEST,false,false,false));
 
   while(true)
   {
@@ -120,7 +125,7 @@ void wait_for_it(pthread_mutex_t *mutex)
 //------------------------------------------------------------------------------
 position_t symetrize(position_t pos)
 {
-  if(color == clRED)
+  if(color == clYELLOW)
   {
     pos.x = _LONGUEUR_TER - pos.x;
     pos.a = M_PI - pos.a;

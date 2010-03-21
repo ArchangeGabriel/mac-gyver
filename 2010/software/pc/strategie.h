@@ -1,7 +1,7 @@
 #ifndef STRATEGIEH
 #define STRATEGIEH
 
-enum{clRED,clGREEN};
+enum{clBLUE,clYELLOW};
 
 //------------------------------------------------------------------------------
 /*

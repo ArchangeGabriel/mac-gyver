@@ -4,6 +4,7 @@
 
 #include "../common/simul.h"
 #include "../common/comm.h"
+//#include "../common/bitmap.h"
 #include "usb.h"
 
 #include "path_planning.h"
@@ -37,7 +38,9 @@ int msg_id_clamp;
 int picSendInfo();
 void (*callbackRecvReset)(void);
 pthread_mutex_t *mut_webcam = NULL;
-void *webcam_data;
+uint16_t *webcam_data;
+int *webcam_W;
+int *webcam_H;
 #else
 #define ANALOGS  0x80          // 10000000
 #define DIGITALS 0x40          // 01000000
@@ -200,12 +203,17 @@ void* pic2_handle_msg(void *)
         #ifdef SIMULATION
         case WEBCAM:
         {
-          MSG_INT1_t *msg = (MSG_INT1_t *)_msg;            
-          int size = msg->value;
-          int *ptr = &msg->value;
-          ptr++;
-          *((char**)webcam_data) = new char[size];
-          memcpy(*((char**)webcam_data),ptr,size);         
+          MSG_INT2_t *msg = (MSG_INT2_t *)_msg;            
+          *webcam_W = msg->value1;
+          *webcam_H = msg->value2; 
+
+          if(webcam_data)
+          {
+            int size = 3*msg->value1*msg->value2*sizeof(uint16_t);
+            uint16_t *ptr = (uint16_t*)(msg+1);
+            memcpy(webcam_data,ptr,size);      
+            //save_buff_to_bitmap("img.bmp", msg->value1, msg->value2, webcam_data);           
+          }
           pthread_mutex_unlock(mut_webcam);      
           mut_webcam = NULL;             
         }
@@ -275,8 +283,8 @@ void* pic2_handle_msg(void *)
         break;        
         
         default:
-        fprintf(stderr,"<picInterface.cpp> PIC2: Unknown message type %d.\n",get_msg_type(_msg));
-        fflush(stdout);            
+        //fprintf(stderr,"<picInterface.cpp> PIC2: Unknown message type %d.\n",get_msg_type(_msg));
+        //fflush(stdout);            
         break;      
       }
       delete _msg;        
@@ -410,7 +418,7 @@ int picSendInfo()
   return write_usb(PIC2, &info, sizeof(info));  
 }
 //------------------------------------------------------------------------------
-pthread_mutex_t* picWebcam(int id, void *data)
+pthread_mutex_t* picWebcam(int id, int *W, int *H, uint16_t *data)
 {
   MSG_INT1_t msg;
   msg.type   = WEBCAM_QUERY;
@@ -431,6 +439,8 @@ pthread_mutex_t* picWebcam(int id, void *data)
     pthread_mutex_init(mut_webcam,NULL);
     pthread_mutex_lock(mut_webcam);        
     webcam_data = data;
+    webcam_W = W;
+    webcam_H = H;
     return mut_webcam;
   }
 }
