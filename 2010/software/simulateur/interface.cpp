@@ -170,54 +170,6 @@ void console()
             else
             {
               Simul.robot_list[r]->webcams[i].start();
-              unsigned char *pix;
-              Simul.robot_list[r]->webcams[i].getPicture(&pix);
-              FILE *F= fopen("img.bmp","w+");
-              int sizeline = 3 * Simul.robot_list[r]->webcams[i].W;
-              sizeline += sizeline%4;
-              int n;
-              fwrite("BM",2,1,F);
-              n = 14 + 40 + sizeline*Simul.robot_list[r]->webcams[i].H; fwrite(&n,4,1,F);              
-              n = 0;   fwrite(&n,4,1,F);              
-              n = 14;  fwrite(&n,4,1,F);
-                            
-              n = 40;  fwrite(&n,4,1,F);        
-              n = Simul.robot_list[r]->webcams[i].W;  fwrite(&n,4,1,F);        
-              n = Simul.robot_list[r]->webcams[i].H; fwrite(&n,4,1,F);   
-              n = 1;   fwrite(&n,2,1,F);
-              n = 24;  fwrite(&n,2,1,F);                  
-              n = 0;   fwrite(&n,4,1,F);   
-              n = sizeline*Simul.robot_list[r]->webcams[i].H; fwrite(&n,4,1,F);
-              n = 1000; fwrite(&n,4,1,F);
-              n = 1000; fwrite(&n,4,1,F);
-              n = 0;   fwrite(&n,4,1,F);  
-              n = 0;   fwrite(&n,4,1,F);  
-              
-              for(int y=0;y<Simul.robot_list[r]->webcams[i].H;y++)
-              {
-                int x;
-                for(x=0;x<Simul.robot_list[r]->webcams[i].W;x++)
-                {
-                  fwrite(&Simul.robot_list[r]->webcams[i].pixels[y*Simul.robot_list[r]->webcams[i].H+3*x+2],1,1,F);  
-                  fwrite(&Simul.robot_list[r]->webcams[i].pixels[y*Simul.robot_list[r]->webcams[i].H+3*x+1],1,1,F);  
-                  fwrite(&Simul.robot_list[r]->webcams[i].pixels[y*Simul.robot_list[r]->webcams[i].H+3*x+0],1,1,F);   
-
-                /*  n = (255*x)/Simul.robot_list[r]->webcams[i].W;
-                  fwrite(&n,1,1,F);                         
-                  n = 128;
-                  fwrite(&n,1,1,F);                       
-                  n = (255*y)/Simul.robot_list[r]->webcams[i].H;
-                  fwrite(&n,1,1,F);                                       */
-                }
-                x*=3;
-                n=0;
-                while(x%4)
-                {
-                  fwrite(&n,1,1,F);
-                  x++;
-                }
-              }              
-              fclose(F);
             }
         }
       }

@@ -67,7 +67,7 @@ int max_Y=180;
 //------------------------------------------------------------------------------
 void cine_init(int color)
 {  
-  pos = position_t((color==clGREEN)?_POS_INIT_X:(_LONGUEUR_TER-_POS_INIT_X),_POS_INIT_Y,((color==clGREEN)?_POS_INIT_A:(180-_POS_INIT_A))*M_PI/180.);
+  pos = position_t((color==clBLUE)?_POS_INIT_X:(_LONGUEUR_TER-_POS_INIT_X),_POS_INIT_Y,((color==clBLUE)?_POS_INIT_A:(180-_POS_INIT_A))*M_PI/180.);
   speed = vector_t(0., 0.);
   aspeed = 0;
   

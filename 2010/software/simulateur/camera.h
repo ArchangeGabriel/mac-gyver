@@ -1,6 +1,7 @@
 #ifndef CAMERAH
 #define CAMERAH
 
+#include <stdint.h>
 #include "object.h"
 #include "parse_params.h"
 #include "../common/lin_alg.h"
@@ -22,7 +23,7 @@ class camera_t : public params_t
   static void make_scene();
     
   public:
-    GLubyte *pixels;
+  uint16_t *pixels;
   int W,H;  
   static simul_info_t* info;  
     
@@ -39,7 +40,7 @@ class camera_t : public params_t
   static void no_display();  
   static void reshape(int width, int height);
   void makePicture();  
-  int getPicture(void *pixels);
+  int getPicture(uint16_t **pix);
   GLuint LoadTexture(const char * filename, int width, int height);
   void FreeTexture(GLuint texture); 
 };

@@ -2,6 +2,7 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <GL/glut.h>
+#include <unistd.h>
 
 #include "camera.h"
 #include "the_cup/the_playground.h"
@@ -38,7 +39,7 @@ void camera_t::init_params()
   capture = false;
   
   int size = 3*W*H;
-  pixels = new GLubyte[size];   
+  pixels = new uint16_t[size];   
   
   printf("ok\n");
   fflush(stdout);   
@@ -146,7 +147,8 @@ void camera_t::display()
   camera_t *WC = (camera_t*) info -> current_webcam;
   if(WC->capture)
   {
-    glReadPixels(0,0,WC->W,WC->H,GL_RGB,GL_UNSIGNED_BYTE,WC->pixels);
+    glReadPixels(0,0,WC->W,WC->H,GL_RGB,GL_UNSIGNED_SHORT,WC->pixels);
+    WC->capture = false;
     WC->done = true;
   }
 }
@@ -230,30 +232,23 @@ void camera_t::makePicture()
   make_scene(); 
 }
 //------------------------------------------------------------------------------
-int camera_t::getPicture(void *pix)
+int camera_t::getPicture(uint16_t **pix)
 {
-  if(info -> current_webcam == this)
+  if(info -> current_webcam != this)
+    start();
+    
+  if(!done)  
   {
-    if(done)
-    {
-      int size = 3*W*H; 
-      *((GLubyte**)pix) = (GLubyte*) malloc(sizeof(GLubyte) * size);
-      memcpy(*((GLubyte**)pix), pixels, size);   
-      capture = false;
-      done = false;
-      return size; 
-    }
-    else
-    {
-      capture = true;
-      return -1;
-    }
+    capture = true;
+    return -1;
   }
   else
   {
-    start();
-    done = false;      
-    return -1;    
+    int size = 3*W*H*sizeof(uint16_t); 
+    *pix = (uint16_t*)malloc(size);
+    memcpy(*pix, pixels, size);   
+    done = false;
+    return size;
   }
 }
 //------------------------------------------------------------------------------

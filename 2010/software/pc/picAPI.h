@@ -2,6 +2,7 @@
 #define PICAPI
 
 #include <pthread.h>
+#include <stdint.h>
 #include "../common/simul.h"
 
 
@@ -79,7 +80,7 @@ int picSendInfo(float posX, float posY, float posA,
 /*
 Pour obtenir une image de la webcam
 */
-pthread_mutex_t* picWebcam(int id, void *data);
+pthread_mutex_t* picWebcam(int id, int *W, int *H, uint16_t *data = NULL);
 
 /*
 Fonction appelé en cas de "re" dans le simulateur
