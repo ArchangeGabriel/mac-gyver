@@ -5,6 +5,9 @@
 #include <pthread.h>
 #include <semaphore.h>
 #include <stdlib.h>
+#include <sys/socket.h>
+#include <errno.h> 
+
 
 #include "../../common/comm.h"
 #include "../../common/simul.h"
@@ -59,20 +62,31 @@ void* pic_main2(void *)
       {
         int size = Simul->robot->webcams[query_webcam].getPicture(&pixels);  
         if(size != -1)
-        {   
-          char *msg = (char*) malloc(sizeof(MSG_INT2_t) + size);
-          ((MSG_INT2_t*)msg)->type = WEBCAM;
-          ((MSG_INT2_t*)msg)->msg_id = msg_webcam;
-          ((MSG_INT2_t*)msg)->value1 = Simul->robot->webcams[query_webcam].W;
-          ((MSG_INT2_t*)msg)->value2 = Simul->robot->webcams[query_webcam].H;
-          uint16_t *ptr = (uint16_t*)&msg[sizeof(MSG_INT2_t)];
-          memcpy(ptr,pixels,size); 
-          if(write_usb(comm_id,msg,sizeof(MSG_INT2_t)+size)<0)
-            close_connection(&comm_id);  
-          else
-            query_webcam=-1;       
+        {           
+          char f[100];
+          sprintf(f, "webcam%d.dat", query_webcam);
+          FILE *file = fopen(f, "wb+");
+          fwrite(&Simul->robot->webcams[query_webcam].W, sizeof(int), 1, file);
+          fwrite(&Simul->robot->webcams[query_webcam].H, sizeof(int), 1, file);
+          fwrite(pixels, size, 1, file);
+          fclose(file);
           free(pixels);
-          free(msg);  
+          
+          int len = sizeof(MSG_INT1_t) + strlen(f) + 1;
+          char *buffer = (char*) malloc(len);
+          MSG_INT1_t *msg = (MSG_INT1_t*)buffer;
+          char *data = &buffer[sizeof(MSG_INT1_t)];
+          
+          msg->type = WEBCAM;
+          msg->msg_id = msg_webcam;
+          msg->value = strlen(f) + 1;
+          strcpy(data, f);
+          
+          if(write_usb(comm_id,buffer,len)<0)
+            close_connection(&comm_id);
+          else
+            query_webcam=-1;
+          free(buffer);
         }
       }
       #endif         

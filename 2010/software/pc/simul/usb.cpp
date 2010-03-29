@@ -110,7 +110,7 @@ bool is_connected(int picID)
 char* read_usb(int picID)
 {
   if(!connected[picID]) return NULL;
-  
+
   char buff[100];
   int len;
   int len_type;
@@ -127,7 +127,8 @@ char* read_usb(int picID)
   char *msg=new char[len]; 
   memcpy(msg,buff,len_type+len_header);   
   int r = read(socket_id[picID],&msg[len_type+len_header],len_data);
-  printf("r = %d, l = %d\n",r, len_data);
+  if(r > 100)
+    printf("r = %d, l = %d\n",r, len_data);
   if(len_data>0 && r<0)
     return NULL;
   return msg;    

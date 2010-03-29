@@ -52,4 +52,4 @@ common.o: common.cpp common.hpp
 	$(CC) -o common.o -c common.cpp $(CFLAGS)
 
 clean:
-	rm -f *.c~ *.h~ *.cpp~ *.ini~ *.o makefile~ simulateur
+	rm -f *.c~ simul/*.c~ *.h~ *.cpp~ *.ini~ *.o makefile~ simulateur

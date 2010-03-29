@@ -17,6 +17,7 @@ using namespace std;
 #include "strategie.h"
 #include "usb.h"
 #include "../common/comm.h"
+//#include "../common/bitmap.h"
 #include "webcam.hpp"
 
 // Couleur du robot
@@ -91,7 +92,8 @@ void stratMainLoop()
   WC.do_capture();
   image_t img = WC.get_image2();
  
-  
+//  save_buff_to_bitmap("img.bmp", 640, 480, img.data);
+ 
   wait_for_it(pp_go_to(symetrize(position_t(2.6,1.3,M_PI)),tpDEST,false,false,false));
 
   while(true)

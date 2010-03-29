@@ -4,7 +4,6 @@
 
 #include "../common/simul.h"
 #include "../common/comm.h"
-//#include "../common/bitmap.h"
 #include "usb.h"
 
 #include "path_planning.h"
@@ -58,6 +57,9 @@ int *webcam_H;
 #define ACTIV_MOTEUR_2 0x08    // 00001000
 #define MOTEUR_3 0x30          // 00110000
 #define ACTIV_MOTEUR_3 0x40    // 01000000
+            *webcam_W = msg->value1;
+            *webcam_H = msg->value2;          
+            webcam_received = ceil(double((*webcam_W)*(*webcam_H))/double(webcam_buffsize));
 
 #define CLAMP_OPEN_SERVO    0x45
 #define CLAMP_LINTEL_SERVO  0x70
@@ -203,19 +205,31 @@ void* pic2_handle_msg(void *)
         #ifdef SIMULATION
         case WEBCAM:
         {
-          MSG_INT2_t *msg = (MSG_INT2_t *)_msg;            
-          *webcam_W = msg->value1;
-          *webcam_H = msg->value2; 
-
+          char *f = (char*)(_msg+sizeof(MSG_INT1_t));
+          FILE *file = fopen(f, "rb");
+          
+          fread(webcam_W, sizeof(int), 1, file);
+          fread(webcam_H, sizeof(int), 1, file);
           if(webcam_data)
           {
-            int size = 3*msg->value1*msg->value2*sizeof(uint16_t);
-            uint16_t *ptr = (uint16_t*)(msg+1);
-            memcpy(webcam_data,ptr,size);      
-            //save_buff_to_bitmap("img.bmp", msg->value1, msg->value2, webcam_data);           
+            fread(webcam_data, sizeof(uint16_t)*3*(*webcam_W)*(*webcam_H), 1, file);  
+            // Convertit de RGB à YUV
+            for(int i=0; i<3*(*webcam_W)*(*webcam_H); i+=3)
+            {
+              const double R = webcam_data[i+0]&255;
+              const double G = webcam_data[i+1]&255;
+              const double B = webcam_data[i+2]&255;  
+              const double Y = 0.299*R + 0.587*G + 0.114*B;    // Y
+              webcam_data[i+2] = 0.877*(R - Y);  // V
+              webcam_data[i+1] = 0.492*(B - Y);  // U
+              webcam_data[i+0] = Y;
+            }
           }
-          pthread_mutex_unlock(mut_webcam);      
-          mut_webcam = NULL;             
+          
+          pthread_mutex_t *cpy = mut_webcam;
+          mut_webcam = NULL;                       
+          pthread_mutex_unlock(cpy);   
+          //save_buff_to_bitmap("img.bmp", *webcam_W, *webcam_H, webcam_data);           
         }
         break;
         #endif
@@ -399,7 +413,17 @@ void picOnReconnectPIC2(void (*fun)())
 void picRecvReset(void (*fun)(void))
 {
   callbackRecvReset = fun;
-}
+}          // Convertit de RGB à YUV
+          /*for(int i=0; i<size; i+=3)
+          {
+            const double R = pixels[i];
+            const double G = pixels[i+1];
+            const double B = pixels[i+2];  
+            const double Y = 0.299*R + 0.587*G + 0.114*B;    // Y
+            pixels[i+2] = 0.877*(R - Y);  // V
+            pixels[i+1] = 0.492*(B - Y);  // U
+            pixels[i+0] = Y;
+          }*/
 //------------------------------------------------------------------------------
 int picSendInfo()
 {
