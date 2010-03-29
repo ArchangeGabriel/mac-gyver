@@ -16,7 +16,7 @@ int get_msg_header_size(char *msg)
   {
     #ifdef SIMULATION
     case WEBCAM:
-      return 3*sizeof(int);
+      return 2*sizeof(int);
     break;
     case WEBCAM_QUERY:
       return sizeof(int);
@@ -54,8 +54,7 @@ int get_msg_data_size(char *msg)
   {
     #ifdef SIMULATION
     case WEBCAM:
-      return ((MSG_INT2_t*)msg)->value1*((MSG_INT2_t*)msg)->value2*3*sizeof(uint16_t);   
-    break;
+      return ((MSG_INT1_t*)msg)->value;
     case WEBCAM_QUERY:
       return sizeof(MSG_INT1_t) - 2*sizeof(int);
     break;

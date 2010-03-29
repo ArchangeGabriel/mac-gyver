@@ -58,6 +58,16 @@ int read_usb(int comm_id, char **msg)
 int write_usb(int comm_id,void *msg,int size)
 {
   if(comm_id<0) return -1;
-  return write(comm_id,msg,size);  
+  
+  int len;
+  while(true)
+  {
+    len = write(comm_id,msg,size);
+    if(len>=0 || errno != EAGAIN)
+      break;
+    else
+      usleep(100);
+  }
+  return len;
 }
 //------------------------------------------------------------------------------
