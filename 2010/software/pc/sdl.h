@@ -2,13 +2,7 @@
 #define SDLH
 #include <SDL.h>
 
-typedef struct point_t
-{
-  int x;
-  int y;
-} point_t;
-
-
+#define _SCALE_SDL 200
 
 #define COLOR_SDL(R,G,B) (256*R + G)*256 + B
 
@@ -35,13 +29,18 @@ typedef struct point_t
 // Robot
 #define clRobot COLOR_SDL(128,128,128)
 
+typedef struct point_t
+{
+  int x;
+  int y;
+} point_t;
+
 void initSDL();
 bool is_SDL_ready();
 void Load_SDL_Colors();
 void Load_SDL_Background();
 void Free_SDL_Background();
 void Draw_SDL_Background();
-void SDL_First_Background();
 
 Uint32 makeColorSDL(char *color);
 Uint32 makeColorSDL(int R, int G, int B);
@@ -54,5 +53,4 @@ void LigneVerticaleSDL(int x, int y, int w, Uint32 coul);
 void FillRectSDL(int x, int y, int w, int h, Uint32 coul);
 void CercleSDL(int cx, int cy, int rayon, Uint32 coul);
 void DisqueSDL(int cx, int cy, int rayon, Uint32 coul);
-void SDL_Draw_Robot();
 #endif

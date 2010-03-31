@@ -6,6 +6,7 @@
 #include "path_planning.h"
 #include "anticol.h"
 #include "sdl.h"
+#include "visualizer.h"
 
 #include "pc_main.h"
 #include "main.h"
@@ -22,7 +23,7 @@ void* start_PP(void*);
 pthread_t ACThread;
 void* start_AC(void*);
 
-#ifdef USE_SDL_CLIENT
+#ifdef VISUALIZE
 pthread_t SDLThread;
 void* start_SDL(void*);
 #endif
@@ -63,9 +64,9 @@ int pc_main(int argc, char **argv)
 
   strat_set_color(color);
   
-  #ifdef USE_SDL_CLIENT
+  #ifdef VISUALIZE
   initSDL();
-  SDL_First_Background();
+  visu_draw_background(11);
   Load_SDL_Background();  
   pthread_create(&SDLThread, NULL, start_SDL, NULL);   // Affichage SDL
   #endif
@@ -110,7 +111,7 @@ void* start_AC(void*)
 //------------------------------------------------------------------------------
 void* start_SDL(void*)
 {
-  SDL_Draw_Robot(); 
+  visu_draw_robot(); 
   return NULL;
 }
 //------------------------------------------------------------------------------
