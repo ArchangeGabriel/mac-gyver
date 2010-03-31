@@ -1,7 +1,7 @@
 include ../makeopt
 
 all: make_common main.o
-	$(CC) -o ../client ../common/console.o ../common/comm.o usb.o cinematik.o webcamAPI.o picAPI.o anticol.o path_planning.o strategie.o sdl.o pc_main.o main.o processing.o utils.o common.o webcam.o $(LDFLAGS)
+	$(CC) -o ../client ../common/console.o ../common/comm.o usb.o cinematik.o webcamAPI.o picAPI.o anticol.o path_planning.o strategie.o sdl.o visualizer.o pc_main.o main.o processing.o utils.o common.o webcam.o $(LDFLAGS)
 
 make_common:
 	make -C ../common
@@ -29,8 +29,11 @@ strategie.o: strategie.cpp strategie.h path_planning.o picAPI.o ../common/simul.
 		
 sdl.o: sdl.cpp sdl.h
 	$(CC) -o sdl.o -c sdl.cpp $(CFLAGS)
+	
+visualizer.o: visualizer.cpp visualizer.h sdl.o
+	$(CC) -o visualizer.o -c visualizer.cpp $(CFLAGS)
 		
-pc_main.o: pc_main.cpp pc_main.h usb.o anticol.o strategie.o ../common/simul.h types.h sdl.o
+pc_main.o: pc_main.cpp pc_main.h usb.o anticol.o strategie.o ../common/simul.h types.h sdl.o visualizer.o
 	$(CC) -o pc_main.o -c pc_main.cpp $(CFLAGS)
 
 main.o: main.cpp main.h pc_main.o ../common/simul.h types.h webcamAPI.o

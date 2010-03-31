@@ -7,8 +7,6 @@
 #include "anticol.h"
 #include "sdl.h"
 
-#define _SCALE_SDL 200
-
 SDL_Surface* affichage=NULL;
 SDL_Surface* background=NULL;
 Uint32 *back_pixels;
@@ -32,7 +30,7 @@ void initSDL()
   }
   printf("ok\nSetting title...                ");
   fflush(stdout); 
-  SDL_WM_SetCaption("Temples of Atlantis", NULL);
+  SDL_WM_SetCaption("Feed the world", NULL);
   printf("ok\n");
   fflush(stdout);  
   Load_SDL_Colors(); 
@@ -295,99 +293,3 @@ void DisqueSDL(int cx, int cy, int rayon, Uint32 coul)
   }
 }
 //------------------------------------------------------------------------------
-void SDL_First_Background()
-{
-  printf("Creating background...          ");
-  fflush(stdout);
-  // sol
-  FillRectSDL(0,0,int(_SCALE_SDL*_LONGUEUR_TER),int(_SCALE_SDL*_LARGEUR_TER),clGround);  
-  // départ 1
-  FillRectSDL(0,0,int(_SCALE_SDL*0.5),int(_SCALE_SDL*0.5),clTeam1);
-  FillRectSDL(int(_SCALE_SDL*(_LONGUEUR_TER-0.5)),int(_SCALE_SDL*(_LARGEUR_TER-0.522)),int(_SCALE_SDL*0.5),int(_SCALE_SDL*0.522),clDeposeTeam1);  
-  // départ 2
-  FillRectSDL(int(_SCALE_SDL*(_LONGUEUR_TER-0.5)),0,int(_SCALE_SDL*0.5),int(_SCALE_SDL*0.5),clTeam2);
-  FillRectSDL(0.,int(_SCALE_SDL*(_LARGEUR_TER-0.522)),int(_SCALE_SDL*0.5),int(_SCALE_SDL*0.522),clDeposeTeam2);  
-  // Hors Terrain
-  FillRectSDL(int(_SCALE_SDL*0.5),int(_SCALE_SDL*2.122),int(_SCALE_SDL*2.),int(_SCALE_SDL*0.5),clBlack);
-  // Mur Bas
-  FillRectSDL(int(_SCALE_SDL*0.5),int(_SCALE_SDL*2.1),int(_SCALE_SDL*2.),int(_SCALE_SDL*0.022),clWall);    
-  FillRectSDL(int(_SCALE_SDL*0.5),int(_SCALE_SDL*2.122),int(_SCALE_SDL*0.022),int(_SCALE_SDL*0.5),clWall);         
-  FillRectSDL(int(_SCALE_SDL*(_LONGUEUR_TER-0.522)),int(_SCALE_SDL*2.122),int(_SCALE_SDL*0.022),int(_SCALE_SDL*0.5),clWall);                         
-  // Colline
-  FillRectSDL(int(_SCALE_SDL*0.67),0,int(_SCALE_SDL*1.66),int(_SCALE_SDL*0.5),clHill);
-  // Mur colline
-  FillRectSDL(int(_SCALE_SDL*0.74),int(_SCALE_SDL*0.5),int(_SCALE_SDL*1.52),int(_SCALE_SDL*0.022),clWall); 
-  LigneVerticaleSDL(int(_SCALE_SDL*0.74), 0, int(_SCALE_SDL*0.5), clBlack);               
-  LigneVerticaleSDL(int(_SCALE_SDL*(_LONGUEUR_TER-0.74)), 0, int(_SCALE_SDL*0.5), clBlack);                 
-  LigneVerticaleSDL(int(_SCALE_SDL*1.24), 0, int(_SCALE_SDL*0.5), clBlack);                                    
-  LigneVerticaleSDL(int(_SCALE_SDL*(_LONGUEUR_TER-1.24)), 0, int(_SCALE_SDL*0.5), clBlack); 
-  
-  printf("ok\n");
-  fflush(stdout);                 
-}
-//------------------------------------------------------------------------------
-void SDL_Draw_Robot()
-{
-  vector_t N,T,u,v;
-  point_t point[4];
-
-  position_t pos,dest;
-  
-  while(true)
-  {
-    Draw_SDL_Background();  
-    // Draw
-    pos = cine_get_position();
-    dest = pp_get_dest();
-
-    // Robot supposé
-    N.x=cos(pos.a);
-    N.y=sin(pos.a);
-    T.x=-sin(pos.a);
-    T.y=cos(pos.a);
-    v=vector_t(_ROUE_X,0.).rotate(pos.a);
-    point[0].x=((int)((pos.x+N.x*_LONGUEUR_ROBOT/2.+T.x*_LARGEUR_ROBOT/2.-v.x)*_SCALE_SDL));     
-    point[0].y=((int)((pos.y+N.y*_LONGUEUR_ROBOT/2.+T.y*_LARGEUR_ROBOT/2.-v.y)*_SCALE_SDL));
-    point[1].x=((int)((pos.x+N.x*_LONGUEUR_ROBOT/2.-T.x*_LARGEUR_ROBOT/2.-v.x)*_SCALE_SDL));
-    point[1].y=((int)((pos.y+N.y*_LONGUEUR_ROBOT/2.-T.y*_LARGEUR_ROBOT/2.-v.y)*_SCALE_SDL));
-    point[2].x=((int)((pos.x-N.x*_LONGUEUR_ROBOT/2.-T.x*_LARGEUR_ROBOT/2.-v.x)*_SCALE_SDL));
-    point[2].y=((int)((pos.y-N.y*_LONGUEUR_ROBOT/2.-T.y*_LARGEUR_ROBOT/2.-v.y)*_SCALE_SDL));
-    point[3].x=((int)((pos.x-N.x*_LONGUEUR_ROBOT/2.+T.x*_LARGEUR_ROBOT/2.-v.x)*_SCALE_SDL));
-    point[3].y=((int)((pos.y-N.y*_LONGUEUR_ROBOT/2.+T.y*_LARGEUR_ROBOT/2.-v.y)*_SCALE_SDL)); 
-    PolylineSDL(point, 4, clRobot);
-    LigneSDL(point[2].x, point[2].y, ((int)(pos.x*_SCALE_SDL)), ((int)(pos.y*_SCALE_SDL)), clRobot); 
-    LigneSDL(point[3].x, point[3].y, ((int)(pos.x*_SCALE_SDL)), ((int)(pos.y*_SCALE_SDL)), clRobot);
-
-    // Destination
-    N.x=cos(dest.a);
-    N.y=sin(dest.a);
-    T.x=-sin(dest.a)*0.03;
-    T.y=cos(dest.a)*0.03; 
-    LigneSDL(((int)(_SCALE_SDL*dest.x)), ((int)(_SCALE_SDL*dest.y)), 
-             ((int)(_SCALE_SDL*(dest.x+N.x*0.1))), ((int)(_SCALE_SDL*(dest.y+N.y*0.1))), clBlack);
-    LigneSDL(((int)(_SCALE_SDL*(dest.x+N.x*0.1))), ((int)(_SCALE_SDL*(dest.y+N.y*0.1))), 
-             ((int)(_SCALE_SDL*(dest.x+N.x*0.07+T.x))), ((int)(_SCALE_SDL*(dest.y+N.y*0.07+T.y))), clBlack);
-    LigneSDL(((int)(_SCALE_SDL*(dest.x+N.x*0.1))), ((int)(_SCALE_SDL*(dest.y+N.y*0.1))), 
-             ((int)(_SCALE_SDL*(dest.x+N.x*0.07-T.x))), ((int)(_SCALE_SDL*(dest.y+N.y*0.07-T.y))), clBlack);
-    
-    // Captors
-    for(int i=0;i<4;i++)
-    {
-      vector_t pos = captor_get_position(i);
-      Uint32 color;
-      switch(captor_get_status(i))
-      {
-        case 0: color = clBlack; break;
-        case 1: color = SDL_MapRGB(affichage->format, 255, 0, 180);  break;
-        case 2: color = SDL_MapRGB(affichage->format, 255, 0, 0);  break;
-        case 3: color = SDL_MapRGB(affichage->format, 60, 60, 60);  break;
-      }
-      DisqueSDL(((int)(_SCALE_SDL*pos.x)),
-                ((int)(_SCALE_SDL*pos.y)),
-                ((int)(_SCALE_SDL*0.01)),color);        
-    }  
-    RefreshSDL();             
-    usleep(40000);
-  }
-}
-

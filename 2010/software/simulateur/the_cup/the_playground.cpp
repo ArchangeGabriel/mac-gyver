@@ -58,26 +58,26 @@ void add_obstacles(simul_info_t *info)
 
   if(configE != 0 && configI !=0)
   {
-    bool FakemaisE[3][3];
-    bool FakemaisI[2];
-    FakemaisE[0][0] = (configE==2 || configE==5 || configE==8);
-    FakemaisE[1][0] = (configE==4 || configE==5 || configE==6);  
-    FakemaisE[2][0] = (configE==7 || configE==8 || configE==9);    
-    FakemaisE[0][1] = (configE==1 || configE==2 || configE==7);
-    FakemaisE[1][1] = (configE==1 || configE==2 || configE==3);  
-    FakemaisE[2][1] = (configI==2 || configI==4);
-    FakemaisE[0][2] = (configE==3 || configE==4 || configE==9);
-    FakemaisE[1][2] = (configI==1 || configI==3);
-    FakemaisE[2][2] = false;      
-    FakemaisI[0] = (configI==1 || configI==2);
-    FakemaisI[1] = (configI==3 || configI==4);
+    bool FakeCornE[3][3];
+    bool FakeCornI[2];
+    FakeCornE[0][0] = (configE==2 || configE==5 || configE==8);
+    FakeCornE[1][0] = (configE==4 || configE==5 || configE==6);  
+    FakeCornE[2][0] = (configE==7 || configE==8 || configE==9);    
+    FakeCornE[0][1] = (configE==1 || configE==2 || configE==7);
+    FakeCornE[1][1] = (configE==1 || configE==2 || configE==3);  
+    FakeCornE[2][1] = (configI==2 || configI==4);
+    FakeCornE[0][2] = (configE==3 || configE==4 || configE==9);
+    FakeCornE[1][2] = (configI==1 || configI==3);
+    FakeCornE[2][2] = false;      
+    FakeCornI[0] = (configI==1 || configI==2);
+    FakeCornI[1] = (configI==3 || configI==4);
     
 
     for(int i=0;i<3;++i)  
       for(int j=0;j<3;++j)    
         if(i != 2 || j != 2)
         {
-          if(FakemaisE[i][j])
+          if(FakeCornE[i][j])
           {
             obj1 = new EltFakeCorn;
             obj2 = new EltFakeCorn;            
@@ -99,7 +99,7 @@ void add_obstacles(simul_info_t *info)
         
     for(int i=0;i<2;++i) 
     {
-      if(FakemaisI[i])
+      if(FakeCornI[i])
         obj1 = new EltFakeCorn;
       else
         obj1 = new EltCorn;

@@ -7,7 +7,7 @@
 #endif
 
 
-#define USE_SDL_CLIENT
+#define VISUALIZE
 
 // Ne pas commenter
 #ifdef SIMULATION

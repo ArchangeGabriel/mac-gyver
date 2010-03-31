@@ -58,7 +58,7 @@ void make_asserv(bool force = false);
 #define _KIL  0.004
 
 
-#ifdef USE_SDL_CLIENT
+#ifdef VISUALIZE
 int trace_X=0;
 int max_X=800;
 int max_Y=180;  
@@ -218,7 +218,7 @@ void refresh_U_safe(bool force)
  
   if(force && !time_out)
   {
-   /* #ifdef USE_SDL_CLIENT
+   /* #ifdef VISUALIZE
     if(is_SDL_ready())
     {
       LigneVerticaleSDL(trace_X,0,2*max_Y+10,makeColorSDL(0,0,0));
