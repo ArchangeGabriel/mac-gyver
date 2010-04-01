@@ -80,15 +80,16 @@ void picMainLoop()
   msg_id_vpos = 0;
   msg_id_clamp = 0;  
   
-  fprintf(stderr,"Init USB...\n");  fflush(stdout);
+  fprintf(stderr,"Init USB...                 ");  fflush(stdout);
   connect_init();
-  fprintf(stderr,"Init USB... Done.\n");  fflush(stdout);
+  fprintf(stderr,"ok\n");  fflush(stdout);
 
   pthread_t thread_pic1;  
 
   pthread_create(&thread_pic1, NULL, &pic1_handle_msg, NULL);  
   pic2_handle_msg(NULL);
-  while(true) {}
+  while(true)
+    sleep(1);
 }
 //------------------------------------------------------------------------------
 void* pic1_handle_msg(void *)

@@ -4,8 +4,11 @@
 #include <pthread.h>
 #include "types.h"
 
-#define RAYON_RECULE    0.05   // si la destination se trouve derrière à telle distance, on recule
-
+//------------------------------------------------------------------------------
+/*
+Initialise le path planner avec la configuration du terrain
+*/
+void pp_init(int config_terrain);
 
 //------------------------------------------------------------------------------
 /*
@@ -15,10 +18,9 @@ Si le robot n'a pas finit le chemin courant, celui-ci est annulé
 et remplacé par le nouveau.
 */
 enum{tpDEST,tpAPPROACH,tpLEAVE, tpWAYPOINT};
-pthread_mutex_t* pp_go_to(position_t pos, int type = tpDEST, bool append = false, bool do_append = true, bool do_leave = true, pthread_mutex_t **approach = NULL, pthread_mutex_t **leave = NULL);
+pthread_mutex_t* pp_go_to(position_t pos, int type = tpDEST, bool append = false);
 
 //------------------------------------------------------------------------------
-
 /*
 Ajoute une étape au chemin en cours (de la destination actuelle à pos)
 */
@@ -36,17 +38,9 @@ Efface le chemin
 */
 void pp_clear_path();
 
-
 //------------------------------------------------------------------------------
 // Stop le robot 
 void pp_stop(int id);
-// Reprend le chemin
-void pp_no_danger();
-// Demande de ralentir
-void pp_slow_down();
-
-void pp_lock_situ();
-void pp_unlock_situ();
 
 //------------------------------------------------------------------------------
 /*

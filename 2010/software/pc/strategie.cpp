@@ -16,6 +16,8 @@ using namespace std;
 #include "path_planning.h"
 #include "strategie.h"
 #include "usb.h"
+#include "visualizer.h"
+#include "sdl.h"
 #include "../common/comm.h"
 //#include "../common/bitmap.h"
 #include "webcam.hpp"
@@ -28,35 +30,61 @@ bool started;
 bool game_over;
 struct timeval start_time;
 
+// Configuration du terrain
+int config_terrain;
+
 // Recallage
 bool recallage_necessaire;
 
-// Attend qu'un mutex se libère et le détruit
-void wait_for_it(pthread_mutex_t *mutex);
-
-// Prend une position pour le vert et renvoit la position adaptée à la couleur
-position_t symetrize(position_t pos);
-
+// Boucle principale de la strategie
+void stratMainLoop();
 
 //------------------------------------------------------------------------------
 void strat_init()
 {
-  fprintf(stderr,"IA thread ok...\n");  fflush(stdout);
-  // Initialise le suivit de position
-  cine_init(color);
-  picOnRecvCoder(cine_OnCoderRecv);
-  
+  fprintf(stderr,"IA thread...                    ok\n");  fflush(stdout);
+
   started = false;
   game_over = false;
   recallage_necessaire = false;  
+  config_terrain = 0;
  
-  fprintf(stderr,"Waiting for jack...\n");  fflush(stdout);
+  // Initialise le suivit de position
+  cine_init(color);
+  
+  // Initialise la webcam
+  webcam_init();
+   
+  // Try to find configuration
+  config_terrain = wc_reco_config();
+  pp_init(config_terrain);
+  
+  #ifdef VISUALIZE
+  visu_draw_background(config_terrain);
+  Load_SDL_Background();  
+  #endif 
+    
+  // Waits until the starting signal is given
+  usleep(100000);
+  fprintf(stderr,">>> Waiting for jack...\n");  fflush(stdout);
   while(!started)
-  {
-    usleep(100000);
+  {       
+    usleep(10000);
   }
   
   stratMainLoop();
+}
+//------------------------------------------------------------------------------
+void stratMainLoop()
+{
+  fprintf(stderr,">>> Let's go!\n");  fflush(stdout);
+   
+  wait_for_it(pp_go_to(symetrize(position_t(2.6,1.3,M_PI)),tpDEST,false));
+
+  while(true)
+  {
+    usleep(100000);    
+  }   
 }
 //------------------------------------------------------------------------------
 void strat_set_color(int _color)
@@ -67,6 +95,11 @@ void strat_set_color(int _color)
 int strat_get_color()
 {
   return color;
+}
+//------------------------------------------------------------------------------
+int get_config_terrain()
+{
+  return config_terrain;
 }
 //------------------------------------------------------------------------------
 float strat_elapsed_time()
@@ -81,25 +114,6 @@ void strat_lets_go()
   gettimeofday(&start_time,NULL); 
    
   started = true;
-}
-//------------------------------------------------------------------------------
-void stratMainLoop()
-{
-  fprintf(stderr,"Let's go!\n");  fflush(stdout);
-  
-  webcam_t WC("0", 640, 480);
-  WC.start();
-  WC.do_capture();
-  image_t img = WC.get_image2();
- 
-//  save_buff_to_bitmap("img.bmp", 640, 480, img.data);
- 
-  wait_for_it(pp_go_to(symetrize(position_t(2.6,1.3,M_PI)),tpDEST,false,false,false));
-
-  while(true)
-  {
-    usleep(100000);    
-  }   
 }
 //------------------------------------------------------------------------------
 bool strat_is_started()

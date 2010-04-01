@@ -1,7 +1,7 @@
 include ../makeopt
 
 all: make_common main.o
-	$(CC) -o ../client ../common/console.o ../common/comm.o usb.o cinematik.o webcamAPI.o picAPI.o anticol.o path_planning.o strategie.o sdl.o visualizer.o pc_main.o main.o processing.o utils.o common.o webcam.o $(LDFLAGS)
+	$(CC) -o ../client ../common/console.o ../common/comm.o usb.o cinematik.o webcamAPI.o dist_transform.o picAPI.o anticol.o path_planning.o strategie.o sdl.o visualizer.o pc_main.o main.o processing.o utils.o common.o webcam.o $(LDFLAGS)
 
 make_common:
 	make -C ../common
@@ -14,6 +14,9 @@ cinematik.o: cinematik.cpp cinematik.h ../common/const.h
 
 webcamAPI.o: webcamAPI.cpp webcamAPI.h ../common/simul.h webcam.o processing.o utils.o
 	$(CC) -o webcamAPI.o -c webcamAPI.cpp $(CFLAGS)
+	
+dist_transform.o: dist_transform.cpp dist_transform.h
+	$(CC) -o dist_transform.o -c dist_transform.cpp $(CFLAGS)
 		
 picAPI.o: picAPI.cpp picAPI.h usb.o cinematik.o ../common/simul.h
 	$(CC) -o picAPI.o -c picAPI.cpp $(CFLAGS)
@@ -21,7 +24,7 @@ picAPI.o: picAPI.cpp picAPI.h usb.o cinematik.o ../common/simul.h
 anticol.o: anticol.cpp anticol.h
 	$(CC) -o anticol.o -c anticol.cpp $(CFLAGS)	
 
-path_planning.o: path_planning.cpp path_planning.h ../common/simul.h types.h
+path_planning.o: path_planning.cpp path_planning.h dist_transform.o ../common/simul.h types.h
 	$(CC) -o path_planning.o -c path_planning.cpp $(CFLAGS)
 
 strategie.o: strategie.cpp strategie.h path_planning.o picAPI.o ../common/simul.h types.h ../common/const.h

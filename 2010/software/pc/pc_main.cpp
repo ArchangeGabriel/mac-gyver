@@ -4,6 +4,7 @@
 #include "picAPI.h"
 #include "strategie.h"
 #include "path_planning.h"
+#include "cinematik.h"
 #include "anticol.h"
 #include "sdl.h"
 #include "visualizer.h"
@@ -66,13 +67,15 @@ int pc_main(int argc, char **argv)
   
   #ifdef VISUALIZE
   initSDL();
-  visu_draw_background(11);
+  visu_draw_background(0);
   Load_SDL_Background();  
   pthread_create(&SDLThread, NULL, start_SDL, NULL);   // Affichage SDL
   #endif
 
-  picOnRecvJack(strat_lets_go); // Point d'entrée pour démarrer le jeu ici
+  // Initialise les fonction de callback
+  picOnRecvJack(strat_lets_go);
   picOnRecvDistCaptors(anticolOnRecvCaptors);
+  picOnRecvCoder(cine_OnCoderRecv);
   #ifdef SIMULATION  
   picRecvReset(strat_init);
   #endif
@@ -85,6 +88,7 @@ int pc_main(int argc, char **argv)
   atexit(exiting);
   pthread_create(&ConsoleThread, NULL, console, NULL);   // Console
   #endif
+  
   
   picMainLoop();
   

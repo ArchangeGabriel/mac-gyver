@@ -26,14 +26,29 @@ void add_obstacles(simul_info_t *info)
   bord_terrain->fixe=true;
   bord_terrain->inverse=true;
   bord_terrain->dimX=pgWidth;
-  bord_terrain->dimY=2.1;
+  bord_terrain->dimY=2.6;
   bord_terrain->position.x=pgWidth/2.;
-  bord_terrain->position.y=2.1/2.;   
+  bord_terrain->position.y=2.6/2.;   
   bord_terrain->hauteur=0.07;
   bord_terrain->z=0.07/2;   
   bord_terrain->couleur=clBlack;
   bord_terrain->matiere=mBois;
   add_object(info,bord_terrain);
+  //On rajoute les obstacles
+  bord_terrain=new ObjBox;
+  bord_terrain->type=OBJ_TABLE;
+  bord_terrain->hide=true;
+  bord_terrain->fixe=true;
+  bord_terrain->inverse=false;
+  bord_terrain->dimX=2.;
+  bord_terrain->dimY=0.5;
+  bord_terrain->position.x=pgWidth/2.;
+  bord_terrain->position.y=2.35;   
+  bord_terrain->hauteur=0.07;
+  bord_terrain->z=0.07/2;   
+  bord_terrain->couleur=clBlack;
+  bord_terrain->matiere=mBois;
+  add_object(info,bord_terrain);  
 
   // La colline
   ObjBox *hill=new ObjBox;

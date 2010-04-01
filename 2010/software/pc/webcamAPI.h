@@ -11,21 +11,15 @@ struct palet_t
     float surete;// 0:nul->1:super
 };
 
-void init_webcam_api();
+void webcam_init();
+
 /*
-Renvoie un nombre xyy avec x codant la position des distrib et yy celle des palets
-x = 0: distrib côté zones de départ
-x = 1: distrib côté zones de dépôt
-yy de 0 à 9: configuration des palets, voir réglement
-Renvoie -1 en cas d'échec
+les différentes configuration possible pour les maïs: xyz : 
+x = 0 ou 1 : tomates activées
+y de 0 à 9 : les maïs externes
+z de 0 à 4 : les maïs internes
+xy = 00 -> pas de mais
 */
-
 int wc_reco_config();
-
-bool teste_palet_en_place(bool vert);
-
-std::vector<palet_t> capture_et_detecte_palets_relatif_camera(bool vert);
-
-std::vector<palet_t> capture_et_detecte_palets(bool vert);
 
 #endif

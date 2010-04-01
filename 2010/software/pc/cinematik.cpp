@@ -93,7 +93,7 @@ void cine_init(int color)
 //  ULim = 4.502167 (pour 0.5)
 //  printf("ULim = %f\n",ULim);
 
-  printf("Ul; Ur; VCl; VCr; Vl; Vr\n");
+  //printf("Ul; Ur; VCl; VCr; Vl; Vr\n");
 }
 //------------------------------------------------------------------------------
 position_t cine_get_position()
