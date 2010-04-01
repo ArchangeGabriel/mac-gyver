@@ -1,6 +1,8 @@
 #ifndef STRATEGIEH
 #define STRATEGIEH
 
+#include "types.h"
+
 enum{clBLUE,clYELLOW};
 
 //------------------------------------------------------------------------------
@@ -19,9 +21,27 @@ int strat_get_color();
 
 //------------------------------------------------------------------------------
 /*
+Renvoie la configuration du terrain (cf webcamAPI.h)
+*/
+int get_config_terrain();
+
+//------------------------------------------------------------------------------
+/*
 Appelé lorsque le Jack est retiré
 */
 void strat_lets_go();
+
+//------------------------------------------------------------------------------
+/*
+Prend une position pour le robot en haut à gauche et renvoit la position adaptée à la couleur
+*/
+position_t symetrize(position_t pos);
+
+//------------------------------------------------------------------------------
+/*
+Attend qu'un mutex se libère et le détruit
+*/
+void wait_for_it(pthread_mutex_t *mutex);
 
 //------------------------------------------------------------------------------
 /*
@@ -40,12 +60,6 @@ float strat_elapsed_time();
 Appelé à la fin de 1min30
 */
 void strat_game_over();
-
-//------------------------------------------------------------------------------
-/*
-Boucle principale de la strategie
-*/
-void stratMainLoop();
 
 //------------------------------------------------------------------------------
 /*

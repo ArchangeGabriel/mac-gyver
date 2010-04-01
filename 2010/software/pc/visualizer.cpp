@@ -62,11 +62,11 @@ void visu_draw_background(int config_terrain)
             double x,y;
             x = 0.15 + 0.45*i;
             y = 2.1 - 1.378 + 0.5*j + 0.25*i;            
-            DisqueSDL(int(_SCALE_SDL*x), int(_SCALE_SDL*y), 0.05, clBlack);
+            DisqueSDL(int(_SCALE_SDL*x), int(_SCALE_SDL*y), (_SCALE_SDL*0.025), clBlack);
             
             x = _LONGUEUR_TER - 0.15 - 0.45*i;
             y = 2.1 - 1.378 + 0.5*j + 0.25*i;
-            DisqueSDL(int(_SCALE_SDL*x), int(_SCALE_SDL*y), 0.05, clBlack);
+            DisqueSDL(int(_SCALE_SDL*x), int(_SCALE_SDL*y), (_SCALE_SDL*0.025), clBlack);
           }
         }
         
@@ -76,7 +76,7 @@ void visu_draw_background(int config_terrain)
       {
         double x = _LONGUEUR_TER/2.;
         double y = 2.1 - 0.628 + 0.5*i; 
-        DisqueSDL(int(_SCALE_SDL*x), int(_SCALE_SDL*y), 0.05, clBlack);        
+        DisqueSDL(int(_SCALE_SDL*x), int(_SCALE_SDL*y), (_SCALE_SDL*0.025), clBlack);        
       }
     }
   }              

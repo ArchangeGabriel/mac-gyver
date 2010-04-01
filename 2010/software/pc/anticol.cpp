@@ -42,7 +42,7 @@ bool check_distrib(vector_t pos); // renvoie vrai si le capteur a vu un distribu
 //------------------------------------------------------------------------------
 void anticolMainLoop()
 {
-  fprintf(stderr,"AC thread ok...\n");  fflush(stdout);
+  fprintf(stderr,"AC thread...                    ok\n");  fflush(stdout);
   while(true)
   {
     if(picDistCaptors() == 0)

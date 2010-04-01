@@ -237,7 +237,6 @@ void* console(void*)
       float r = cine_get_speed_wheel(1);      
       
       printf("s: (%f,%f)\n",l,r);
-      strat_lets_go();        
     }                      
     else    
       printf("Commande inconnue: %s\n",Buff);    
