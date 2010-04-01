@@ -38,8 +38,8 @@
 
 
 // Robot
-#define clRobot COLOR_SDL(128,128,128)
-#define glRobot COLOR_GL (128,128,128)
+#define clRobot COLOR_SDL(200,200,200)
+#define glRobot COLOR_GL (200,200,200)
 
 
 #endif

@@ -12,7 +12,6 @@
 
 
 #ifdef _USE_SIMUL_CONST
-
 #define _LONGUEUR_TER   Simul->info.longueur_ter
 #define _LARGEUR_TER    Simul->info.largeur_ter
 #define _POS_INIT_X     Simul->info.pos_init.x
@@ -31,20 +30,9 @@
 #define _RAP_REDUC      Simul->info.moteur_k
 #define _RENDEMNT       Simul->info.moteur_n
 #define _TENSION        Simul->info.Umax
-#define _POS_CAM1_X     10.0
-#define _POS_CAM1_Y     13.5
-#define _POS_CAM1_A     0.0
-#define _LONGUEUR_ROBOT 0.27
-#define _LARGEUR_ROBOT  0.28
-
 #else
-
 #define _LONGUEUR_TER   3.
 #define _LARGEUR_TER    2.1
-
-#define _LONGUEUR_ROBOT 0.27
-#define _LARGEUR_ROBOT  0.28
-
 #define _POS_INIT_X     0.2
 #define _POS_INIT_Y     0.2
 #define _POS_INIT_A     45.
@@ -61,10 +49,13 @@
 #define _RAP_REDUC      19.
 #define _RENDEMNT       0.7
 #define _TENSION        14.4
+#endif
+
+#define _DEMI_FOCALE    26.35                 //     (en degrées)
 #define _POS_CAM1_X     10.0
 #define _POS_CAM1_Y     13.5
 #define _POS_CAM1_A     0.0
-
-#endif
+#define _LONGUEUR_ROBOT 0.27
+#define _LARGEUR_ROBOT  0.28
 
 #endif

@@ -6,6 +6,7 @@
 
 #include "camera.h"
 #include "the_cup/the_playground.h"
+#include "../common/const.h"
 
 simul_info_t* camera_t::info;  
 
@@ -132,7 +133,7 @@ void camera_t::reshape(int , int )
   glViewport(0,0,WC->W,WC->H);
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-  gluPerspective(45,float(WC->W)/float(WC->H),0.1,100); 	//Pour les explications, lire le tutorial sur OGL et win
+  gluPerspective(_DEMI_FOCALE,float(WC->W)/float(WC->H),0.1,100); 	//Pour les explications, lire le tutorial sur OGL et win
   glMatrixMode(GL_MODELVIEW);	
   
   WC->reshaped = true; 

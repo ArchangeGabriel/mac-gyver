@@ -220,10 +220,9 @@ void* pic2_handle_msg(void *)
               const double R = webcam_data[i+0]&255;
               const double G = webcam_data[i+1]&255;
               const double B = webcam_data[i+2]&255;  
-              const double Y = 0.299*R + 0.587*G + 0.114*B;    // Y
-              webcam_data[i+2] = 0.877*(R - Y);  // V
-              webcam_data[i+1] = 0.492*(B - Y);  // U
-              webcam_data[i+0] = Y;
+              webcam_data[i+0] =  0.299  * R + 0.587  * G + 0.114 * B;          // Y 
+              webcam_data[i+1] = -0.1687 * R - 0.3313 * G + 0.5   * B + 128.;   // Cb
+              webcam_data[i+2] =  0.5   *  R - 0.4187 * G - 0.0813* B + 128.;   // Cr
             }
           }
           
