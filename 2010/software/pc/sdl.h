@@ -27,7 +27,7 @@
 
 
 // Robot
-#define clRobot COLOR_SDL(128,128,128)
+#define clRobot COLOR_SDL(255,255,255)
 
 typedef struct point_t
 {

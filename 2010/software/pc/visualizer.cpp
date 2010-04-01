@@ -127,7 +127,7 @@ void visu_draw_robot()
              ((int)(_SCALE_SDL*(dest.x+N.x*0.07-T.x))), ((int)(_SCALE_SDL*(dest.y+N.y*0.07-T.y))), clBlack);
     
     // Captors
-    for(int i=0;i<4;i++)
+    /*for(int i=0;i<4;i++)
     {
       vector_t pos = captor_get_position(i);
       Uint32 color;
@@ -141,7 +141,7 @@ void visu_draw_robot()
       DisqueSDL(((int)(_SCALE_SDL*pos.x)),
                 ((int)(_SCALE_SDL*pos.y)),
                 ((int)(_SCALE_SDL*0.01)),color);        
-    }  
+    } */ 
     RefreshSDL();             
     usleep(40000);
   }
