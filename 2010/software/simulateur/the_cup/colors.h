@@ -33,8 +33,8 @@
 #define glOrange       COLOR_GL(245,143,17)
 #define clMais         COLOR_SDL(229,223,204)
 #define glMais         COLOR_GL(229,223,204)
-#define clFake         COLOR_SDL(51,54,52)
-#define glFake         COLOR_GL(51,54,52)
+#define clFake         COLOR_SDL(27,25,29)
+#define glFake         COLOR_GL(27,25,29)
 
 
 // Robot
