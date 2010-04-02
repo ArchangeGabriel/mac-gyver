@@ -10,6 +10,7 @@
 
 #define PC_INCLUDE
 #include "../common/const.h"
+#include "../common/bitmap.h"
 
 using namespace std;
 
@@ -317,5 +318,60 @@ void pp_stop(int id)
 //------------------------------------------------------------------------------
 void pp_init(int config_terrain)
 {
-  dt_map_t *distMap = dt_create_map(_LONGUEUR_TER, _LARGEUR_TER, 0.005);
+  dt_map_t pathMap(_LONGUEUR_TER, _LARGEUR_TER, 0.005);
+  
+  int configE = (config_terrain%100)/10;
+  int configI = config_terrain%10;
+  
+  if(configE != 0 && configI !=0)
+  {
+    bool FakeCornE[3][3];
+    bool FakeCornI[2];
+    FakeCornE[0][0] = (configE==2 || configE==5 || configE==8);
+    FakeCornE[1][0] = (configE==4 || configE==5 || configE==6);  
+    FakeCornE[2][0] = (configE==7 || configE==8 || configE==9);    
+    FakeCornE[0][1] = (configE==1 || configE==2 || configE==7);
+    FakeCornE[1][1] = (configE==1 || configE==2 || configE==3);  
+    FakeCornE[2][1] = (configI==2 || configI==4);
+    FakeCornE[0][2] = (configE==3 || configE==4 || configE==9);
+    FakeCornE[1][2] = (configI==1 || configI==3);
+    FakeCornE[2][2] = false;      
+    FakeCornI[0] = (configI==1 || configI==2);
+    FakeCornI[1] = (configI==3 || configI==4);
+    
+    for(int i=0;i<3;++i)  
+      for(int j=0;j<3;++j)    
+        if(i != 2 || j != 2)
+        {
+          if(FakeCornE[i][j])
+          {
+            double x,y;
+            x = 0.15 + 0.45*i;
+            y = 2.1 - 1.378 + 0.5*j + 0.25*i;   
+            pathMap.drawDisc(x, y, 0.025);
+
+            x = _LONGUEUR_TER - 0.15 - 0.45*i;
+            y = 2.1 - 1.378 + 0.5*j + 0.25*i;
+            pathMap.drawDisc(x, y, 0.025);
+          }
+        }
+        
+    for(int i=0;i<2;++i) 
+    {
+      if(FakeCornI[i])
+      {
+        double x = _LONGUEUR_TER/2.;
+        double y = 2.1 - 0.628 + 0.5*i; 
+        pathMap.drawDisc(x, y, 0.025);
+      }
+    }
+  }   
+  pathMap.drawBox(0.74, 0., 1.519, 0.52); 
+  
+  pathMap.compute_distance_transform();
+  
+  int w,h;
+  uint16_t *pix = pathMap.to_bitmap(w, h);
+  save_buff_to_bitmap("pathMap.bmp", w, h, pix);
+  delete[] pix;
 }

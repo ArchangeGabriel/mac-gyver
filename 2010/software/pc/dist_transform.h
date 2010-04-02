@@ -1,55 +1,49 @@
 #ifndef DIST_TRSFRM_H
 #define DIST_TRSFRM_H
 
-#include <string.h>
+#include <stdint.h>
 
-typedef bool dt_map_pix_t;
+typedef double dt_map_pix_t;
+
 class dt_map_t
 {
   private:
-  int width, height;
+  static const dt_map_pix_t contrast;
+  
   double pixResol;
-  dt_map_pix_t* pix;
+  int width, height;
+  dt_map_pix_t* pix; 
   
-  public:
-  dt_map_t(double terrainWidth, double terrainHeight, double resol):pixResol(resol)
-  {
-    width = terrainWidth / resol;
-    height = terrainHeight / resol;
+  void swap_int(int* x, int* y);
   
-    pix = new dt_map_pix_t[width * height];
-    memset(pix, true, sizeof(dt_map_pix_t)*width*height);
-  }
+  // Marque un pixel comme infranchissable
+  inline void setPix(int x, int y);
+  inline dt_map_pix_t getPix(int x, int y);
   
-  void free()
-  {
-    delete[] pix;
-  }
+  // Marque une ligne comme infranchissable 
+  inline void fastHline(int x1, int y1, int w);  
+  
+  // 1-dimensionale distance transform
+  void distance_transform_1D(dt_map_pix_t *src_pix, dt_map_pix_t *dest_pix, bool vertical);
+  
+  public:    
+  // Constructeur / Destructeur
+  dt_map_t(double terrainWidth, double terrainHeight, double resol);
+  ~dt_map_t();
+  void free();
+  
+  //Dessine sur la map (toutes les mesures sont en mètres)
+  void drawHline(double x1, double y1, double w);
+  void drawVline(double x1, double y1, double h);
+  void drawline(double x1, double y1, double x2, double y2);
+  void drawBox(double x1, double y1, double w, double h);
+  void drawDisc(double x1, double y1, double r);  
+    
+  // Produit un tableau pouvant être envoyé à save_buff_to_bitmap (see common/bitmap.h)
+  uint16_t* to_bitmap(int &w, int &h);
+  
+  // Calcule la distance en chaque point de la map
+  void compute_distance_transform();
 };
 
-typedef double dt_distmap_t;
-
-//------------------------------------------------------------------------------
-/*
-Renvoie une map des distances initialisée à true
-- terrainWidth et terrainHeight sont les dimensions du terrain
-- pixResol contrôle la distance en mètre qui sépare deux pixels voisins de la map
-*/
-dt_map_t* dt_create_map(double terrainWidth, double terrainHeight, double pixResol);
-
-//------------------------------------------------------------------------------
-/*
-Dessine sur la map (toutes les mesures sont en mètres)
-*/
-void dt_drawHline(dt_map_t *map, double x0, double y0, double w);
-void dt_drawVline(dt_map_t *map, double x0, double y0, double h);
-void dt_drawline(dt_map_t *map, double x0, double y0, double x1, double y1);
-void dt_drawBox(dt_map_t *map, double x0, double y0, double w, double h);
-void dt_drawDisc(dt_map_t *map, double x0, double y0, double r);
-
-//------------------------------------------------------------------------------
-/*
-Calcule les cartes des distances pour 'num_orient' orientations
-*/
-dt_distmap_t** dt_compute_distmap(dt_map_t *map, int num_orient);
 #endif

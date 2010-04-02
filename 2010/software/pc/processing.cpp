@@ -653,7 +653,7 @@ unproject_result_t unproject(const rectangle_t& rect,const unproject_parameters_
     float alpha=atan(rel_x_alpha*factor);
     float beta=atan(rel_x_beta*factor);
     
-    printf("alpha=%lf beta=%lf\n",alpha,beta);
+    printf("alpha=%f beta=%f\n",alpha,beta);
     
     unproject_result_t res;
     res.x=-param.object_radius*(sin(alpha)+sin(beta))/sin(beta-alpha);

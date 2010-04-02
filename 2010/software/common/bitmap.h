@@ -29,16 +29,15 @@ void save_buff_to_bitmap(const char *file, unsigned int w, unsigned int h, uint1
   
   for(unsigned int y=0;y<h;y++)
   {
-    int x;
-    for(unsigned x=0;x<w;x++)
+    for(unsigned int x=0;x<w;x++)
     {
       int ipix = 3*(y*w+x);
       fwrite(&data[ipix+2],1,1,F);   // 2
       fwrite(&data[ipix+1],1,1,F);   // 1
       fwrite(&data[ipix+0],1,1,F);   // 0
     }
-    x*=3;
-    n=0;
+    unsigned int x = 3 * w;
+    n = 0;
     while(x%4)
     {
       fwrite(&n,1,1,F);
