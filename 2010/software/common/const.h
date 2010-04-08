@@ -56,6 +56,6 @@
 #define _POS_CAM1_Y     13.5
 #define _POS_CAM1_A     0.0
 #define _LONGUEUR_ROBOT 0.27
-#define _LARGEUR_ROBOT  0.28
+#define _LARGEUR_ROBOT  0.29
 
 #endif

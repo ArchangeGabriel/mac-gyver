@@ -3,47 +3,93 @@
 
 #include <stdint.h>
 
-typedef double dt_map_pix_t;
+//------------------------------------------------------------------------------
 
-class dt_map_t
+typedef float dt_map_pix;
+
+//------------------------------------------------------------------------------
+
+class dt_map;
+
+class dt_zone
+{
+  friend class dt_map;
+  
+  private:
+  void allocate();
+  
+  protected:
+  int height;
+  int *left;
+  int *right;
+  int cy;
+  
+  public:
+  dt_zone(int h);
+  dt_zone(int h, int c);  
+  ~dt_zone();
+  
+  dt_zone* operator * (const dt_zone &A);
+};
+
+//------------------------------------------------------------------------------
+
+class dt_zone_disc : public dt_zone
+{
+  public:
+  dt_zone_disc(int radius);
+};
+
+class dt_zone_hbox : public dt_zone
+{
+  public:
+  dt_zone_hbox(int w, int h);
+};
+
+class dt_zone_orientbox : public dt_zone
 {
   private:
-  static const dt_map_pix_t contrast;
+  void line(int *array, int x1, int y1, int x2, int y2);
+  inline void swap_int(int* x, int* y);
+  
+  public:
+  dt_zone_orientbox(int width, int depth, double angle);
+};
+
+//------------------------------------------------------------------------------
+
+class dt_map
+{
+  private:
+  static const dt_map_pix contrast;
   
   double pixResol;
   int width, height;
-  dt_map_pix_t* pix; 
+  int nAngle;
+  dt_map_pix** pix;
   
-  void swap_int(int* x, int* y);
+  dt_zone_orientbox **robot;
   
-  // Marque un pixel comme infranchissable
-  inline void setPix(int x, int y);
-  inline dt_map_pix_t getPix(int x, int y);
+  // 1-dimensional distance transform
+  void distance_transform_1D(dt_map_pix *src_pix, dt_map_pix *dest_pix, bool vertical);
   
-  // Marque une ligne comme infranchissable 
-  inline void fastHline(int x1, int y1, int w);  
-  
-  // 1-dimensionale distance transform
-  void distance_transform_1D(dt_map_pix_t *src_pix, dt_map_pix_t *dest_pix, bool vertical);
+  // Marque l'intérieur de la zone comme infranchissable
+  void fillZone(dt_zone *zone, int iAngle, int x, int y);
   
   public:    
   // Constructeur / Destructeur
-  dt_map_t(double terrainWidth, double terrainHeight, double resol);
-  ~dt_map_t();
-  void free();
-  
-  //Dessine sur la map (toutes les mesures sont en mètres)
-  void drawHline(double x1, double y1, double w);
-  void drawVline(double x1, double y1, double h);
-  void drawline(double x1, double y1, double x2, double y2);
-  void drawBox(double x1, double y1, double w, double h);
-  void drawDisc(double x1, double y1, double r);  
-    
+  dt_map(double terrainWidth, double terrainHeight, double robotWidth, double robotDepth, double resolXY, int resolA);
+  ~dt_map();
+      
   // Produit un tableau pouvant être envoyé à save_buff_to_bitmap (see common/bitmap.h)
-  uint16_t* to_bitmap(int &w, int &h);
+  uint16_t* to_bitmap(int iAngle, int &w, int &h);
   
   // Calcule la distance en chaque point de la map
   void compute_distance_transform();
+  
+  // Remplis les cartes avec les zones indiqués en prenant en compte la taille du robot
+  void fillBox(double x, double y, double w, double h);
+  void fillDisc(double cx, double cy, double radius);
 };
 
 #endif
