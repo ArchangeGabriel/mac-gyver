@@ -18,13 +18,13 @@ Si le robot n'a pas finit le chemin courant, celui-ci est annulé
 et remplacé par le nouveau.
 */
 enum{tpDEST,tpAPPROACH,tpLEAVE, tpWAYPOINT};
-pthread_mutex_t* pp_go_to(position_t pos, int type = tpDEST, bool append = false);
+pthread_mutex_t* pp_go_to(const position_t &pos, int type = tpDEST, bool append = false);
 
 //------------------------------------------------------------------------------
 /*
 Ajoute une étape au chemin en cours (de la destination actuelle à pos)
 */
-pthread_mutex_t* pp_add_step(position_t pos);
+pthread_mutex_t* pp_add_step(const position_t &pos);
 
 //------------------------------------------------------------------------------
 /*

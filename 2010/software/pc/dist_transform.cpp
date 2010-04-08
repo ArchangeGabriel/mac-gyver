@@ -1,14 +1,21 @@
 #include <stdlib.h>
 #include <iostream>
-#include <limits>
 #include <limits.h>
+#include <limits>
+#include <queue>
 #include <math.h>
 #include <string.h>
 #include <stdio.h>
 
 #include "dist_transform.h"
+#include "sdl.h"
 
-const dt_map_pix dt_map::contrast = 7.;
+// Marge de sécurité entre le robot et les obstacles en mètres
+#define SECURITY_MARGIN  0.1
+
+const dt_dist dt_map::pix_cost = 1./3.;   // score corresponding to 3*SECURITY_MARGIN
+const double dt_map::RAD_ANGLE_RESOL   = M_PI   / double(DT_ANGLE_RESOL);
+const double dt_map::RAD_ANGLE_RESOL_2 = M_PI_2 / double(DT_ANGLE_RESOL);
 
 
 //------------------------------------------------------------------------------
@@ -119,16 +126,11 @@ dt_zone_orientbox::dt_zone_orientbox(int width, int depth, double angle) : dt_zo
   int px[4];
   int py[4];
 
-  printf("off: %f  height: %d\n", h_offset, height);
-
   for(int i=0; i<4; i++)
   {
     px[i] = d[i]*C-w[i]*S;
     py[i] = d[i]*S+w[i]*C + h_offset;    
-    
-    printf("i: %d, (%d, %d)\n", i, px[i], py[i]);
   }
-  fflush(stdout);
   
   const int i_top = (C > 0) ? ((S>0)?2:3) : ((S>0)?1:0);
   const int i_left = (i_top+3)%4;
@@ -139,13 +141,10 @@ dt_zone_orientbox::dt_zone_orientbox(int width, int depth, double angle) : dt_zo
   line(left,  px[i_left],   py[i_left],   px[i_top],    py[i_top]);
   line(right, px[i_top],    py[i_top],    px[i_right],  py[i_right]);
   line(right, px[i_right],  py[i_right],  px[i_bottom], py[i_bottom]);
-  
-  printf("left[0]: %d right[0]: %d\n", left[0], right[0]);
 }
 //------------------------------------------------------------------------------
 void dt_zone_orientbox::line(int *array, int x1, int y1, int x2, int y2)
 { 
-  printf("line: (%d,%d) (%d, %d)\n", x1, y1, x2, y2);
   if(y1 == y2)
     array[y1] = x1;
   else
@@ -236,35 +235,34 @@ void dt_zone_orientbox::swap_int(int* x, int* y)
 //                                  dt_map                                    //
 //                                                                            //
 //------------------------------------------------------------------------------
-dt_map::dt_map(double terrainWidth, double terrainHeight, double robotWidth, double robotDepth, double resolXY, int resolA)
+dt_map::dt_map(double terrainWidth, double terrainHeight, double robotWidth, double robotDepth)
 {
-  nAngle = resolA;
-  pixResol = resolXY;
-  width = terrainWidth / pixResol;
-  height = terrainHeight / pixResol;
-  int robotW = robotWidth / pixResol;
-  int robotD = robotDepth / pixResol;
+  width = terrainWidth / DT_DIST_RESOL;
+  height = terrainHeight / DT_DIST_RESOL;
+  int robotW = robotWidth / DT_DIST_RESOL;
+  int robotD = robotDepth / DT_DIST_RESOL;
   
-  if(resolA<1)
-    resolA = 1;
+  robot = new dt_zone_orientbox*[DT_ANGLE_RESOL];
+  for(int i=0; i<DT_ANGLE_RESOL; i++)
+    robot[i] = new dt_zone_orientbox(robotW, robotD, double(i)*M_PI/double(DT_ANGLE_RESOL));
   
-  robot = new dt_zone_orientbox*[resolA];
-  for(int i=0; i<resolA; i++)
-    robot[i] = new dt_zone_orientbox(robotW, robotD, double(i)*M_PI/double(resolA));
-  
-  pix = new dt_map_pix*[nAngle];
-  for(int i=0; i<nAngle; i++)
+  pix = new dt_dist*[DT_ANGLE_RESOL];
+  for(int i=0; i<DT_ANGLE_RESOL; i++)
   {
-    pix[i] = new dt_map_pix[width * height];
+    pix[i] = new dt_dist[width * height];
     for(int k=0; k<width*height; k++)
-      pix[i][k] = std::numeric_limits<dt_map_pix>::infinity();
+      pix[i][k] = numeric_limits<dt_dist>::infinity();
   }
 }
 //------------------------------------------------------------------------------
 dt_map::~dt_map()
 {
-  for(int i=0; i<nAngle; i++)
+  for(int i=0; i<DT_ANGLE_RESOL; i++)
+  {
     delete[] pix[i];
+    delete[] robot[i];
+  }
+  delete[] robot;   
   delete[] pix;
 }
 //------------------------------------------------------------------------------
@@ -281,7 +279,7 @@ void dt_map::fillZone(dt_zone *zone, int iAngle, int cx, int cy)
     x2 = cx + zone->right[i];
     if(x1<0) x1 = 0;
     if(x2>=width) x2 = width-1;
-    memset(&pix[iAngle][y*width+x1], 0, (x2-x1+1)*sizeof(dt_map_pix));
+    memset(&pix[iAngle][y*width+x1], 0, (x2-x1+1)*sizeof(dt_dist));
   } 
 }
 //------------------------------------------------------------------------------
@@ -294,7 +292,7 @@ uint16_t* dt_map::to_bitmap(int iAngle, int &w, int &h)
   for(int y=height-1;y>=0; y--)
     for(int x=0;x<width; x++)
     {
-      int c = (1. - (1. / (1. + contrast*pix[iAngle][y*width+x]))) * 255.;
+      int c = pix[iAngle][y*width+x] * 255.;
       int i = 3*((height-1-y)*width+x);
       pixbmp[i+0] = c;
       pixbmp[i+1] = c;
@@ -306,9 +304,9 @@ uint16_t* dt_map::to_bitmap(int iAngle, int &w, int &h)
 //------------------------------------------------------------------------------
 void dt_map::compute_distance_transform()
 {
-  dt_map_pix *tmppix = new dt_map_pix[width * height];
+  dt_dist *tmppix = new dt_dist[width * height];
   
-  for(int i=0; i<nAngle; i++)
+  for(int i=0; i<DT_ANGLE_RESOL; i++)
   {
     // Col transformation
     distance_transform_1D(pix[i], tmppix, true);
@@ -319,12 +317,12 @@ void dt_map::compute_distance_transform()
     // Taking square root to have distance  
     for(int x=0; x<width; x++)
       for(int y=0; y<height; y++)
-        pix[i][y*width+x] = pixResol*sqrt(pix[i][y*width+x]);
+        pix[i][y*width+x] = score(DT_DIST_RESOL*sqrt(pix[i][y*width+x]));
   }
   delete[] tmppix;
 }
 //------------------------------------------------------------------------------
-void dt_map::distance_transform_1D(dt_map_pix *src_pix, dt_map_pix *dest_pix, bool vertical)
+void dt_map::distance_transform_1D(dt_dist *src_pix, dt_dist *dest_pix, bool vertical)
 {
   int x,y;
   int n,m;
@@ -349,15 +347,15 @@ void dt_map::distance_transform_1D(dt_map_pix *src_pix, dt_map_pix *dest_pix, bo
   double f_q_p_q2, f_vk;
   int k;
   int *v = new int[n+2];
-  dt_map_pix *z = new dt_map_pix[n+3];
-  dt_map_pix s;
+  dt_dist *z = new dt_dist[n+3];
+  dt_dist s;
   
   for(p=0; p<m; p++)
   {
     k = 0;
     v[0] = -1;
-    z[0] = -std::numeric_limits<dt_map_pix>::infinity();
-    z[1] = +std::numeric_limits<dt_map_pix>::infinity();
+    z[0] = -numeric_limits<dt_dist>::infinity();
+    z[1] = +numeric_limits<dt_dist>::infinity();
     
     for(q = 0; q <= n; q++)
     {
@@ -377,7 +375,7 @@ void dt_map::distance_transform_1D(dt_map_pix *src_pix, dt_map_pix *dest_pix, bo
             k++;
             v[k] = q;
             z[k] = s;
-            z[k+1] = +std::numeric_limits<dt_map_pix>::infinity();
+            z[k+1] = +numeric_limits<dt_dist>::infinity();
             break;
           }
         }
@@ -405,14 +403,14 @@ void dt_map::distance_transform_1D(dt_map_pix *src_pix, dt_map_pix *dest_pix, bo
 //------------------------------------------------------------------------------
 void dt_map::fillBox(double x, double y, double w, double h)
 {
-  int xi = x / pixResol; 
-  int yi = y / pixResol; 
-  int wi  = w  / pixResol;
-  int hi  = h  / pixResol;
+  int xi = x / DT_DIST_RESOL; 
+  int yi = y / DT_DIST_RESOL; 
+  int wi  = w  / DT_DIST_RESOL;
+  int hi  = h  / DT_DIST_RESOL;
   
   dt_zone_hbox box(wi, hi);
   
-  for(int i=0; i<nAngle; i++)
+  for(int i=0; i<DT_ANGLE_RESOL; i++)
   {
     dt_zone *zone = box * (*robot[i]);
     fillZone(zone, i, xi+wi/2, yi+hi/2);     
@@ -422,17 +420,152 @@ void dt_map::fillBox(double x, double y, double w, double h)
 //------------------------------------------------------------------------------
 void dt_map::fillDisc(double cx, double cy, double radius)
 {
-  int cxi = cx / pixResol; 
-  int cyi = cy / pixResol; 
-  int r = radius / pixResol;
+  int cxi = cx / DT_DIST_RESOL; 
+  int cyi = cy / DT_DIST_RESOL; 
+  int r = radius / DT_DIST_RESOL;
     
   dt_zone_disc disc(r);
   
-  for(int i=0; i<nAngle; i++)
+  for(int i=0; i<DT_ANGLE_RESOL; i++)
   {
     dt_zone *zone = disc * (*robot[i]);
     fillZone(zone, i, cxi, cyi);
     delete zone;
   }
+}
+//------------------------------------------------------------------------------
+dt_dist dt_map::score(double distance)
+{
+  return 1./pow(1.+distance/SECURITY_MARGIN, 2.);
+}
+//------------------------------------------------------------------------------
+dt_path dt_map::find_path(const position_t &from, const position_t &to)
+{
+  const int xs = clip(from.x / DT_DIST_RESOL, width);
+  const int ys = clip(from.y / DT_DIST_RESOL, height);
+  const int xt = clip(to.x / DT_DIST_RESOL, width);
+  const int yt = clip(to.y / DT_DIST_RESOL, height);
+
+  dt_pix current;
+  priority_queue<dt_pix> boundary;
+  priority_queue<dt_pix> boundary_dont_cross;
+  bool allow_crossing = false;
+  
+  dt_dist *dist = new dt_dist[width * height];
+  bool *processed = new bool[width * height];
+  for(int x=0; x<width; x++)
+    for(int y=0; y<height; y++)
+    {
+      dist[y*width+x] = numeric_limits<dt_dist>::infinity();
+      processed[y*width+x] = false;
+    }
+      
+  dist[ys*width+xs] = 0;
+  
+  boundary.push(dt_pix(xs, ys, 0, 0));
+  
+  while(true)
+  {
+    while(!boundary.empty())
+    {
+      current = boundary.top();
+      boundary.pop();  
+      if(processed[current.y*width+current.x]) continue;
+      if(current.x == xt && current.y == yt) 
+      {
+        delete[] processed;
+        return dist2path(dist, xt, yt);
+      }
+      processed[current.y*width+current.x] = true; 
+      //setPixelVerif(double(current.x)*DT_DIST_RESOL*_SCALE_SDL, double(current.y)*DT_DIST_RESOL*_SCALE_SDL, clBlack);
+      
+      add_to_queue(dist, processed, boundary, boundary_dont_cross, allow_crossing, current.dist, current.x-1, current.y, xt, yt); 
+      add_to_queue(dist, processed, boundary, boundary_dont_cross, allow_crossing, current.dist, current.x+1, current.y, xt, yt); 
+      add_to_queue(dist, processed, boundary, boundary_dont_cross, allow_crossing, current.dist, current.x, current.y-1, xt, yt); 
+      add_to_queue(dist, processed, boundary, boundary_dont_cross, allow_crossing, current.dist, current.x, current.y+1, xt, yt);
+      add_to_queue(dist, processed, boundary, boundary_dont_cross, allow_crossing, current.dist, current.x-1, current.y-1, xt, yt); 
+      add_to_queue(dist, processed, boundary, boundary_dont_cross, allow_crossing, current.dist, current.x-1, current.y+1, xt, yt); 
+      add_to_queue(dist, processed, boundary, boundary_dont_cross, allow_crossing, current.dist, current.x+1, current.y-1, xt, yt); 
+      add_to_queue(dist, processed, boundary, boundary_dont_cross, allow_crossing, current.dist, current.x+1, current.y+1, xt, yt);      
+    }
+    // On n'a pas trouvé de chemin, on permet d'aller dans l'infranchissable (l'objectif est peut-être dedans)
+    boundary = boundary_dont_cross;
+    allow_crossing = true;
+  }  
+}
+//------------------------------------------------------------------------------
+dt_dist dt_map::estimate_path_energy(int x1, int y1, int x2, int y2)
+{
+  return pix_cost * sqrt(pow(x1-x2, 2) + pow(y1-y2, 2));
+}
+//------------------------------------------------------------------------------
+int dt_map::clip(int c, int max)
+{
+  return c<0?0:(c>=max?max-1:c);
+}
+//------------------------------------------------------------------------------
+void dt_map::add_to_queue(dt_dist *dist, bool *processed, priority_queue<dt_pix> &boundary, priority_queue<dt_pix> &boundary_dont_cross, bool allow_crossing, dt_dist d, int x, int y, int xt, int yt)
+{
+  if(x >= 0 && x<width && y >= 0 && y<height && !processed[y*width+x])
+  {
+    dt_dist energy = get_pix_energy(x, y, 0.);  /// !!!!!!
+    dt_dist new_dist = d + energy;
+    if(new_dist < dist[y*width+x])
+    {
+      dist[y*width+x] = new_dist;
+      dt_dist new_score = new_dist + estimate_path_energy(x, y, xt, yt);
+      if(energy == 1. && !allow_crossing)
+        boundary_dont_cross.push(dt_pix(x, y, new_dist, new_score));
+      else
+      {
+        boundary.push(dt_pix(x, y, new_dist, new_score));
+        setPixelVerif(double(x)*DT_DIST_RESOL*_SCALE_SDL, double(y)*DT_DIST_RESOL*_SCALE_SDL, clBlack);
+      }
+    }
+  } 
+}
+//------------------------------------------------------------------------------
+dt_dist dt_map::get_pix_energy(int x, int y, double a)
+{
+  int k = a / RAD_ANGLE_RESOL;
+  if(a - k*RAD_ANGLE_RESOL > RAD_ANGLE_RESOL_2) k++;
+  return pix[k][y*width+x];
+}
+//------------------------------------------------------------------------------
+dt_path dt_map::dist2path(dt_dist *dist, int x, int y)
+{
+  int dx[] = {1,-1, 0, 0};
+  int dy[] = {0, 0, 1,-1};
+  
+  int new_x, new_y, x2, y2;
+  dt_dist min_d;
+   
+  dt_path path;
+  path.push_front(pair<dt_dist, dt_dist>(double(x) * DT_DIST_RESOL, double(y) * DT_DIST_RESOL));
+  
+  while(dist[y*width+x])
+  {
+    setPixelVerif(double(x)*DT_DIST_RESOL*_SCALE_SDL, double(y)*DT_DIST_RESOL*_SCALE_SDL, makeColorSDL(255,0,0));
+    min_d = numeric_limits<dt_dist>::infinity();
+    for(int i=0; i<4; i++)
+    {
+      x2 = x + dx[i];
+      y2 = y + dy[i];   
+      if(x2>=0 && x2<width && y2>=0 && y2<height)
+        if(dist[y2*width+x2]<min_d)
+        {
+          min_d = dist[y2*width+x2];
+          new_x = x2;
+          new_y = y2;
+        }
+    }
+    x = new_x;
+    y = new_y;
+    path.push_front(pair<dt_dist, dt_dist>(double(x) * DT_DIST_RESOL, double(y) * DT_DIST_RESOL));
+  }
+  
+  delete[] dist;
+    
+  return path;
 }
 //------------------------------------------------------------------------------

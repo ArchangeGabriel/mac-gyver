@@ -61,7 +61,7 @@ void strat_init()
   
   #ifdef VISUALIZE
   visu_draw_background(config_terrain);
-  Load_SDL_Background();  
+  //Load_SDL_Background();  
   #endif 
     
   // Waits until the starting signal is given
@@ -79,7 +79,7 @@ void stratMainLoop()
 {
   fprintf(stderr,">>> Let's go!\n");  fflush(stdout);
    
-  wait_for_it(pp_go_to(symetrize(position_t(2.6,1.3,M_PI)),tpDEST,false));
+  wait_for_it(pp_go_to(symetrize(position_t(2.7,1.9,M_PI_2)),tpDEST,false));
 
   while(true)
   {
