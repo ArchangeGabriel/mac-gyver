@@ -91,7 +91,7 @@ void visu_draw_robot()
   
   while(true)
   {
-    Draw_SDL_Background();  
+  //  Draw_SDL_Background();  
     // Draw
     pos = cine_get_position();
     dest = pp_get_dest();
@@ -146,4 +146,11 @@ void visu_draw_robot()
     usleep(40000);
   }
 }
-
+//------------------------------------------------------------------------------
+void visu_draw_dt_path(dt_path *path)
+{
+  dt_path::iterator iter;
+  for(iter = path->begin(); iter != path->end(); iter++)
+    setPixelVerif(int((*iter).first*_SCALE_SDL), int((*iter).second*_SCALE_SDL), makeColorSDL(255,0,0));
+}
+//------------------------------------------------------------------------------

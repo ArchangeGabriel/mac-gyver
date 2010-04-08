@@ -9,7 +9,7 @@ typedef struct position_t
   
   position_t(){}
   position_t(float x,float y,float a):x(x),y(y),a(a){}
-  vector_t v() {return vector_t(x,y);}
+  vector_t v() const {return vector_t(x,y);}
 } position_t;
 
 typedef struct tension_t

@@ -6,6 +6,7 @@
 #include "dist_transform.h"
 #include "cinematik.h"
 #include "picAPI.h"
+#include "visualizer.h"
 #include <cstdio>
 
 #define PC_INCLUDE
@@ -16,9 +17,9 @@ using namespace std;
 
 pthread_mutex_t mutex_situ;
 
-int num_angle = 8;
+dt_map *pathMap = NULL;
 
-void calc_path(position_t from, position_t to, int type, bool append = false);
+void calc_path(const position_t &from, const position_t &to, int type, bool append = false);
 
 //------------------------------------------------------------------------------
 
@@ -49,11 +50,11 @@ class direct_path_t
   float normalize(float angle);   // renvoie un angle compris entre -M_PI et M_PI
 
   
-  bool is_dest_reached_xy(position_t *pos);   // renvoie vrai si la destination est atteinte (à peu près) en x y
-  bool is_dest_reached_a(position_t *pos);    // renvoie vrai si la destination est atteinte (à peu près) en angle
+  bool is_dest_reached_xy(const position_t &pos);   // renvoie vrai si la destination est atteinte (à peu près) en x y
+  bool is_dest_reached_a(const position_t &pos);    // renvoie vrai si la destination est atteinte (à peu près) en angle
   
   public:
-  position_t dest;      // destination de l'étape
+  const position_t dest;      // destination de l'étape
   int type;             // destination ou étape?
   
   bool reached;         // destination déjà atteinte?
@@ -61,19 +62,19 @@ class direct_path_t
   
   pthread_mutex_t *mutex;
 
-  direct_path_t(position_t dest, int type):dest(dest),type(type){mutex = NULL; reached = false; iter = 0;} // constructeur de classe
+  direct_path_t(const position_t &dest, int type):dest(dest),type(type){mutex = NULL; reached = false; iter = 0;} // constructeur de classe
   
-  bool is_dest_reached(position_t *pos);      // renvoie vrai si la destination est atteinte (à peu près)
-  tension_t get_tension(position_t *pos);     // renvoie la tension des moteurs pour atteindre le but
+  bool is_dest_reached(const position_t &pos);      // renvoie vrai si la destination est atteinte (à peu près)
+  tension_t get_tension(const position_t &pos);     // renvoie la tension des moteurs pour atteindre le but
 };
 
 list<direct_path_t> path;
 //------------------------------------------------------------------------------
-bool direct_path_t::is_dest_reached_xy(position_t *pos)
+bool direct_path_t::is_dest_reached_xy(const position_t &pos)
 {
   if(reached) return true;
   
-  vector_t dist = vector_t(pos->x-dest.x, pos->y-dest.y);
+  vector_t dist = vector_t(pos.x-dest.x, pos.y-dest.y);
 
   switch(type)
   {
@@ -90,34 +91,34 @@ bool direct_path_t::is_dest_reached_xy(position_t *pos)
   }  
 }
 //------------------------------------------------------------------------------
-bool direct_path_t::is_dest_reached_a(position_t *pos)
+bool direct_path_t::is_dest_reached_a(const position_t &pos)
 {
   switch(type)
   {
     case tpDEST:
-    return (fabsf(normalize(pos->a-dest.a))<DEST_ORIENT);   
+    return (fabsf(normalize(pos.a-dest.a))<DEST_ORIENT);   
     case tpAPPROACH:
-    return (fabsf(normalize(pos->a-dest.a))<APPROACH_ORIENT);
+    return (fabsf(normalize(pos.a-dest.a))<APPROACH_ORIENT);
     case tpLEAVE:
-    return (fabsf(normalize(pos->a-dest.a))<LEAVE_ORIENT);    
+    return (fabsf(normalize(pos.a-dest.a))<LEAVE_ORIENT);    
     case tpWAYPOINT:
-    return (fabsf(normalize(pos->a-dest.a))<WAYPOINT_ORIENT);   
+    return (fabsf(normalize(pos.a-dest.a))<WAYPOINT_ORIENT);   
     default:
     return true;
   }  
 }
 //------------------------------------------------------------------------------
-bool direct_path_t::is_dest_reached(position_t *pos)
+bool direct_path_t::is_dest_reached(const position_t &pos)
 {
   return is_dest_reached_xy(pos) && is_dest_reached_a(pos) && iter>5;
 }
 //------------------------------------------------------------------------------
-tension_t direct_path_t::get_tension(position_t *pos)
+tension_t direct_path_t::get_tension(const position_t &pos)
 { 
-  vector_t N = vector_t(cos(pos->a), sin(pos->a));
+  vector_t N = vector_t(cos(pos.a), sin(pos.a));
   
   // on calcule l'angle vers la destination
-  vector_t v = dest.v() - pos->v();
+  vector_t v = dest.v() - pos.v();
    
   float max_pw = MAX_SPEED;
     
@@ -131,7 +132,7 @@ tension_t direct_path_t::get_tension(position_t *pos)
     else
     {
       iter = 0;
-      float da = normalize(pos->a-dest.a);
+      float da = normalize(pos.a-dest.a);
       float pw;
       if(fabsf(da)>M_PI/3.)
         pw = fabsf(da)/(1.2 * M_PI) * max_pw;
@@ -149,7 +150,7 @@ tension_t direct_path_t::get_tension(position_t *pos)
   }   
   else
   {      
-    float da = normalize(pos->a-v.to_angle()); 
+    float da = normalize(pos.a-v.to_angle()); 
     
     if(fabs(da)>M_PI_2 && v.norme()<0.05)
     {
@@ -203,7 +204,7 @@ tension_t direct_path_t::get_tension(position_t *pos)
         for(iter = path.begin(); iter != path.end(); ++iter)
           if((*iter).type != tpWAYPOINT)
           {
-            vector_t v = (*iter).dest.v() - pos->v();
+            vector_t v = (*iter).dest.v() - pos.v();
             dist = v.norme();
             break;
           }
@@ -239,7 +240,7 @@ float direct_path_t::normalize(float angle)
 
 
 //------------------------------------------------------------------------------
-pthread_mutex_t* pp_go_to(position_t pos, int type, bool append)
+pthread_mutex_t* pp_go_to(const position_t &pos, int type, bool append)
 {
   calc_path(cine_get_position(), pos, type, append);
 
@@ -250,17 +251,21 @@ pthread_mutex_t* pp_go_to(position_t pos, int type, bool append)
   return mutex;
 }
 //------------------------------------------------------------------------------
-pthread_mutex_t* pp_add_step(position_t pos)
+pthread_mutex_t* pp_add_step(const position_t &pos)
 {
   return pp_go_to(pos, tpDEST, true);  
 }
 //------------------------------------------------------------------------------
-void calc_path(position_t from, position_t to, int type, bool append)
+void calc_path(const position_t &from, const position_t &to, int type, bool append)
 {
+  dt_path new_path = pathMap->find_path(from, to);
+  
+  visu_draw_dt_path(&new_path);
+
   if(!append)
     pp_clear_path();
     
-  path.push_back(direct_path_t(to, type)); 
+  //path.push_back(direct_path_t(to, type)); 
 }
 //------------------------------------------------------------------------------
 position_t pp_get_dest()
@@ -290,7 +295,7 @@ void ppMainLoop()
     else
     {
       position_t pos = cine_get_position();
-      if(path.front().is_dest_reached(&pos))
+      if(path.front().is_dest_reached(pos))
       {
         cine_motors(0.,0.);
         if(path.front().mutex)
@@ -299,7 +304,7 @@ void ppMainLoop()
       }
       else
       {
-        tension_t tension = path.front().get_tension(&pos);
+        tension_t tension = path.front().get_tension(pos);
         cine_motors(tension.left, tension.right);
         usleep(10000);        
       }
@@ -320,7 +325,7 @@ void pp_stop(int id)
 //------------------------------------------------------------------------------
 void pp_init(int config_terrain)
 {
-  dt_map pathMap(_LONGUEUR_TER, _LARGEUR_TER, _LARGEUR_ROBOT, _LONGUEUR_ROBOT, 0.005, num_angle);
+  pathMap = new dt_map(_LONGUEUR_TER, _LARGEUR_TER, _LARGEUR_ROBOT, _LONGUEUR_ROBOT);
   
   int configE = (config_terrain%100)/10;
   int configI = config_terrain%10;
@@ -350,11 +355,11 @@ void pp_init(int config_terrain)
             double x,y;
             x = 0.15 + 0.45*i;
             y = 2.1 - 1.378 + 0.5*j + 0.25*i;   
-            pathMap.fillDisc(x, y, 0.025);
+            pathMap->fillDisc(x, y, 0.025);
 
             x = _LONGUEUR_TER - 0.15 - 0.45*i;
             y = 2.1 - 1.378 + 0.5*j + 0.25*i;
-            pathMap.fillDisc(x, y, 0.025);
+            pathMap->fillDisc(x, y, 0.025);
           }
         }
         
@@ -364,19 +369,23 @@ void pp_init(int config_terrain)
       {
         double x = _LONGUEUR_TER/2.;
         double y = 2.1 - 0.628 + 0.5*i; 
-        pathMap.fillDisc(x, y, 0.025);
+        pathMap->fillDisc(x, y, 0.025);
       }
     }
   }   
-  pathMap.fillBox(0.74, 0., 1.519, 0.52); 
+  pathMap->fillBox(0.74, 0., 1.519, 0.52); 
+  pathMap->fillBox(0., 0., _LONGUEUR_TER, DT_DIST_RESOL); 
+  pathMap->fillBox(0., 0.,  DT_DIST_RESOL, _LARGEUR_TER);
+  pathMap->fillBox(0., _LARGEUR_TER, _LONGUEUR_TER, DT_DIST_RESOL); 
+  pathMap->fillBox(_LONGUEUR_TER, 0.,  DT_DIST_RESOL, _LARGEUR_TER);
   
-  pathMap.compute_distance_transform();
+  pathMap->compute_distance_transform();
   
   int w,h;
   char file[100];
-  for(int i=0; i<num_angle; i++)
+  for(int i=0; i<DT_ANGLE_RESOL; i++)
   {
-    uint16_t *pix = pathMap.to_bitmap(i, w, h);
+    uint16_t *pix = pathMap->to_bitmap(i, w, h);
     sprintf(file, "pathMap%d.bmp", i);
     save_buff_to_bitmap(file, w, h, pix);
     delete[] pix;
