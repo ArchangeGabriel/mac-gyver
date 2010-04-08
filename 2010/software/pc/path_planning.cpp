@@ -16,6 +16,8 @@ using namespace std;
 
 pthread_mutex_t mutex_situ;
 
+int num_angle = 8;
+
 void calc_path(position_t from, position_t to, int type, bool append = false);
 
 //------------------------------------------------------------------------------
@@ -318,7 +320,7 @@ void pp_stop(int id)
 //------------------------------------------------------------------------------
 void pp_init(int config_terrain)
 {
-  dt_map_t pathMap(_LONGUEUR_TER, _LARGEUR_TER, 0.005);
+  dt_map pathMap(_LONGUEUR_TER, _LARGEUR_TER, _LARGEUR_ROBOT, _LONGUEUR_ROBOT, 0.005, num_angle);
   
   int configE = (config_terrain%100)/10;
   int configI = config_terrain%10;
@@ -348,11 +350,11 @@ void pp_init(int config_terrain)
             double x,y;
             x = 0.15 + 0.45*i;
             y = 2.1 - 1.378 + 0.5*j + 0.25*i;   
-            pathMap.drawDisc(x, y, 0.025);
+            pathMap.fillDisc(x, y, 0.025);
 
             x = _LONGUEUR_TER - 0.15 - 0.45*i;
             y = 2.1 - 1.378 + 0.5*j + 0.25*i;
-            pathMap.drawDisc(x, y, 0.025);
+            pathMap.fillDisc(x, y, 0.025);
           }
         }
         
@@ -362,16 +364,21 @@ void pp_init(int config_terrain)
       {
         double x = _LONGUEUR_TER/2.;
         double y = 2.1 - 0.628 + 0.5*i; 
-        pathMap.drawDisc(x, y, 0.025);
+        pathMap.fillDisc(x, y, 0.025);
       }
     }
   }   
-  pathMap.drawBox(0.74, 0., 1.519, 0.52); 
+  pathMap.fillBox(0.74, 0., 1.519, 0.52); 
   
   pathMap.compute_distance_transform();
   
   int w,h;
-  uint16_t *pix = pathMap.to_bitmap(w, h);
-  save_buff_to_bitmap("pathMap.bmp", w, h, pix);
-  delete[] pix;
+  char file[100];
+  for(int i=0; i<num_angle; i++)
+  {
+    uint16_t *pix = pathMap.to_bitmap(i, w, h);
+    sprintf(file, "pathMap%d.bmp", i);
+    save_buff_to_bitmap(file, w, h, pix);
+    delete[] pix;
+  }
 }
