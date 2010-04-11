@@ -1,4 +1,5 @@
 #include <unistd.h>
+#include <pthread.h>
 
 #define PC_INCLUDE
 #include "../common/const.h"
@@ -11,34 +12,37 @@ SDL_Surface* affichage=NULL;
 SDL_Surface* background=NULL;
 Uint32 *back_pixels;
 
+pthread_mutex_t using_background;
+
 //------------------------------------------------------------------------------
 void initSDL()
 {
   printf("SDL initialization...           ");
   fflush(stdout);  
+
+  pthread_mutex_init(&using_background, NULL); 
+
   if (SDL_Init(SDL_INIT_VIDEO) < 0) {
     fprintf(stderr, "Error during SDL initialization : %s\n", SDL_GetError());
     exit(EXIT_FAILURE);
   }
+
   int Width = _LONGUEUR_TER * _SCALE_SDL;
   int Height = _LARGEUR_TER * _SCALE_SDL;  
+  back_pixels = new Uint32[4*Width*Height];
+  
   affichage = SDL_SetVideoMode(Width,Height, 32, SDL_HWSURFACE|SDL_DOUBLEBUF/*|SDL_FULLSCREEN*/);
-  back_pixels = new Uint32[4*affichage->w*affichage->h];
+
   if (affichage == NULL || back_pixels == NULL) {
     fprintf(stderr, "Cannot activate the graphic mode : %s\n", SDL_GetError());
     exit(EXIT_FAILURE);
-  }
+  }  
   printf("ok\nSetting title...                ");
   fflush(stdout); 
+  
   SDL_WM_SetCaption("Feed the world", NULL);
   printf("ok\n");
   fflush(stdout);  
-  Load_SDL_Colors(); 
-}
-//------------------------------------------------------------------------------
-void Load_SDL_Colors()
-{  
- 
 }
 //------------------------------------------------------------------------------
 bool is_SDL_ready()
@@ -48,22 +52,22 @@ bool is_SDL_ready()
 //------------------------------------------------------------------------------
 void Load_SDL_Background()
 {
+  pthread_mutex_lock(&using_background);
   memcpy(back_pixels,affichage->pixels,4*affichage->w*affichage->h);
+  if(background) SDL_FreeSurface(background);
   background=SDL_CreateRGBSurfaceFrom(back_pixels,affichage->w,affichage->h,32,4*affichage->w,0,0,0,0);
-  if (background == NULL) {
+  if(!background) {
     fprintf(stderr, "Cannot create background : %s\n", SDL_GetError());
     exit(EXIT_FAILURE);
   }  
-}
-//------------------------------------------------------------------------------
-void Free_SDL_Background()
-{
-  SDL_FreeSurface(background);
+  pthread_mutex_unlock(&using_background);  
 }
 //------------------------------------------------------------------------------
 void Draw_SDL_Background()
 {
+  pthread_mutex_lock(&using_background);
   SDL_BlitSurface(background,NULL,affichage,NULL);
+  pthread_mutex_unlock(&using_background);  
 }
 //------------------------------------------------------------------------------
 inline Uint32 makeColorSDL(int R, int G, int B)

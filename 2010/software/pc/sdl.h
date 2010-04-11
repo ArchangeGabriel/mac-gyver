@@ -37,9 +37,7 @@ typedef struct point_t
 
 void initSDL();
 bool is_SDL_ready();
-void Load_SDL_Colors();
 void Load_SDL_Background();
-void Free_SDL_Background();
 void Draw_SDL_Background();
 
 Uint32 makeColorSDL(char *color);

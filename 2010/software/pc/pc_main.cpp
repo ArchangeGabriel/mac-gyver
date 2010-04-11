@@ -70,6 +70,7 @@ int pc_main(int argc, char **argv)
   visu_draw_background(0);
   Load_SDL_Background();  
   pthread_create(&SDLThread, NULL, start_SDL, NULL);   // Affichage SDL
+  while(!is_SDL_ready()) usleep(10000);
   #endif
 
   // Initialise les fonction de callback
@@ -81,6 +82,8 @@ int pc_main(int argc, char **argv)
   #endif
 
   pthread_create(&IAThread, NULL, start_IA, NULL);   // Intelligence Artificielle
+  while(!is_strat_ready()) usleep(10000);
+    
   pthread_create(&PPThread, NULL, start_PP, NULL);   // Path Planner
   pthread_create(&ACThread, NULL, start_AC, NULL);   // Anti Collision
   
@@ -88,7 +91,6 @@ int pc_main(int argc, char **argv)
   atexit(exiting);
   pthread_create(&ConsoleThread, NULL, console, NULL);   // Console
   #endif
-  
   
   picMainLoop();
   
