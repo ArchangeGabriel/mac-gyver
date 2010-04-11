@@ -6,6 +6,7 @@
 #include <math.h>
 #include <string.h>
 #include <stdio.h>
+#include <list>
 
 #include "dist_transform.h"
 #include "sdl.h"
@@ -446,9 +447,9 @@ dt_path dt_map::find_path(const position_t &from, const position_t &to)
   const int xt = clip(to.x / DT_DIST_RESOL, width);
   const int yt = clip(to.y / DT_DIST_RESOL, height);
 
-  dt_pix current;
   priority_queue<dt_pix> boundary;
   priority_queue<dt_pix> boundary_dont_cross;
+  list<dt_pix> pix_poped;
   bool allow_crossing = false;
   
   dt_dist *dist = new dt_dist[width * height];
@@ -462,31 +463,33 @@ dt_path dt_map::find_path(const position_t &from, const position_t &to)
       
   dist[ys*width+xs] = 0;
   
-  boundary.push(dt_pix(xs, ys, 0, 0));
-  
+  boundary.push(dt_pix(xs, ys, 0, 0, NULL));
+    
   while(true)
   {
     while(!boundary.empty())
     {
-      current = boundary.top();
-      boundary.pop();  
+      pix_poped.push_back(boundary.top());
+      boundary.pop();
+      dt_pix &current = pix_poped.back();
+
       if(processed[current.y*width+current.x]) continue;
       if(current.x == xt && current.y == yt) 
       {
         delete[] processed;
-        return dist2path(dist, xt, yt);
+        delete[] dist;
+        return build_path(&current, from.a);
       }
       processed[current.y*width+current.x] = true; 
-      //setPixelVerif(double(current.x)*DT_DIST_RESOL*_SCALE_SDL, double(current.y)*DT_DIST_RESOL*_SCALE_SDL, clBlack);
       
-      add_to_queue(dist, processed, boundary, boundary_dont_cross, allow_crossing, current.dist, current.x-1, current.y, xt, yt); 
-      add_to_queue(dist, processed, boundary, boundary_dont_cross, allow_crossing, current.dist, current.x+1, current.y, xt, yt); 
-      add_to_queue(dist, processed, boundary, boundary_dont_cross, allow_crossing, current.dist, current.x, current.y-1, xt, yt); 
-      add_to_queue(dist, processed, boundary, boundary_dont_cross, allow_crossing, current.dist, current.x, current.y+1, xt, yt);
-      add_to_queue(dist, processed, boundary, boundary_dont_cross, allow_crossing, current.dist, current.x-1, current.y-1, xt, yt); 
-      add_to_queue(dist, processed, boundary, boundary_dont_cross, allow_crossing, current.dist, current.x-1, current.y+1, xt, yt); 
-      add_to_queue(dist, processed, boundary, boundary_dont_cross, allow_crossing, current.dist, current.x+1, current.y-1, xt, yt); 
-      add_to_queue(dist, processed, boundary, boundary_dont_cross, allow_crossing, current.dist, current.x+1, current.y+1, xt, yt);      
+      add_to_boundary(dist, processed, boundary, boundary_dont_cross, allow_crossing, current, -1,  0, xt, yt); 
+      add_to_boundary(dist, processed, boundary, boundary_dont_cross, allow_crossing, current, +1,  0, xt, yt); 
+      add_to_boundary(dist, processed, boundary, boundary_dont_cross, allow_crossing, current,  0, -1, xt, yt); 
+      add_to_boundary(dist, processed, boundary, boundary_dont_cross, allow_crossing, current,  0, +1, xt, yt);
+      add_to_boundary(dist, processed, boundary, boundary_dont_cross, allow_crossing, current, -1, -1, xt, yt); 
+      add_to_boundary(dist, processed, boundary, boundary_dont_cross, allow_crossing, current, -1, +1, xt, yt); 
+      add_to_boundary(dist, processed, boundary, boundary_dont_cross, allow_crossing, current, +1, -1, xt, yt); 
+      add_to_boundary(dist, processed, boundary, boundary_dont_cross, allow_crossing, current, +1, +1, xt, yt);      
     }
     // On n'a pas trouvé de chemin, on permet d'aller dans l'infranchissable (l'objectif est peut-être dedans)
     boundary = boundary_dont_cross;
@@ -504,23 +507,22 @@ int dt_map::clip(int c, int max)
   return c<0?0:(c>=max?max-1:c);
 }
 //------------------------------------------------------------------------------
-void dt_map::add_to_queue(dt_dist *dist, bool *processed, priority_queue<dt_pix> &boundary, priority_queue<dt_pix> &boundary_dont_cross, bool allow_crossing, dt_dist d, int x, int y, int xt, int yt)
+void dt_map::add_to_boundary(dt_dist *dist, bool *processed, priority_queue<dt_pix> &boundary, priority_queue<dt_pix> &boundary_dont_cross, bool allow_crossing, dt_pix &p, int dx, int dy, int xt, int yt)
 {
+  int x = p.x + dx;
+  int y = p.y + dy;
   if(x >= 0 && x<width && y >= 0 && y<height && !processed[y*width+x])
   {
     dt_dist energy = get_pix_energy(x, y, 0.);  /// !!!!!!
-    dt_dist new_dist = d + energy;
+    dt_dist new_dist = p.dist + energy;
     if(new_dist < dist[y*width+x])
     {
       dist[y*width+x] = new_dist;
       dt_dist new_score = new_dist + estimate_path_energy(x, y, xt, yt);
       if(energy == 1. && !allow_crossing)
-        boundary_dont_cross.push(dt_pix(x, y, new_dist, new_score));
+        boundary_dont_cross.push(dt_pix(x, y, new_dist, new_score, &p));
       else
-      {
-        boundary.push(dt_pix(x, y, new_dist, new_score));
-        setPixelVerif(double(x)*DT_DIST_RESOL*_SCALE_SDL, double(y)*DT_DIST_RESOL*_SCALE_SDL, clBlack);
-      }
+        boundary.push(dt_pix(x, y, new_dist, new_score, &p));
     }
   } 
 }
@@ -532,40 +534,62 @@ dt_dist dt_map::get_pix_energy(int x, int y, double a)
   return pix[k][y*width+x];
 }
 //------------------------------------------------------------------------------
-dt_path dt_map::dist2path(dt_dist *dist, int x, int y)
-{
-  int dx[] = {1,-1, 0, 0};
-  int dy[] = {0, 0, 1,-1};
+dt_path dt_map::build_path(dt_pix *current, double initial_angle)
+{ 
+  int resol = 0.05 / DT_DIST_RESOL;
+  if(resol<1) resol = 1;
+  int count = resol;
   
-  int new_x, new_y, x2, y2;
-  dt_dist min_d;
-   
-  dt_path path;
-  path.push_front(pair<dt_dist, dt_dist>(double(x) * DT_DIST_RESOL, double(y) * DT_DIST_RESOL));
+  vector<int> X;
+  vector<int> Y;  
   
-  while(dist[y*width+x])
+  // Add the last pixel
+  X.push_back(current->x);
+  Y.push_back(current->y);  
+    
+  while(current->parent)
   {
-    setPixelVerif(double(x)*DT_DIST_RESOL*_SCALE_SDL, double(y)*DT_DIST_RESOL*_SCALE_SDL, makeColorSDL(255,0,0));
-    min_d = numeric_limits<dt_dist>::infinity();
-    for(int i=0; i<4; i++)
+    if(!count) 
     {
-      x2 = x + dx[i];
-      y2 = y + dy[i];   
-      if(x2>=0 && x2<width && y2>=0 && y2<height)
-        if(dist[y2*width+x2]<min_d)
-        {
-          min_d = dist[y2*width+x2];
-          new_x = x2;
-          new_y = y2;
-        }
+      // Add intermediate pixels
+      X.push_back(current->x);
+      Y.push_back(current->y);  
+      count = resol;
     }
-    x = new_x;
-    y = new_y;
-    path.push_front(pair<dt_dist, dt_dist>(double(x) * DT_DIST_RESOL, double(y) * DT_DIST_RESOL));
+    count--;
+    current = current->parent;
   }
+    
+  // Add the first pixel
+  X.push_back(current->x);
+  Y.push_back(current->y);
+
+  // Optimize path
+  optimize_path(X,Y);
+    
+  // Convert to dt_path
+  const int n_points = X.size();
+  dt_path path;
+  path.resize(n_points);
   
-  delete[] dist;
+  double angle;
+  for(int i=0; i<n_points; i++)
+  {
+    if(i==0)
+     angle = initial_angle;
+    else
+    {
+      vector_t v(X[(n_points-1) - i] - X[(n_points-1) - (i-1)], Y[(n_points-1) - i] - Y[(n_points-1) - (i-1)]);
+      angle = v.to_angle();
+    }
+    path[i] = position_t(X[(n_points-1) - i]*DT_DIST_RESOL, Y[(n_points-1) - i]*DT_DIST_RESOL, angle);
+  }
     
   return path;
+}
+//------------------------------------------------------------------------------
+void dt_map::optimize_path(vector<int> &X, vector<int> &Y)
+{
+  
 }
 //------------------------------------------------------------------------------

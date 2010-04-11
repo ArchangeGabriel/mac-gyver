@@ -8,6 +8,8 @@
 #include "sdl.h"
 #include "visualizer.h"
 
+dt_path path_planned;
+
 //------------------------------------------------------------------------------
 void visu_draw_background(int config_terrain)
 {
@@ -91,7 +93,13 @@ void visu_draw_robot()
   
   while(true)
   {
-  //  Draw_SDL_Background();  
+    Draw_SDL_Background();  
+    
+    // Draw path
+    for(unsigned int i=1; i<path_planned.size(); i++)
+      LigneSDL((int)(_SCALE_SDL*path_planned[i-1].x), (int)(_SCALE_SDL*path_planned[i-1].y),
+               (int)(_SCALE_SDL*path_planned[i].x), (int)(_SCALE_SDL*path_planned[i].y), clBlack);//makeColorSDL(255,0,0));
+
     // Draw
     pos = cine_get_position();
     dest = pp_get_dest();
@@ -147,10 +155,10 @@ void visu_draw_robot()
   }
 }
 //------------------------------------------------------------------------------
-void visu_draw_dt_path(dt_path *path)
+void visu_draw_dt_path(dt_path &p)
 {
-  dt_path::iterator iter;
-  for(iter = path->begin(); iter != path->end(); iter++)
-    setPixelVerif(int((*iter).first*_SCALE_SDL), int((*iter).second*_SCALE_SDL), makeColorSDL(255,0,0));
+  path_planned.resize(p.size());
+  for(unsigned int i=0; i<p.size(); i++)
+    path_planned[i] = p[i];    
 }
 //------------------------------------------------------------------------------

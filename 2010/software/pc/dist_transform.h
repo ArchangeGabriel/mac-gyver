@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 #include <queue>
-#include <list>
+#include <vector>
 #include <utility>
 
 #include "types.h"
@@ -68,7 +68,7 @@ class dt_zone_orientbox : public dt_zone
 
 //------------------------------------------------------------------------------
 
-typedef list<pair<dt_dist, dt_dist> > dt_path;
+typedef vector<position_t> dt_path;
 
 //------------------------------------------------------------------------------
 
@@ -89,9 +89,10 @@ class dt_map
     int x,y;
     dt_dist dist;
     dt_dist score;
+    dt_pix *parent;
     
     dt_pix() {};
-    dt_pix(int _x, int _y, dt_dist _dist, dt_dist _score) : x(_x), y(_y), dist(_dist), score(_score) {}
+    dt_pix(int _x, int _y, dt_dist _dist, dt_dist _score, dt_pix *_parent) : x(_x), y(_y), dist(_dist), score(_score), parent(_parent) {}
     bool operator < (const dt_pix &b) const {return score>b.score;}
   } dt_pix;
   
@@ -114,10 +115,13 @@ class dt_map
   static inline int clip(int c, int max);
   
   // Ajoute un pixel à la frontière
-  void add_to_queue(dt_dist *dist, bool *processed, priority_queue<dt_pix> &boundary, priority_queue<dt_pix> &boundary_dont_cross, bool allow_crossing, dt_dist d, int x, int y, int xt, int yt);
+  void add_to_boundary(dt_dist *dist, bool *processed, priority_queue<dt_pix> &boundary, priority_queue<dt_pix> &boundary_dont_cross, bool allow_crossing, dt_pix &p, int dx, int dy, int xt, int yt);
   
-  // Deduit le chemin à partir de la carte des distances
-  dt_path dist2path(dt_dist *dist, int x, int y);
+  // Construit le chemin et l'optimise
+  dt_path build_path(dt_pix *current, double initial_angle);
+  
+  // Optimise le chemin
+  void optimize_path(vector<int> &X, vector<int> &Y);
    
   public:    
   // Constructeur / Destructeur

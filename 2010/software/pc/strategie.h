@@ -11,6 +11,7 @@ Appelé au démarrage du programme, color est la couleur du robot (clRED ou clGR
 Lance la reconnaissance vidéo de la configuration
 */
 void strat_init();
+bool is_strat_ready();
 
 //------------------------------------------------------------------------------
 /*
@@ -23,7 +24,8 @@ int strat_get_color();
 /*
 Renvoie la configuration du terrain (cf webcamAPI.h)
 */
-int get_config_terrain();
+void strat_set_config_terrain(int c);
+int strat_get_config_terrain();
 
 //------------------------------------------------------------------------------
 /*

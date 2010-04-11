@@ -22,6 +22,9 @@ using namespace std;
 //#include "../common/bitmap.h"
 #include "webcam.hpp"
 
+// Strategie prête
+bool strat_ready = false;
+
 // Couleur du robot
 int color;
 
@@ -54,18 +57,10 @@ void strat_init()
   
   // Initialise la webcam
   webcam_init();
-   
-  // Try to find configuration
-  config_terrain = wc_reco_config();
-  pp_init(config_terrain);
   
-  #ifdef VISUALIZE
-  visu_draw_background(config_terrain);
-  //Load_SDL_Background();  
-  #endif 
-    
+  strat_ready = true; 
+         
   // Waits until the starting signal is given
-  usleep(100000);
   fprintf(stderr,">>> Waiting for jack...\n");  fflush(stdout);
   while(!started)
   {       
@@ -75,9 +70,16 @@ void strat_init()
   stratMainLoop();
 }
 //------------------------------------------------------------------------------
+bool is_strat_ready()
+{
+  return strat_ready;
+}
+//------------------------------------------------------------------------------
 void stratMainLoop()
 {
   fprintf(stderr,">>> Let's go!\n");  fflush(stdout);
+  
+  while(!config_terrain) usleep(10000);    
    
   wait_for_it(pp_go_to(symetrize(position_t(2.7,1.9,M_PI_2)),tpDEST,false));
 
@@ -97,7 +99,17 @@ int strat_get_color()
   return color;
 }
 //------------------------------------------------------------------------------
-int get_config_terrain()
+void strat_set_config_terrain(int c)
+{
+  #ifdef VISUALIZE
+  visu_draw_background(c);  
+  Load_SDL_Background();  
+  #endif
+
+  config_terrain = c;
+}
+//------------------------------------------------------------------------------
+int strat_get_config_terrain()
 {
   return config_terrain;
 }

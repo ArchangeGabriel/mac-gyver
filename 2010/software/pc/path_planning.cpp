@@ -6,6 +6,7 @@
 #include "dist_transform.h"
 #include "cinematik.h"
 #include "picAPI.h"
+#include "webcamAPI.h"
 #include "visualizer.h"
 #include <cstdio>
 
@@ -259,13 +260,13 @@ pthread_mutex_t* pp_add_step(const position_t &pos)
 void calc_path(const position_t &from, const position_t &to, int type, bool append)
 {
   dt_path new_path = pathMap->find_path(from, to);
-  
-  visu_draw_dt_path(&new_path);
+  visu_draw_dt_path(new_path);    
 
   if(!append)
-    pp_clear_path();
-    
-  //path.push_back(direct_path_t(to, type)); 
+    pp_clear_path(); 
+
+ // for(unsigned int i = 0; i<new_path.size(); i++)
+ //   path.push_back(direct_path_t(new_path[i], i==new_path.size()-1?type:tpWAYPOINT));
 }
 //------------------------------------------------------------------------------
 position_t pp_get_dest()
@@ -284,10 +285,16 @@ void pp_clear_path()
 //------------------------------------------------------------------------------
 void ppMainLoop()
 {
-
   pthread_mutex_init(&mutex_situ, NULL);
-
+  
+  // Try to find configuration
+  int config = wc_reco_config();
+  pp_init(config);   
+     
   fprintf(stderr,"PP thread...                    ok\n");  fflush(stdout);
+  
+  strat_set_config_terrain(config);
+
   while(true)
   {
     if(path.empty())
@@ -381,7 +388,7 @@ void pp_init(int config_terrain)
   
   pathMap->compute_distance_transform();
   
-  int w,h;
+  /*int w,h;
   char file[100];
   for(int i=0; i<DT_ANGLE_RESOL; i++)
   {
@@ -389,5 +396,5 @@ void pp_init(int config_terrain)
     sprintf(file, "pathMap%d.bmp", i);
     save_buff_to_bitmap(file, w, h, pix);
     delete[] pix;
-  }
+  }*/
 }
