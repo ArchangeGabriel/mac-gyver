@@ -81,6 +81,8 @@ class dt_map
   
   int width, height;
   dt_dist** pix;
+  dt_dist** pix_gradX;
+  dt_dist** pix_gradY;
   
   dt_zone_orientbox **robot;
   
@@ -99,14 +101,20 @@ class dt_map
   // 1-dimensional distance transform
   void distance_transform_1D(dt_dist *src_pix, dt_dist *dest_pix, bool vertical);
   
+  // Calcule les dérivés en X et Y de pix
+  void compute_gradient();
+  
   // Marque l'intérieur de la zone comme infranchissable
   void fillZone(dt_zone *zone, int iAngle, int x, int y);
   
   // Transforme une distance en score entre 0 et 1
   static inline dt_dist score(double distance);
 
-  // Renvoie l'énergie associé au pixel
+  // Renvoie l'énergie associée au pixel
   dt_dist get_pix_energy(int x, int y, double a);
+  
+  // Renvoie la dérivée de l'énergie associée a pixel
+  void get_pix_energy_gradient(int x, int y, double a, dt_dist &dEdx, dt_dist &dEdy);  
   
   // Estime l'énergie associée au chemin de (x1,y1) à (x2,y2)
   dt_dist estimate_path_energy(int x1, int y1, int x2, int y2);
@@ -121,7 +129,11 @@ class dt_map
   dt_path build_path(dt_pix *current, double initial_angle);
   
   // Optimise le chemin
-  void optimize_path(vector<int> &X, vector<int> &Y);
+  void optimize_path(int N, float *X, float *Y);
+  void optimize_path_iter(int N, float *A, float *V, float *F);
+  
+  // Translate a pixel coordinate path into a terrain's position path
+  dt_path pix_path2dt_path(int N, float *X, float *Y, double initial_angle);
    
   public:    
   // Constructeur / Destructeur
