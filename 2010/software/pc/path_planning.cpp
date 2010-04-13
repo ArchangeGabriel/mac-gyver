@@ -24,7 +24,7 @@ void calc_path(const position_t &from, const position_t &to, int type, bool appe
 
 //------------------------------------------------------------------------------
 
-#define MAX_SPEED    1.3    // Vitesse maximale atteignable
+#define MAX_SPEED    0.5    // Vitesse maximale atteignable
 
 //#define DEST_RADIUS  0.02   // distance minimum (en mètres) pour valider le waypoint
 //#define DEST_ORIENT  0.01  // écart de direction minimum (en radian) pour valider le waypoint
@@ -265,8 +265,8 @@ void calc_path(const position_t &from, const position_t &to, int type, bool appe
   if(!append)
     pp_clear_path(); 
 
- // for(unsigned int i = 0; i<new_path.size(); i++)
- //   path.push_back(direct_path_t(new_path[i], i==new_path.size()-1?type:tpWAYPOINT));
+  for(unsigned int i = 0; i<new_path.size(); i++)
+    path.push_back(direct_path_t(new_path[i], i==new_path.size()-1?type:tpWAYPOINT));
 }
 //------------------------------------------------------------------------------
 position_t pp_get_dest()

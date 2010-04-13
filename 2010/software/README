@@ -7,3 +7,5 @@ libncurses5-dev
 freeglut3-dev
 libusb-dev
 libdevil-dev
+liblapack-dev
+f2c

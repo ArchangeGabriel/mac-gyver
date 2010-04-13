@@ -9,15 +9,22 @@
 #include <list>
 
 #include "dist_transform.h"
-#include "sdl.h"
+#include "visualizer.h"
+
+extern "C" void sgetrf_(int*, int*, float*, int*, int*, int*);
+extern "C" void sgetri_(int*, float*, int*, int*, float*, int*, int*);
 
 // Marge de sécurité entre le robot et les obstacles en mètres
 #define SECURITY_MARGIN  0.1
 
+// Constants for optimisation
+#define ALPHA   0.001     // Weight for first derivative 
+#define BETA    0.005    // Weight for second derivative
+#define GAMMA   0.01      // Converging rate
+
 const dt_dist dt_map::pix_cost = 1./3.;   // score corresponding to 3*SECURITY_MARGIN
 const double dt_map::RAD_ANGLE_RESOL   = M_PI   / double(DT_ANGLE_RESOL);
 const double dt_map::RAD_ANGLE_RESOL_2 = M_PI_2 / double(DT_ANGLE_RESOL);
-
 
 //------------------------------------------------------------------------------
 //                                                                            //
@@ -248,9 +255,13 @@ dt_map::dt_map(double terrainWidth, double terrainHeight, double robotWidth, dou
     robot[i] = new dt_zone_orientbox(robotW, robotD, double(i)*M_PI/double(DT_ANGLE_RESOL));
   
   pix = new dt_dist*[DT_ANGLE_RESOL];
+  pix_gradX = new dt_dist*[DT_ANGLE_RESOL];
+  pix_gradY = new dt_dist*[DT_ANGLE_RESOL];
   for(int i=0; i<DT_ANGLE_RESOL; i++)
   {
     pix[i] = new dt_dist[width * height];
+    pix_gradX[i] = new dt_dist[width * height];
+    pix_gradY[i] = new dt_dist[width * height];
     for(int k=0; k<width*height; k++)
       pix[i][k] = numeric_limits<dt_dist>::infinity();
   }
@@ -318,8 +329,12 @@ void dt_map::compute_distance_transform()
     // Taking square root to have distance  
     for(int x=0; x<width; x++)
       for(int y=0; y<height; y++)
-        pix[i][y*width+x] = score(DT_DIST_RESOL*sqrt(pix[i][y*width+x]));
+        pix[i][y*width+x] = score(DT_DIST_RESOL*sqrt(pix[i][y*width+x]));       
   }
+  
+  // Computes energy gradient
+  compute_gradient();
+  
   delete[] tmppix;
 }
 //------------------------------------------------------------------------------
@@ -400,6 +415,22 @@ void dt_map::distance_transform_1D(dt_dist *src_pix, dt_dist *dest_pix, bool ver
    
   delete[] v;
   delete[] z;
+}
+//------------------------------------------------------------------------------
+void dt_map::compute_gradient()
+{
+  for(int i=0; i<DT_ANGLE_RESOL; i++)
+    for(int x=0; x<width; x++)
+      for(int y=0; y<height; y++)
+      {
+        if(x == 0)             pix_gradX[i][y*width]   =  pix[i][y*width+1]     - pix[i][y*width];
+        else if(x == width-1)  pix_gradX[i][y*width+x] =  pix[i][(y+1)*width-1] - pix[i][(y+1)*width-2];
+        else                   pix_gradX[i][y*width+x] = (pix[i][y*width+x+1]   - pix[i][y*width+x-1]) / 2.;
+        
+        if(y == 0)             pix_gradY[i][x]         =  pix[i][width+x]            - pix[i][x];
+        else if(y == height-1) pix_gradY[i][y*width+x] =  pix[i][(height-1)*width+x] - pix[i][(height-2)*width+x];
+        else                   pix_gradY[i][y*width+x] = (pix[i][(y+1)*width+x]      - pix[i][(y-1)*width+x]) / 2.;
+      }
 }
 //------------------------------------------------------------------------------
 void dt_map::fillBox(double x, double y, double w, double h)
@@ -534,26 +565,31 @@ dt_dist dt_map::get_pix_energy(int x, int y, double a)
   return pix[k][y*width+x];
 }
 //------------------------------------------------------------------------------
+void dt_map::get_pix_energy_gradient(int x, int y, double a, dt_dist &dEdx, dt_dist &dEdy)
+{
+  int k = a / RAD_ANGLE_RESOL;
+  if(a - k*RAD_ANGLE_RESOL > RAD_ANGLE_RESOL_2) k++;
+  dEdx = pix_gradX[k][y*width+x];
+  dEdy = pix_gradY[k][y*width+x];
+}
+//------------------------------------------------------------------------------
 dt_path dt_map::build_path(dt_pix *current, double initial_angle)
 { 
   int resol = 0.05 / DT_DIST_RESOL;
   if(resol<1) resol = 1;
   int count = resol;
   
-  vector<int> X;
-  vector<int> Y;  
+  list<pair<int, int> > points;
   
   // Add the last pixel
-  X.push_back(current->x);
-  Y.push_back(current->y);  
+  points.push_front(pair<int, int>(current->x, current->y));
     
   while(current->parent)
   {
     if(!count) 
     {
       // Add intermediate pixels
-      X.push_back(current->x);
-      Y.push_back(current->y);  
+      points.push_front(pair<int, int>(current->x, current->y));      
       count = resol;
     }
     count--;
@@ -561,35 +597,138 @@ dt_path dt_map::build_path(dt_pix *current, double initial_angle)
   }
     
   // Add the first pixel
-  X.push_back(current->x);
-  Y.push_back(current->y);
+  points.push_front(pair<int, int>(current->x, current->y));
+  
+  // Transform into float arrays
+  const int n_points = points.size();
+  float *X = new float[n_points];
+  float *Y = new float[n_points];  
+    
+  list<pair<int, int> >::iterator iter = points.begin();
+  for(int i=0; iter != points.end(); iter++, i++)
+  {
+    X[i] = iter->first;
+    Y[i] = iter->second;    
+  }
 
   // Optimize path
-  optimize_path(X,Y);
+  optimize_path(n_points, X, Y);
     
   // Convert to dt_path
-  const int n_points = X.size();
+  dt_path path = pix_path2dt_path(n_points, X, Y, initial_angle);
+  
+  delete[] X;
+  delete[] Y;
+  
+  return path;
+}
+//------------------------------------------------------------------------------
+void dt_map::optimize_path(int N, float *X, float *Y)
+{
+  int info;
+  int size;
+  float *A = new float[N*N];
+  float lwork;
+  float *work;
+  int *pivot = new int[N];
+  
+  for(int i = 0; i<N; i++)
+  {
+    if(i == 0 || i == N-1) // First and last point doesn't move
+    {
+      for(int j = 0; j<N; j++) 
+        A[j*N+i] = 0.;
+      A[i*N+i] = GAMMA;        
+    } else if(i == 1 || i == N-2)   // only first derivative for i == 1 && i == N-2
+    {
+      for(int j = 0; j<N; j++) 
+        A[j*N+i] = 0.;
+      A[i*N+i] = 2.*ALPHA + GAMMA;
+      A[(i+1)*N+i] = -ALPHA;
+      A[(i-1)*N+i] = -ALPHA;
+    } else
+    {
+      for(int j = 0; j<N; j++)
+      {
+        if(i == j)             A[j*N+i] = 2.*ALPHA + 6.*BETA + GAMMA;
+        else if(abs(i-j) == 1) A[j*N+i] =   -ALPHA - 4.*BETA;
+        else if(abs(i-j) == 2) A[j*N+i] =               BETA;
+        else                   A[j*N+i] = 0.;
+      }    
+    }
+  }
+    
+  // LU decomposition (gets pivot array)
+  sgetrf_(&N, &N, A, &N, pivot, &info);
+  
+  // Inverses matrix A
+  size = -1;
+  sgetri_(&N, A, &N, pivot, &lwork, &size, &info);
+  size = lwork;
+  work = new float[size];
+  sgetri_(&N, A, &N, pivot, work, &size, &info);  
+  
+  // Optimizes path
+  float *Fx = new float[N];
+  float *Fy = new float[N];  
+  int n_iter = 100;
+  Fx[0] = Fx[N-1] = 0.;
+  Fy[0] = Fy[N-1] = 0.;  
+   
+  for(int n=0; n<n_iter; n++)
+  {
+    dt_path path = pix_path2dt_path(N, X, Y, 0.);
+    visu_draw_dt_path(path);
+    usleep(10000);
+
+    // gets gradients
+    for(int i=0; i<N; i++)
+      if(i>0 && i<N-1) 
+        get_pix_energy_gradient(X[i], Y[i], 0., Fx[i], Fy[i]);   // !!!!!!
+    
+    // Compute x_(t+1) from x_t (the same for y)
+    optimize_path_iter(N, A, X, Fx);
+    optimize_path_iter(N, A, Y, Fy);
+  }
+  
+  delete[] Fy;
+  delete[] Fx;  
+  delete[] pivot;
+  delete[] A;    
+}
+//------------------------------------------------------------------------------
+void dt_map::optimize_path_iter(int N, float *A, float *V, float *F)
+{
+  float *tmp = new float[N];
+  for(int i=0; i<N; i++)
+    tmp[i] = GAMMA * V[i] - F[i];
+  for(int i=0; i<N; i++)
+  {
+    V[i] = 0;
+    for(int j=0; j<N; j++)
+      V[i] += A[j*N+i]*tmp[j];
+  }
+  delete[] tmp;
+}
+//------------------------------------------------------------------------------
+dt_path dt_map::pix_path2dt_path(int N, float *X, float *Y, double initial_angle)
+{
   dt_path path;
-  path.resize(n_points);
+  path.resize(N);
   
   double angle;
-  for(int i=0; i<n_points; i++)
+  for(int i=0; i<N; i++)
   {
     if(i==0)
      angle = initial_angle;
     else
     {
-      vector_t v(X[(n_points-1) - i] - X[(n_points-1) - (i-1)], Y[(n_points-1) - i] - Y[(n_points-1) - (i-1)]);
+      vector_t v(X[i] - X[i-1], Y[i] - Y[i-1]);
       angle = v.to_angle();
     }
-    path[i] = position_t(X[(n_points-1) - i]*DT_DIST_RESOL, Y[(n_points-1) - i]*DT_DIST_RESOL, angle);
+    path[i] = position_t(X[i]*DT_DIST_RESOL, Y[i]*DT_DIST_RESOL, angle);
   }
-    
-  return path;
-}
-//------------------------------------------------------------------------------
-void dt_map::optimize_path(vector<int> &X, vector<int> &Y)
-{
   
+  return path;
 }
 //------------------------------------------------------------------------------
