@@ -13,4 +13,4 @@ path_planner.o: ../path_planner.cpp ../path_planner.h
 	$(CC) -o ../path_planner.o -c ../path_planner.cpp $(CFLAGS)
 
 clean:
-	rm -rf *.c~ *.h~ *.cpp~ *.bmp
+	rm -rf *.c~ *.h~ *.cpp~ *.bmp energyMap_tool

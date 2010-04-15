@@ -342,6 +342,6 @@ void pt_init(int config_terrain)
     pathMap->draw_config((config_terrain%100)/10, config_terrain%10);
     pathMap->compute_distance_transform();
   } 
-  else
-    pathMap->save_to_bmp("maps.bmp");
+//  else
+//    pathMap->save_to_bmp("maps.bmp");
 }

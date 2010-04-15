@@ -89,9 +89,42 @@ class pp_map
     pp_dist dist;
     pp_dist score;
     pp_pix *parent;
+    pp_pix *angle_next_ref;  // reference for computing angle
+    int angle_next_cd;       // pixel to skip before computing angle
+    double angle;            // robot's angle at this point
     
     pp_pix() {};
-    pp_pix(int _x, int _y, pp_dist _dist, pp_dist _score, pp_pix *_parent) : x(_x), y(_y), dist(_dist), score(_score), parent(_parent) {}
+    pp_pix(int _x, int _y, double _angle, int _angle_next_cd) : 
+      x(_x), 
+      y(_y), 
+      dist(0.), 
+      score(0.), 
+      parent(NULL),
+      angle_next_ref(this),
+      angle_next_cd(_angle_next_cd),
+      angle(_angle)
+    {}    
+    pp_pix(int _x, int _y, pp_dist _dist, pp_dist _score, pp_pix *_parent) : 
+      x(_x), 
+      y(_y), 
+      dist(_dist), 
+      score(_score), 
+      parent(_parent)
+    {
+      if(parent->angle_next_cd == 1)
+      {
+        vector_t v(x-parent->x, y-parent->y);
+        angle_next_ref = this;
+        angle_next_cd = parent->angle_next_ref->angle_next_cd;
+        angle = v.to_angle();
+      }
+      else
+      {
+        angle_next_ref = parent->angle_next_ref;
+        angle_next_cd = parent->angle_next_cd - 1;
+        angle = parent->angle;   
+      }
+    }
     bool operator < (const pp_pix &b) const {return score>b.score;}
   } pp_pix;
   
