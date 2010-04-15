@@ -6,7 +6,7 @@
 #include "../common/comm.h"
 #include "usb.h"
 
-#include "path_planning.h"
+#include "path_tracker.h"
 #include "picAPI.h"
 
 // Gère les moteurs
@@ -431,7 +431,7 @@ int picSendInfo()
   info.type = MSG_INFO;
   info.msg_id = msg_id++;
   position_t pos = cine_get_position();
-  position_t dest = pp_get_dest();  
+  position_t dest = pt_get_dest();  
   info.posX = pos.x;
   info.posY = pos.y;  
   info.posA = pos.a;    

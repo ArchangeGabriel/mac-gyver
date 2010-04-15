@@ -3,7 +3,7 @@
 #include <unistd.h>
 #include "picAPI.h"
 #include "strategie.h"
-#include "path_planning.h"
+#include "path_tracker.h"
 #include "cinematik.h"
 #include "anticol.h"
 #include "sdl.h"

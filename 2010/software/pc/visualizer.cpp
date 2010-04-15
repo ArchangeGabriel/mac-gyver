@@ -3,12 +3,12 @@
 #define PC_INCLUDE
 #include "../common/const.h"
 #include "cinematik.h"
-#include "path_planning.h"
+#include "path_tracker.h"
 #include "anticol.h"
 #include "sdl.h"
 #include "visualizer.h"
 
-dt_path path_planned;
+pp_path path_planned;
 
 //------------------------------------------------------------------------------
 void visu_draw_background(int config_terrain)
@@ -102,7 +102,7 @@ void visu_draw_robot()
 
     // Draw
     pos = cine_get_position();
-    dest = pp_get_dest();
+    dest = pt_get_dest();
 
     // Robot supposé
     N.x=cos(pos.a);
@@ -154,7 +154,7 @@ void visu_draw_robot()
   }
 }
 //------------------------------------------------------------------------------
-void visu_draw_dt_path(dt_path &p)
+void visu_draw_path(pp_path &p)
 {
   path_planned.resize(p.size());
   for(unsigned int i=0; i<p.size(); i++)

@@ -1,9 +1,9 @@
 #include <list>
 #include <math.h>
 #include <unistd.h>
-#include "path_planning.h"
+#include "path_tracker.h"
 #include "strategie.h"
-#include "dist_transform.h"
+#include "path_planner.h"
 #include "cinematik.h"
 #include "picAPI.h"
 #include "webcamAPI.h"
@@ -17,7 +17,7 @@ using namespace std;
 
 pthread_mutex_t mutex_situ;
 
-dt_map *pathMap = NULL;
+pp_map *pathMap = NULL;
 
 void calc_path(const position_t &from, const position_t &to, int type, bool append = false);
 
@@ -34,7 +34,7 @@ void calc_path(const position_t &from, const position_t &to, int type, bool appe
 #define APPROACH_RADIUS  0.01 // distance minimum (en mètres) pour valider le waypoint
 #define APPROACH_ORIENT  0.01 // écart de direction minimum (en radian) pour valider le waypoint
 
-#define LEAVE_RADIUS  0.05    // distance minimum (en mètres) pour valider le waypoint
+#define LEAVE_RADIUS  0.05    // dist        map->save_to_bmp(file);ance minimum (en mètres) pour valider le waypoint
 #define LEAVE_ORIENT  1.5     // écart de direction minimum (en radian) pour valider le waypoint
 
 #define WAYPOINT_RADIUS  0.1  // distance minimum (en mètres) pour valider le waypoint
@@ -240,7 +240,7 @@ float direct_path_t::normalize(float angle)
 
 
 //------------------------------------------------------------------------------
-pthread_mutex_t* pp_go_to(const position_t &pos, int type, bool append)
+pthread_mutex_t* pt_go_to(const position_t &pos, int type, bool append)
 {
   calc_path(cine_get_position(), pos, type, append);
 
@@ -251,24 +251,24 @@ pthread_mutex_t* pp_go_to(const position_t &pos, int type, bool append)
   return mutex;
 }
 //------------------------------------------------------------------------------
-pthread_mutex_t* pp_add_step(const position_t &pos)
+pthread_mutex_t* pt_add_step(const position_t &pos)
 {
-  return pp_go_to(pos, tpDEST, true);  
+  return pt_go_to(pos, tpDEST, true);  
 }
 //------------------------------------------------------------------------------
 void calc_path(const position_t &from, const position_t &to, int type, bool append)
 {
-  dt_path new_path = pathMap->find_path(from, to);
-  visu_draw_dt_path(new_path);    
+  pp_path new_path = pathMap->find_path(from, to);
+  visu_draw_path(new_path);    
 
   if(!append)
-    pp_clear_path(); 
+    pt_clear_path(); 
 
   for(unsigned int i = 0; i<new_path.size(); i++)
     path.push_back(direct_path_t(new_path[i], i==new_path.size()-1?type:tpWAYPOINT));
 }
 //------------------------------------------------------------------------------
-position_t pp_get_dest()
+position_t pt_get_dest()
 {
   if(path.empty())
     return cine_get_position();
@@ -277,7 +277,7 @@ position_t pp_get_dest()
    return path.front().dest;   
 }
 //------------------------------------------------------------------------------
-void pp_clear_path()
+void pt_clear_path()
 {
   path.clear();
 }
@@ -288,7 +288,7 @@ void ppMainLoop()
   
   // Try to find configuration
   int config = wc_reco_config();
-  pp_init(config);   
+  pt_init(config);   
      
   fprintf(stderr,"PP thread...                    ok\n");  fflush(stdout);
   
@@ -318,7 +318,7 @@ void ppMainLoop()
   }
 }
 //------------------------------------------------------------------------------
-void pp_stop(int id)
+void pt_stop(int id)
 {
   picMotorsPower(0.,0.);
   position_t pos = cine_get_position();
@@ -329,10 +329,10 @@ void pp_stop(int id)
   path.push_front(direct_path_t(pos,tpDEST));
 }
 //------------------------------------------------------------------------------
-void pp_init(int config_terrain)
+void pt_init(int config_terrain)
 {
   char file[300];
-  pathMap = new dt_map(_LONGUEUR_TER, _LARGEUR_TER, _LARGEUR_ROBOT, _LONGUEUR_ROBOT);
+  pathMap = new pp_map(_LONGUEUR_TER, _LARGEUR_TER, _LARGEUR_ROBOT, _LONGUEUR_ROBOT);
   
   sprintf(file, "data/config%d.dat", config_terrain);
   if(!pathMap->load_from_file(file))
@@ -342,4 +342,6 @@ void pp_init(int config_terrain)
     pathMap->draw_config((config_terrain%100)/10, config_terrain%10);
     pathMap->compute_distance_transform();
   } 
+  else
+    pathMap->save_to_bmp("maps.bmp");
 }

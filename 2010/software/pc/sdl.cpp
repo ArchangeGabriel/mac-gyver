@@ -4,7 +4,7 @@
 #define PC_INCLUDE
 #include "../common/const.h"
 #include "cinematik.h"
-#include "path_planning.h"
+#include "path_tracker.h"
 #include "anticol.h"
 #include "sdl.h"
 

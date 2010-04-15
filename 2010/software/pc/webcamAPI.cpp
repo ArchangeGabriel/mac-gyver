@@ -29,6 +29,6 @@ int wc_reco_config()
 //  save_buff_to_bitmap("img.bmp", 640, 480, img.data);
 
 
-  return 11;
+  return 14;
 }
 

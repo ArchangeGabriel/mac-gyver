@@ -2,7 +2,7 @@
 #include <string.h>
 
 #define PC_INCLUDE
-#include "../../dist_transform.h"
+#include "../../path_planner.h"
 #include "../../../common/const.h"
 
 
@@ -19,7 +19,7 @@ int main()
     for(int configE = 1; configE <= 9; configE++)
       for(int configI = 1; configI <= 4; configI++)    
       {
-        dt_map *map = new dt_map(_LONGUEUR_TER, _LARGEUR_TER, _LARGEUR_ROBOT, _LONGUEUR_ROBOT);
+        pp_map *map = new pp_map(_LONGUEUR_TER, _LARGEUR_TER, _LARGEUR_ROBOT, _LONGUEUR_ROBOT);
         printf("Generating configuration (%d/9,%d/4)...\n", configE, configI);
         
         map->draw_config(configE, configI);
