@@ -8,6 +8,9 @@
 #include <stdio.h>
 #include <list>
 
+#define PC_INCLUDE
+#include "../common/const.h"
+#include "../common/bitmap.h"
 #include "dist_transform.h"
 #include "visualizer.h"
 
@@ -18,9 +21,9 @@ extern "C" void sgetri_(int*, float*, int*, int*, float*, int*, int*);
 #define SECURITY_MARGIN  0.1
 
 // Constants for optimisation
-#define ALPHA   0.001     // Weight for first derivative 
-#define BETA    0.005    // Weight for second derivative
-#define GAMMA   0.01      // Converging rate
+#define ALPHA   0.005     // Weight for first derivative 
+#define BETA    0.005     // Weight for second derivative
+#define GAMMA   0.04      // Converging rate
 
 const dt_dist dt_map::pix_cost = 1./3.;   // score corresponding to 3*SECURITY_MARGIN
 const double dt_map::RAD_ANGLE_RESOL   = M_PI   / double(DT_ANGLE_RESOL);
@@ -245,20 +248,18 @@ void dt_zone_orientbox::swap_int(int* x, int* y)
 //------------------------------------------------------------------------------
 dt_map::dt_map(double terrainWidth, double terrainHeight, double robotWidth, double robotDepth)
 {
-  width = terrainWidth / DT_DIST_RESOL;
-  height = terrainHeight / DT_DIST_RESOL;
-  int robotW = robotWidth / DT_DIST_RESOL;
-  int robotD = robotDepth / DT_DIST_RESOL;
+  width = terrainWidth / DT_SPATIAL_RESOL;
+  height = terrainHeight / DT_SPATIAL_RESOL;
+  int robotW = robotWidth / DT_SPATIAL_RESOL;
+  int robotD = robotDepth / DT_SPATIAL_RESOL;
   
   robot = new dt_zone_orientbox*[DT_ANGLE_RESOL];
-  for(int i=0; i<DT_ANGLE_RESOL; i++)
-    robot[i] = new dt_zone_orientbox(robotW, robotD, double(i)*M_PI/double(DT_ANGLE_RESOL));
-  
   pix = new dt_dist*[DT_ANGLE_RESOL];
   pix_gradX = new dt_dist*[DT_ANGLE_RESOL];
   pix_gradY = new dt_dist*[DT_ANGLE_RESOL];
   for(int i=0; i<DT_ANGLE_RESOL; i++)
   {
+    robot[i] = new dt_zone_orientbox(robotW, robotD, double(i)*M_PI/double(DT_ANGLE_RESOL));
     pix[i] = new dt_dist[width * height];
     pix_gradX[i] = new dt_dist[width * height];
     pix_gradY[i] = new dt_dist[width * height];
@@ -271,11 +272,15 @@ dt_map::~dt_map()
 {
   for(int i=0; i<DT_ANGLE_RESOL; i++)
   {
+    delete robot[i];  
     delete[] pix[i];
-    delete[] robot[i];
+    delete[] pix_gradX[i];    
+    delete[] pix_gradY[i];        
   }
   delete[] robot;   
   delete[] pix;
+  delete[] pix_gradX;
+  delete[] pix_gradY;  
 }
 //------------------------------------------------------------------------------
 void dt_map::fillZone(dt_zone *zone, int iAngle, int cx, int cy)
@@ -295,23 +300,20 @@ void dt_map::fillZone(dt_zone *zone, int iAngle, int cx, int cy)
   } 
 }
 //------------------------------------------------------------------------------
-uint16_t* dt_map::to_bitmap(int iAngle, int &w, int &h)
+void dt_map::to_bitmap(uint16_t *pixbmp, int iAngle, int &w, int &h)
 {
   w = width;
   h = height;
-  uint16_t *pixbmp = new uint16_t[3*width*height];
   
-  for(int y=height-1;y>=0; y--)
+  for(int y=0;y<height; y++)
     for(int x=0;x<width; x++)
     {
       int c = pix[iAngle][y*width+x] * 255.;
-      int i = 3*((height-1-y)*width+x);
+      int i = 3*(y*width+x);
       pixbmp[i+0] = c;
       pixbmp[i+1] = c;
       pixbmp[i+2] = c;
     }
-    
-  return pixbmp;
 }
 //------------------------------------------------------------------------------
 void dt_map::compute_distance_transform()
@@ -329,7 +331,7 @@ void dt_map::compute_distance_transform()
     // Taking square root to have distance  
     for(int x=0; x<width; x++)
       for(int y=0; y<height; y++)
-        pix[i][y*width+x] = score(DT_DIST_RESOL*sqrt(pix[i][y*width+x]));       
+        pix[i][y*width+x] = score(DT_SPATIAL_RESOL*sqrt(pix[i][y*width+x]));       
   }
   
   // Computes energy gradient
@@ -435,10 +437,10 @@ void dt_map::compute_gradient()
 //------------------------------------------------------------------------------
 void dt_map::fillBox(double x, double y, double w, double h)
 {
-  int xi = x / DT_DIST_RESOL; 
-  int yi = y / DT_DIST_RESOL; 
-  int wi  = w  / DT_DIST_RESOL;
-  int hi  = h  / DT_DIST_RESOL;
+  int xi = x / DT_SPATIAL_RESOL; 
+  int yi = y / DT_SPATIAL_RESOL; 
+  int wi  = w  / DT_SPATIAL_RESOL;
+  int hi  = h  / DT_SPATIAL_RESOL;
   
   dt_zone_hbox box(wi, hi);
   
@@ -452,9 +454,9 @@ void dt_map::fillBox(double x, double y, double w, double h)
 //------------------------------------------------------------------------------
 void dt_map::fillDisc(double cx, double cy, double radius)
 {
-  int cxi = cx / DT_DIST_RESOL; 
-  int cyi = cy / DT_DIST_RESOL; 
-  int r = radius / DT_DIST_RESOL;
+  int cxi = cx / DT_SPATIAL_RESOL; 
+  int cyi = cy / DT_SPATIAL_RESOL; 
+  int r = radius / DT_SPATIAL_RESOL;
     
   dt_zone_disc disc(r);
   
@@ -466,6 +468,58 @@ void dt_map::fillDisc(double cx, double cy, double radius)
   }
 }
 //------------------------------------------------------------------------------
+void dt_map::draw_config(int configE, int configI)
+{ 
+  if(configE != 0 && configI !=0)
+  {
+    bool FakeCornE[3][3];
+    bool FakeCornI[2];
+    FakeCornE[0][0] = (configE==2 || configE==5 || configE==8);
+    FakeCornE[1][0] = (configE==4 || configE==5 || configE==6);  
+    FakeCornE[2][0] = (configE==7 || configE==8 || configE==9);    
+    FakeCornE[0][1] = (configE==1 || configE==6 || configE==7);
+    FakeCornE[1][1] = (configE==1 || configE==2 || configE==3);  
+    FakeCornE[2][1] = (configI==2 || configI==4);
+    FakeCornE[0][2] = (configE==3 || configE==4 || configE==9);
+    FakeCornE[1][2] = (configI==1 || configI==3);
+    FakeCornE[2][2] = false;      
+    FakeCornI[0] = (configI==1 || configI==2);
+    FakeCornI[1] = (configI==3 || configI==4);
+    
+    for(int i=0;i<3;++i)  
+      for(int j=0;j<3;++j)    
+        if(i != 2 || j != 2)
+        {
+          if(FakeCornE[i][j])
+          {
+            double x,y;
+            x = 0.15 + 0.45*i;
+            y = 2.1 - 1.378 + 0.5*j + 0.25*i;   
+            fillDisc(x, y, 0.025);
+
+            x = _LONGUEUR_TER - 0.15 - 0.45*i;
+            y = 2.1 - 1.378 + 0.5*j + 0.25*i;
+            fillDisc(x, y, 0.025);
+          }
+        }
+        
+    for(int i=0;i<2;++i) 
+    {
+      if(FakeCornI[i])
+      {
+        double x = _LONGUEUR_TER/2.;
+        double y = 2.1 - 0.628 + 0.5*i; 
+        fillDisc(x, y, 0.025);
+      }
+    }
+  }   
+  fillBox(0.74, 0., 1.519, 0.52); 
+  fillBox(0., 0., _LONGUEUR_TER, DT_SPATIAL_RESOL); 
+  fillBox(0., 0.,  DT_SPATIAL_RESOL, _LARGEUR_TER);
+  fillBox(0., _LARGEUR_TER, _LONGUEUR_TER, DT_SPATIAL_RESOL); 
+  fillBox(_LONGUEUR_TER, 0.,  DT_SPATIAL_RESOL, _LARGEUR_TER);
+}
+//------------------------------------------------------------------------------
 dt_dist dt_map::score(double distance)
 {
   return 1./pow(1.+distance/SECURITY_MARGIN, 2.);
@@ -473,10 +527,10 @@ dt_dist dt_map::score(double distance)
 //------------------------------------------------------------------------------
 dt_path dt_map::find_path(const position_t &from, const position_t &to)
 {
-  const int xs = clip(from.x / DT_DIST_RESOL, width);
-  const int ys = clip(from.y / DT_DIST_RESOL, height);
-  const int xt = clip(to.x / DT_DIST_RESOL, width);
-  const int yt = clip(to.y / DT_DIST_RESOL, height);
+  const int xs = clip(from.x / DT_SPATIAL_RESOL, width);
+  const int ys = clip(from.y / DT_SPATIAL_RESOL, height);
+  const int xt = clip(to.x / DT_SPATIAL_RESOL, width);
+  const int yt = clip(to.y / DT_SPATIAL_RESOL, height);
 
   priority_queue<dt_pix> boundary;
   priority_queue<dt_pix> boundary_dont_cross;
@@ -560,22 +614,28 @@ void dt_map::add_to_boundary(dt_dist *dist, bool *processed, priority_queue<dt_p
 //------------------------------------------------------------------------------
 dt_dist dt_map::get_pix_energy(int x, int y, double a)
 {
+  if(a < 0) a += 2*M_PI;
   int k = a / RAD_ANGLE_RESOL;
   if(a - k*RAD_ANGLE_RESOL > RAD_ANGLE_RESOL_2) k++;
+  while(k>=DT_ANGLE_RESOL)  // symétrie du robot
+    k -= DT_ANGLE_RESOL;
   return pix[k][y*width+x];
 }
 //------------------------------------------------------------------------------
 void dt_map::get_pix_energy_gradient(int x, int y, double a, dt_dist &dEdx, dt_dist &dEdy)
 {
+  if(a < 0) a += 2*M_PI;
   int k = a / RAD_ANGLE_RESOL;
   if(a - k*RAD_ANGLE_RESOL > RAD_ANGLE_RESOL_2) k++;
+  while(k>=DT_ANGLE_RESOL)  // symétrie du robot
+    k -= DT_ANGLE_RESOL;
   dEdx = pix_gradX[k][y*width+x];
   dEdy = pix_gradY[k][y*width+x];
 }
 //------------------------------------------------------------------------------
 dt_path dt_map::build_path(dt_pix *current, double initial_angle)
 { 
-  int resol = 0.05 / DT_DIST_RESOL;
+  int resol = 0.05 / DT_SPATIAL_RESOL;
   if(resol<1) resol = 1;
   int count = resol;
   
@@ -677,14 +737,17 @@ void dt_map::optimize_path(int N, float *X, float *Y)
    
   for(int n=0; n<n_iter; n++)
   {
-    dt_path path = pix_path2dt_path(N, X, Y, 0.);
+/*    dt_path path = pix_path2dt_path(N, X, Y, 0.);
     visu_draw_dt_path(path);
-    usleep(10000);
+    usleep(100000);*/
 
     // gets gradients
     for(int i=0; i<N; i++)
       if(i>0 && i<N-1) 
-        get_pix_energy_gradient(X[i], Y[i], 0., Fx[i], Fy[i]);   // !!!!!!
+      {
+        vector_t v(X[i+1] - X[i-1], Y[i+1] - Y[i-1]);
+        get_pix_energy_gradient(X[i], Y[i], v.to_angle(), Fx[i], Fy[i]);
+      }
     
     // Compute x_(t+1) from x_t (the same for y)
     optimize_path_iter(N, A, X, Fx);
@@ -726,9 +789,56 @@ dt_path dt_map::pix_path2dt_path(int N, float *X, float *Y, double initial_angle
       vector_t v(X[i] - X[i-1], Y[i] - Y[i-1]);
       angle = v.to_angle();
     }
-    path[i] = position_t(X[i]*DT_DIST_RESOL, Y[i]*DT_DIST_RESOL, angle);
+    path[i] = position_t(X[i]*DT_SPATIAL_RESOL, Y[i]*DT_SPATIAL_RESOL, angle);
   }
   
   return path;
+}
+//------------------------------------------------------------------------------
+bool dt_map::load_from_file(char* file)
+{
+  FILE *File = fopen(file, "rb");
+  if(!File) return false;
+  
+  int r;
+  for(int i=0; i<DT_ANGLE_RESOL; i++)
+  {
+    r = fread(pix[i], sizeof(dt_dist), width * height, File);
+    if(r)
+    {
+      r = fread(pix_gradX[i], sizeof(dt_dist), width * height, File);
+      if(r)
+        r = fread(pix_gradY[i], sizeof(dt_dist), width * height, File);        
+      else
+        break;
+    }
+    else
+      break;
+  }
+  fclose(File);
+  return r;
+}
+//------------------------------------------------------------------------------
+void dt_map::save_to_file(char* file)
+{
+  FILE *File = fopen(file, "wb+");
+  for(int i=0; i<DT_ANGLE_RESOL; i++)
+  {
+    fwrite(pix[i], sizeof(dt_dist), width * height, File);
+    fwrite(pix_gradX[i], sizeof(dt_dist), width * height, File);
+    fwrite(pix_gradY[i], sizeof(dt_dist), width * height, File);        
+  }
+  fclose(File);
+}
+//------------------------------------------------------------------------------
+void dt_map::save_to_bmp(char *file)
+{
+  int w, h;
+  uint16_t *bmp = new uint16_t[DT_ANGLE_RESOL*3*width*height];
+  
+  for(int i=0; i<DT_ANGLE_RESOL; i++)
+    to_bitmap(&bmp[i*3*width*height], i, w, h);
+  
+  save_buff_to_bitmap(file, width, DT_ANGLE_RESOL*height, bmp);
 }
 //------------------------------------------------------------------------------

@@ -8,7 +8,7 @@
 
 #include "types.h"
 
-#define DT_DIST_RESOL  0.005    // Résolution métrique pour la carte des distances
+#define DT_SPATIAL_RESOL  0.005    // Résolution métrique pour la carte des distances
 #define DT_ANGLE_RESOL 8        // Résolution angulaire pour la carte des distances
 
 using namespace std;
@@ -98,6 +98,10 @@ class dt_map
     bool operator < (const dt_pix &b) const {return score>b.score;}
   } dt_pix;
   
+  // Dessine des formes sur les cartes 
+  void fillBox(double x, double y, double w, double h);
+  void fillDisc(double cx, double cy, double radius);
+  
   // 1-dimensional distance transform
   void distance_transform_1D(dt_dist *src_pix, dt_dist *dest_pix, bool vertical);
   
@@ -135,23 +139,29 @@ class dt_map
   // Translate a pixel coordinate path into a terrain's position path
   dt_path pix_path2dt_path(int N, float *X, float *Y, double initial_angle);
    
+  // Produit un tableau pouvant être envoyé à save_buff_to_bitmap (see common/bitmap.h)
+  void to_bitmap(uint16_t* pixbmp, int iAngle, int &w, int &h);
+  
   public:    
   // Constructeur / Destructeur
   dt_map(double terrainWidth, double terrainHeight, double robotWidth, double robotDepth);
   ~dt_map();
-      
-  // Produit un tableau pouvant être envoyé à save_buff_to_bitmap (see common/bitmap.h)
-  uint16_t* to_bitmap(int iAngle, int &w, int &h);
-  
+        
   // Calcule la distance en chaque point de la map
   void compute_distance_transform();
   
-  // Remplis les cartes avec les zones indiqués en prenant en compte la taille du robot
-  void fillBox(double x, double y, double w, double h);
-  void fillDisc(double cx, double cy, double radius);
+  // Remplis les cartes avec les obstacles en prenant en compte la taille du robot  
+  void draw_config(int configE, int configI);
     
   // Renvoie un chemin 
   dt_path find_path(const position_t &from, const position_t &to);
+  
+  // Charge/Sauve dans un fichier
+  bool load_from_file(char* file);
+  void save_to_file(char* file);  
+  
+  // Sauve dans un bmp
+  void save_to_bmp(char *file);
 };
 
 #endif

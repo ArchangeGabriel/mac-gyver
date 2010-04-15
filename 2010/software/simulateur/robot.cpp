@@ -67,10 +67,11 @@ void robot_t::init_params()
   objects_pos[0].y=0.;
 
   position.x       = double_param_value("position_x");  
-  position.y       = double_param_value("position_y");    
-  speed.x          = double_param_value("vitesse_x");  
-  speed.y          = double_param_value("vitesse_y");  
+  position.y       = double_param_value("position_y");
   angle            = double_param_value("angle")*M_PI/180.;  
+  position = position + G_init.rotate(angle);
+  speed.x          = double_param_value("vitesse_x");  
+  speed.y          = double_param_value("vitesse_y");
   omega            = double_param_value("omega")*M_PI/180.;
   coeff_frott_t    = double_param_value("coeff_frott_t");
   coeff_frott_n    = double_param_value("coeff_frott_n");
@@ -227,15 +228,14 @@ void robot_t::draw()
   _N.y=sin(data[i].angle);
   _T.x=-sin(data[i].angle);
   _T.y=cos(data[i].angle);
-  v=G_init.rotate(data[i].angle);
-  point[0].x=((int)((data[i].posX+_N.x*dimX/2.+_T.x*dimY/2.-v.x)*simul_info->scale));     
-  point[0].y=((int)((data[i].posY+_N.y*dimX/2.+_T.y*dimY/2.-v.y)*simul_info->scale));
-  point[1].x=((int)((data[i].posX+_N.x*dimX/2.-_T.x*dimY/2.-v.x)*simul_info->scale));
-  point[1].y=((int)((data[i].posY+_N.y*dimX/2.-_T.y*dimY/2.-v.y)*simul_info->scale));
-  point[2].x=((int)((data[i].posX-_N.x*dimX/2.-_T.x*dimY/2.-v.x)*simul_info->scale));
-  point[2].y=((int)((data[i].posY-_N.y*dimX/2.-_T.y*dimY/2.-v.y)*simul_info->scale));
-  point[3].x=((int)((data[i].posX-_N.x*dimX/2.+_T.x*dimY/2.-v.x)*simul_info->scale));
-  point[3].y=((int)((data[i].posY-_N.y*dimX/2.+_T.y*dimY/2.-v.y)*simul_info->scale)); 
+  point[0].x=((int)((data[i].posX+_N.x*dimX/2.+_T.x*dimY/2.)*simul_info->scale));     
+  point[0].y=((int)((data[i].posY+_N.y*dimX/2.+_T.y*dimY/2.)*simul_info->scale));
+  point[1].x=((int)((data[i].posX+_N.x*dimX/2.-_T.x*dimY/2.)*simul_info->scale));
+  point[1].y=((int)((data[i].posY+_N.y*dimX/2.-_T.y*dimY/2.)*simul_info->scale));
+  point[2].x=((int)((data[i].posX-_N.x*dimX/2.-_T.x*dimY/2.)*simul_info->scale));
+  point[2].y=((int)((data[i].posY-_N.y*dimX/2.-_T.y*dimY/2.)*simul_info->scale));
+  point[3].x=((int)((data[i].posX-_N.x*dimX/2.+_T.x*dimY/2.)*simul_info->scale));
+  point[3].y=((int)((data[i].posY-_N.y*dimX/2.+_T.y*dimY/2.)*simul_info->scale)); 
   PolylineSDL(point, 4, clWhite);
   LigneSDL(point[2].x, point[2].y, ((int)(data[i].posX*simul_info->scale)), ((int)(data[i].posY*simul_info->scale)), clWhite); 
   LigneSDL(point[3].x, point[3].y, ((int)(data[i].posX*simul_info->scale)), ((int)(data[i].posY*simul_info->scale)), clWhite);

@@ -1,7 +1,7 @@
 include ../makeopt
 
 all: make_common main.o
-	$(CC) -o ../client ../common/console.o ../common/comm.o usb.o cinematik.o webcamAPI.o dist_transform.o picAPI.o anticol.o path_planning.o strategie.o sdl.o visualizer.o pc_main.o main.o processing.o utils.o common.o webcam.o -f90lib -llapack -lblas $(LDFLAGS)
+	$(CC) -o ../client ../common/console.o ../common/comm.o ../common/bitmap.o usb.o cinematik.o webcamAPI.o dist_transform.o picAPI.o anticol.o path_planning.o strategie.o sdl.o visualizer.o pc_main.o main.o processing.o utils.o common.o webcam.o -f90lib -llapack -lblas $(LDFLAGS)
 
 make_common:
 	make -C ../common
