@@ -52,7 +52,7 @@ void strat_init()
   config_terrain = 0;
  
   // Initialise le suivit de position
-  cine_init(color);
+  cine_init();
   
   // Initialise la webcam
   webcam_init();
@@ -80,7 +80,7 @@ void stratMainLoop()
   
   while(!config_terrain) usleep(10000);    
    
-  wait_for_it(pt_go_to(symetrize(position_t(2.7,1.9,M_PI_2)),tpDEST,false));
+  wait_for_it(pt_go_to(symetrize(position_t(2.7,1.8,M_PI_2)),tpDEST,false));
 
   while(true)
   {

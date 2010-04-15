@@ -28,11 +28,13 @@ int main()
         sprintf(file,"config%d.dat",configE*10+configI);
         map->save_to_file(file);
 
-        sprintf(file,"config%d.bmp",configE*10+configI);
-        map->save_to_bmp(file);
+        //sprintf(file,"config%d.bmp",configE*10+configI);
+        //map->save_to_bmp(file);
         
         delete map;
       }
+      
+    printf("Les fichiers configxx.dat générés dans le répertoire courant doivent être placés dans le répertoire 'data' à la racine du client pc.\n");
   }
   return 0;
 }
