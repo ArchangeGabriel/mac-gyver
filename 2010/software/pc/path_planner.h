@@ -160,14 +160,14 @@ class pp_map
   void add_to_boundary(pp_dist *dist, bool *processed, priority_queue<pp_pix> &boundary, priority_queue<pp_pix> &boundary_dont_cross, bool allow_crossing, pp_pix &p, int dx, int dy, int xt, int yt);
   
   // Construit le chemin et l'optimise
-  pp_path build_path(pp_pix *current, double initial_angle);
+  pp_path build_path(pp_pix *current, double initial_angle, double final_angle);
   
   // Optimise le chemin
   void optimize_path(int N, float *X, float *Y);
   void optimize_path_iter(int N, const float &gamma, float *A, float *V, float *F);
   
   // Translate a pixel coordinate path into a terrain's position path
-  pp_path pix_path2pp_path(int N, float *X, float *Y, double initial_angle);
+  pp_path pix_path2pp_path(int N, float *X, float *Y, double initial_angle, double final_angle);
    
   // Produit un tableau pouvant être envoyé à save_buff_to_bitmap (see common/bitmap.h)
   void to_bitmap(uint16_t* pixbmp, int iAngle, int &w, int &h);

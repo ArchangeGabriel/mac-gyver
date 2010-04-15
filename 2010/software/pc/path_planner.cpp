@@ -569,7 +569,7 @@ pp_path pp_map::find_path(const position_t &from, const position_t &to)
       {
         delete[] processed;
         delete[] dist;
-        return build_path(&current, from.a);
+        return build_path(&current, from.a, to.a);
       }
       processed[current.y*width+current.x] = true; 
       
@@ -639,7 +639,7 @@ void pp_map::get_pix_energy_gradient(int x, int y, double a, pp_dist &dEdx, pp_d
   dEdy = pix_gradY[k][y*width+x];
 }
 //------------------------------------------------------------------------------
-pp_path pp_map::build_path(pp_pix *current, double initial_angle)
+pp_path pp_map::build_path(pp_pix *current, double initial_angle, double final_angle)
 { 
   int resol = 0.05 / PP_SPATIAL_RESOL;
   if(resol<1) resol = 1;
@@ -681,7 +681,7 @@ pp_path pp_map::build_path(pp_pix *current, double initial_angle)
   optimize_path(n_points, X, Y);
     
   // Convert to pp_path
-  pp_path path = pix_path2pp_path(n_points, X, Y, initial_angle);
+  pp_path path = pix_path2pp_path(n_points, X, Y, initial_angle, final_angle);
   
   delete[] X;
   delete[] Y;
@@ -805,10 +805,10 @@ void pp_map::optimize_path_iter(int N, const float &gamma, float *A, float *V, f
   delete[] tmp;
 }
 //------------------------------------------------------------------------------
-pp_path pp_map::pix_path2pp_path(int N, float *X, float *Y, double initial_angle)
+pp_path pp_map::pix_path2pp_path(int N, float *X, float *Y, double initial_angle, double final_angle)
 {
   pp_path path;
-  path.resize(N);
+  path.resize(N+1);
   
   double angle;
   for(int i=0; i<N; i++)
@@ -822,6 +822,7 @@ pp_path pp_map::pix_path2pp_path(int N, float *X, float *Y, double initial_angle
     }
     path[i] = position_t(X[i]*PP_SPATIAL_RESOL, Y[i]*PP_SPATIAL_RESOL, angle);
   }
+  path[N] = position_t(X[N-1]*PP_SPATIAL_RESOL, Y[N-1]*PP_SPATIAL_RESOL, final_angle);
   
   return path;
 }

@@ -17,7 +17,7 @@
 bool time_out;
 
 // position et vitesse actuelles
-position_t pos;
+position_t pos; // Position du centre des roues
 vector_t speed;
 float aspeed;
 
@@ -65,9 +65,10 @@ int max_Y=180;
 #endif
 
 //------------------------------------------------------------------------------
-void cine_init(int color)
+void cine_init()
 {  
-  pos = position_t((color==clBLUE)?_POS_INIT_X:(_LONGUEUR_TER-_POS_INIT_X),_POS_INIT_Y,((color==clBLUE)?_POS_INIT_A:(180-_POS_INIT_A))*M_PI/180.);
+  pos = symetrize(position_t(_POS_INIT_X,_POS_INIT_Y,_POS_INIT_A*M_PI/180.)); // position of the robot's center
+  cine_set_position(pos);  // position of the wheels' center
   speed = vector_t(0., 0.);
   aspeed = 0;
   
@@ -98,12 +99,17 @@ void cine_init(int color)
 //------------------------------------------------------------------------------
 position_t cine_get_position()
 {
-  return pos;
+  vector_t c(_ROUE_X*cos(pos.a), _ROUE_X*sin(pos.a));
+  return position_t(pos.x - c.x, pos.y - c.y, pos.a);
 }
 //------------------------------------------------------------------------------
 void cine_set_position(position_t &_pos)
 {
-  pos = _pos;
+  vector_t c(_ROUE_X*cos(_pos.a), _ROUE_X*sin(_pos.a));
+  pos.x = _pos.x + c.x;
+  pos.y = _pos.y + c.y;
+  pos.a = _pos.a;    
+  printf("%f %f\n", pos.x, pos.y);
 }
 //------------------------------------------------------------------------------
 vector_t cine_get_speed()
@@ -130,12 +136,7 @@ void cine_OnCoderRecv(int left, int right)
   float distL = ((float)dleft)  / ((float)(_FREQ_CODER * _MOTOR_K)) * _RAYON_ROUE;
   float distR = ((float)dright) / ((float)(_FREQ_CODER * _MOTOR_K)) * _RAYON_ROUE;
   float dt = ((float)TIMER_CODER) * 0.001;
-  
-/*  struct timeval time;  
-  gettimeofday(&time,NULL);   
-  float t = ((float)time.tv_sec - ltime.tv_sec) + 0.000001*((float)time.tv_usec - ltime.tv_usec);
-  ltime = time;
-  printf("dt: %f\n",t); */
+
   float da = (distL - distR) / _ROUE_Y;
   float dx = (distL+distR)/2.*cos(pos.a);
   float dy = (distL+distR)/2.*sin(pos.a);

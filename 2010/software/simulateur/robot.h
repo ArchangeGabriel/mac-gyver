@@ -25,8 +25,6 @@ class robot_t : public union_obj_t
   
   int manual;
   double dimX,dimY,hauteur;    // dimensions du rectangle contenant le robot  
-  vector_t coins[4];      // les coins du rectangle sans rotation
-  vector_t coins_rot[4];
     
   double capacite_max;    // capacité des batteries chargées
   double capacite;        // capacité des batteries restante

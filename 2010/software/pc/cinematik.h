@@ -5,12 +5,11 @@
 
 /*
 Appelée pour initialisation
-color est la couleur du robot (cl RED ou clGREEN)
 */
-void cine_init(int color);
+void cine_init();
 
 /*
-Donne/règle la position
+Donne/règle la position du centre du robot
 */
 position_t cine_get_position();
 void cine_set_position(position_t &_pos);
