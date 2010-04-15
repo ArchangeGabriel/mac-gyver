@@ -12,7 +12,7 @@
 #include "picAPI.h"
 #include "webcamAPI.h"
 #include "cinematik.h"
-#include "path_planning.h"
+#include "path_tracker.h"
 #include "strategie.h"
 #include "cinematik.h"
 #include "sdl.h"
@@ -262,7 +262,7 @@ void change_dest(position_t *pos, int type)
     p.a = pos->a;
     break;
   }
-  pp_go_to(p);
+  pt_go_to(p);
 }
 //------------------------------------------------------------------------------
 void exiting()

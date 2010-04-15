@@ -1,11 +1,11 @@
 #ifndef VISUALIZERH
 #define VISUALIZERH
 
-#include "dist_transform.h"
+#include "path_planner.h"
 
 void visu_draw_background(int config_terrain);
 void visu_draw_robot();
-void visu_draw_dt_path(dt_path &p);
+void visu_draw_path(pp_path &p);
 
 #endif
 

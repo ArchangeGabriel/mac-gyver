@@ -13,13 +13,12 @@ using namespace std;
 #include "picAPI.h"
 #include "webcamAPI.h"
 #include "cinematik.h"
-#include "path_planning.h"
+#include "path_tracker.h"
 #include "strategie.h"
 #include "usb.h"
 #include "visualizer.h"
 #include "sdl.h"
 #include "../common/comm.h"
-//#include "../common/bitmap.h"
 #include "webcam.hpp"
 
 // Strategie prête
@@ -81,7 +80,7 @@ void stratMainLoop()
   
   while(!config_terrain) usleep(10000);    
    
-  wait_for_it(pp_go_to(symetrize(position_t(2.7,1.9,M_PI_2)),tpDEST,false));
+  wait_for_it(pt_go_to(symetrize(position_t(2.7,1.9,M_PI_2)),tpDEST,false));
 
   while(true)
   {
