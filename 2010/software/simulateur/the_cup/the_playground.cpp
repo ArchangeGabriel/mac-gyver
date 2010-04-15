@@ -78,7 +78,7 @@ void add_obstacles(simul_info_t *info)
     FakeCornE[0][0] = (configE==2 || configE==5 || configE==8);
     FakeCornE[1][0] = (configE==4 || configE==5 || configE==6);  
     FakeCornE[2][0] = (configE==7 || configE==8 || configE==9);    
-    FakeCornE[0][1] = (configE==1 || configE==2 || configE==7);
+    FakeCornE[0][1] = (configE==1 || configE==6 || configE==7);
     FakeCornE[1][1] = (configE==1 || configE==2 || configE==3);  
     FakeCornE[2][1] = (configI==2 || configI==4);
     FakeCornE[0][2] = (configE==3 || configE==4 || configE==9);
