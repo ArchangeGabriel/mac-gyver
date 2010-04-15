@@ -531,6 +531,8 @@ pp_dist pp_map::score(double distance)
 //------------------------------------------------------------------------------
 pp_path pp_map::find_path(const position_t &from, const position_t &to)
 {
+  int angle_pix_step = 0.05 / PP_SPATIAL_RESOL;
+  if(angle_pix_step<1) angle_pix_step = 1;  
   const int xs = clip(from.x / PP_SPATIAL_RESOL, width);
   const int ys = clip(from.y / PP_SPATIAL_RESOL, height);
   const int xt = clip(to.x / PP_SPATIAL_RESOL, width);
@@ -552,7 +554,7 @@ pp_path pp_map::find_path(const position_t &from, const position_t &to)
       
   dist[ys*width+xs] = 0;
   
-  boundary.push(pp_pix(xs, ys, 0, 0, NULL));
+  boundary.push(pp_pix(xs, ys, from.a, angle_pix_step));
     
   while(true)
   {
@@ -602,7 +604,7 @@ void pp_map::add_to_boundary(pp_dist *dist, bool *processed, priority_queue<pp_p
   int y = p.y + dy;
   if(x >= 0 && x<width && y >= 0 && y<height && !processed[y*width+x])
   {
-    pp_dist energy = get_pix_energy(x, y, 0.);  /// !!!!!!
+    pp_dist energy = get_pix_energy(x, y, p.angle);
     pp_dist new_dist = p.dist + energy;
     if(new_dist < dist[y*width+x])
     {
