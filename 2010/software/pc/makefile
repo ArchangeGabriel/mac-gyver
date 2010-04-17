@@ -58,4 +58,4 @@ webcam_common.o: webcam_common.cpp webcam_common.hpp
 	$(CC) -o webcam_common.o -c webcam_common.cpp $(CFLAGS)
 
 clean:
-	rm -f *.c~ simul/*.c~ *.h~ *.hpp *.cpp~ *.ini~ *.o makefile~ simulateur
+	rm -f *.c~ simul/*.c~ *.h~ *.hpp~ *.cpp~ *.ini~ *.o makefile~ simulateur
