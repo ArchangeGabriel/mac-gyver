@@ -1,8 +1,8 @@
+#define PC_INCLUDE
 #include "webcamAPI.h"
 #include "webcam.hpp"
-#include "processing.hpp"
-#include "utils.hpp"
-#define PC_INCLUDE
+#include "webcam_processing.hpp"
+#include "webcam_utils.hpp"
 #include "../common/const.h"
 #include "../simulateur/the_cup/webcam_list.h"
 #include "cinematik.h"

@@ -1,7 +1,7 @@
 include ../makeopt
 
 all: make_common main.o
-	$(CC) -o ../client ../common/console.o ../common/comm.o ../common/bitmap.o usb.o cinematik.o webcamAPI.o path_planner.o picAPI.o anticol.o path_tracker.o strategie.o sdl.o visualizer.o pc_main.o main.o processing.o utils.o common.o webcam.o -f90lib -llapack -lblas $(LDFLAGS)
+	$(CC) -o ../client ../common/console.o ../common/comm.o ../common/bitmap.o usb.o cinematik.o webcamAPI.o path_planner.o picAPI.o anticol.o path_tracker.o strategie.o sdl.o visualizer.o pc_main.o main.o webcam_processing.o webcam_utils.o webcam_common.o webcam.o -f90lib -llapack -lblas $(LDFLAGS)
 
 make_common:
 	make -C ../common
@@ -12,7 +12,7 @@ usb.o: usb.cpp usb.h simul/usb.cpp ../common/comm.h ../common/simul.h
 cinematik.o: cinematik.cpp cinematik.h ../common/const.h
 	$(CC) -o cinematik.o -c cinematik.cpp $(CFLAGS)
 
-webcamAPI.o: webcamAPI.cpp webcamAPI.h ../common/simul.h webcam.o processing.o utils.o
+webcamAPI.o: webcamAPI.cpp webcamAPI.h ../common/simul.h webcam.o webcam_processing.o webcam_utils.o
 	$(CC) -o webcamAPI.o -c webcamAPI.cpp $(CFLAGS)
 	
 path_planner.o: path_planner.cpp path_planner.h
@@ -42,20 +42,20 @@ pc_main.o: pc_main.cpp pc_main.h usb.o anticol.o strategie.o ../common/simul.h t
 main.o: main.cpp main.h pc_main.o ../common/simul.h types.h webcamAPI.o
 	$(CC) -o main.o -c main.cpp $(CFLAGS)
 
-webcam.o: webcam.cpp webcam.hpp common.o
+webcam.o: webcam.cpp webcam.hpp webcam_common.o
 	$(CC) -o webcam.o -c webcam.cpp $(CFLAGS)
 
-processing.o: processing.cpp processing.hpp
-	$(CC) -o processing.o -c processing.cpp $(CFLAGS)
+webcam_processing.o: webcam_processing.cpp webcam_processing.hpp
+	$(CC) -o webcam_processing.o -c webcam_processing.cpp $(CFLAGS)
 
-utils.o: utils.cpp utils.hpp
-	$(CC) -o utils.o -c utils.cpp $(CFLAGS)
+webcam_utils.o: webcam_utils.cpp webcam_utils.hpp
+	$(CC) -o webcam_utils.o -c webcam_utils.cpp $(CFLAGS)
 
-filter.o: filter.cpp filter.hpp
-	$(CC) -o filter.o -c filter.cpp $(CFLAGS)
+webcam_filter.o: webcam_filter.cpp webcam_filter.hpp
+	$(CC) -o webcam_filter.o -c webcam_filter.cpp $(CFLAGS)
     
-common.o: common.cpp common.hpp
-	$(CC) -o common.o -c common.cpp $(CFLAGS)
+webcam_common.o: webcam_common.cpp webcam_common.hpp
+	$(CC) -o webcam_common.o -c webcam_common.cpp $(CFLAGS)
 
 clean:
-	rm -f *.c~ simul/*.c~ *.h~ *.cpp~ *.ini~ *.o makefile~ simulateur
+	rm -f *.c~ simul/*.c~ *.h~ *.hpp *.cpp~ *.ini~ *.o makefile~ simulateur

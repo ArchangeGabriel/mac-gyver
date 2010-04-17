@@ -1,4 +1,4 @@
-#include "processing.hpp"
+#include "webcam_processing.hpp"
 
 bool filter_red(const image_t::pixel_type_t *pix)
 {

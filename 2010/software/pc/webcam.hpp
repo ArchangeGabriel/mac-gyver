@@ -4,7 +4,7 @@
         
 #include <linux/videodev2.h>
 
-#include "common.hpp"
+#include "webcam_common.hpp"
 
 class webcam_t
 {

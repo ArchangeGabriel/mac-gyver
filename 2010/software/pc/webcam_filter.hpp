@@ -1,7 +1,7 @@
-#ifndef __filter__
-#define __filter__
+#ifndef __webcam_filter__
+#define __webcam_filter__
 
-#include "common.hpp"
+#include "webcam_common.hpp"
 
 enum filter_t
 {

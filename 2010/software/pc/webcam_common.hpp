@@ -1,5 +1,5 @@
-#ifndef __common__
-#define __common__
+#ifndef __webcam_common__
+#define __webcam_common__
 
 #include <stdint.h>
 #include <cstddef>

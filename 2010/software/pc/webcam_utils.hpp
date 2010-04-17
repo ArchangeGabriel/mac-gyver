@@ -1,7 +1,7 @@
-#ifndef __utils__
-#define __utils__
+#ifndef __webcam_utils__
+#define __webcam_utils__
 
-#include "common.hpp"
+#include "webcam_common.hpp"
 
 bool init_utils();
 void deinit_utils();

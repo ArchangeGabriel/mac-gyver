@@ -103,13 +103,17 @@ position_t cine_get_position()
   return position_t(pos.x - c.x, pos.y - c.y, pos.a);
 }
 //------------------------------------------------------------------------------
+position_t cine_get_wheel_center_position()
+{
+  return pos;
+}
+//------------------------------------------------------------------------------
 void cine_set_position(position_t &_pos)
 {
   vector_t c(_ROUE_X*cos(_pos.a), _ROUE_X*sin(_pos.a));
   pos.x = _pos.x + c.x;
   pos.y = _pos.y + c.y;
   pos.a = _pos.a;    
-  printf("%f %f\n", pos.x, pos.y);
 }
 //------------------------------------------------------------------------------
 vector_t cine_get_speed()

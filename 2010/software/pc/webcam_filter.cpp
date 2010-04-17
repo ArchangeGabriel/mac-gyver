@@ -1,4 +1,4 @@
-#include "filter.hpp"
+#include "webcam_filter.hpp"
 
 float blur_kernel[3][3]=
 {

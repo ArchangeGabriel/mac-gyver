@@ -11,8 +11,9 @@ void cine_init();
 /*
 Donne/règle la position du centre du robot
 */
-position_t cine_get_position();
 void cine_set_position(position_t &_pos);
+position_t cine_get_position();
+position_t cine_get_wheel_center_position();
 
 /*
 Donne la vitesse (du robot et de la roue 0 gauche, 1 droite)
