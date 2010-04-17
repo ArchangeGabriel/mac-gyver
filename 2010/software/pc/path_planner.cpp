@@ -3,10 +3,11 @@
 #include <limits.h>
 #include <limits>
 #include <queue>
+#include <list>
+#include <utility>
 #include <math.h>
 #include <string.h>
 #include <stdio.h>
-#include <list>
 
 #define PC_INCLUDE
 #include "../common/const.h"
@@ -14,24 +15,175 @@
 #include "path_planner.h"
 #include "visualizer.h"
 
+// To compute matrix inverse
 extern "C" void sgetrf_(int*, int*, float*, int*, int*, int*);
 extern "C" void sgetri_(int*, float*, int*, int*, float*, int*, int*);
 
 // Resolutions
 #define PP_SPATIAL_RESOL  0.005    // Résolution métrique pour la carte des distances
-#define PP_ANGLE_RESOL 8        // Résolution angulaire pour la carte des distances
+#define PP_ANGLE_RESOL    8        // Résolution angulaire pour la carte des distances
+#define RAD_ANGLE_RESOL   (M_PI/double(PP_ANGLE_RESOL))
+#define RAD_ANGLE_RESOL_2 (M_PI_2/double(PP_ANGLE_RESOL))
 
-// Marge de sécurité entre le robot et les obstacles en mètres
+// Marge de sécurité entre le pp_robot et les obstacles en mètres
 #define SECURITY_MARGIN  0.1
+#define PIX_COST         (1./3.)   // score corresponding to 2*SECURITY_MARGIN
 
 // Constants for optimisation
 #define ALPHA   0.005     // Weight for first derivative 
 #define BETA    0.005     // Weight for second derivative
 #define GAMMA   0.05      // Converging rate (the bigger, the slower)
 
-const pp_dist pp_map::pix_cost = 1./3.;   // score corresponding to 3*SECURITY_MARGIN
-const double pp_map::RAD_ANGLE_RESOL   = M_PI   / double(PP_ANGLE_RESOL);
-const double pp_map::RAD_ANGLE_RESOL_2 = M_PI_2 / double(PP_ANGLE_RESOL);
+//------------------------------------------------------------------------------
+
+class pp_zone
+{ 
+  friend void pp_fillZone(pp_zone *zone, int iAngle, int cx, int cy);
+
+  private:
+  void allocate();
+  
+  protected:
+  int pp_height;
+  int *left;
+  int *right;
+  int cy;
+  
+  public:
+  pp_zone(int h);
+  pp_zone(int h, int c);  
+  ~pp_zone();
+  
+  pp_zone* operator * (const pp_zone &A);
+};
+
+//------------------------------------------------------------------------------
+
+class pp_zone_disc : public pp_zone
+{
+  public:
+  pp_zone_disc(int radius);
+};
+
+class pp_zone_hbox : public pp_zone
+{
+  public:
+  pp_zone_hbox(int w, int h);
+};
+
+class pp_zone_orientbox : public pp_zone
+{
+  private:
+  void line(int *array, int x1, int y1, int x2, int y2);
+  inline void swap_int(int* x, int* y);
+  
+  public:
+  pp_zone_orientbox(int pp_width, int depth, double angle);
+};
+
+//------------------------------------------------------------------------------
+
+typedef struct pp_pix
+{
+  int x,y;
+  pp_dist dist;
+  pp_dist score;
+  pp_pix *parent;
+  pp_pix *angle_next_ref;  // reference for computing angle
+  int angle_next_cd;       // pixel to skip before computing angle
+  double angle;            // pp_robot's angle at this point
+  
+  pp_pix() {};
+  pp_pix(int _x, int _y, double _angle, int _angle_next_cd) : 
+    x(_x), 
+    y(_y), 
+    dist(0.), 
+    score(0.), 
+    parent(NULL),
+    angle_next_ref(this),
+    angle_next_cd(_angle_next_cd),
+    angle(_angle)
+  {}    
+  pp_pix(int _x, int _y, pp_dist _dist, pp_dist _score, pp_pix *_parent) : 
+    x(_x), 
+    y(_y), 
+    dist(_dist), 
+    score(_score), 
+    parent(_parent)
+  {
+    if(parent->angle_next_cd == 1)
+    {
+      vector_t v(x-parent->x, y-parent->y);
+      angle_next_ref = this;
+      angle_next_cd = parent->angle_next_ref->angle_next_cd;
+      angle = v.to_angle();
+    }
+    else
+    {
+      angle_next_ref = parent->angle_next_ref;
+      angle_next_cd = parent->angle_next_cd - 1;
+      angle = parent->angle;   
+    }
+  }
+  bool operator < (const pp_pix &b) const {return score>b.score;}
+} pp_pix;
+
+//------------------------------------------------------------------------------
+
+int pp_width, pp_height;
+pp_dist** pp_energy;
+pp_dist** pp_energy_gradX;
+pp_dist** pp_energy_gradY;
+pp_zone_orientbox **pp_robot;
+
+//------------------------------------------------------------------------------
+
+// Dessine des formes sur les cartes 
+void pp_fillBox(double x, double y, double w, double h);
+void pp_fillDisc(double cx, double cy, double radius);
+
+// 1-dimensional distance transform
+void pp_distance_transform_1D(pp_dist *src_pix, pp_dist *dest_pix, bool vertical);
+
+// Calcule les dérivés en X et Y de pix
+void pp_compute_gradient();
+
+// Marque l'intérieur de la zone comme infranchissable
+void pp_fillZone(pp_zone *zone, int iAngle, int x, int y);
+
+// Transforme une distance en score entre 0 et 1
+inline pp_dist pp_score(double distance);
+
+// Renvoie l'énergie associée au pixel
+pp_dist pp_get_pix_energy(int x, int y, double a);
+
+// Renvoie la dérivée de l'énergie associée a pixel
+void pp_get_pix_energy_gradient(int x, int y, double a, pp_dist &dEdx, pp_dist &dEdy);  
+
+// Estime l'énergie associée au chemin de (x1,y1) à (x2,y2)
+pp_dist pp_estimate_path_energy(int x1, int y1, int x2, int y2);
+
+// Vérifie que la coordonnée est dans le terrain
+inline int pp_clip(int c, int max);
+
+// Ajoute un pixel à la frontière
+void pp_add_to_boundary(pp_dist *dist, bool *processed, priority_queue<pp_pix> &boundary, priority_queue<pp_pix> &boundary_dont_cross, bool allow_crossing, pp_pix &p, int dx, int dy, int xt, int yt);
+
+// Construit le chemin et l'optimise
+pp_path pp_build_path(pp_pix *current, double initial_angle, double final_angle);
+
+// Optimise le chemin
+void pp_optimize_path(int N, float *X, float *Y);
+void pp_optimize_path_iter(int N, const float &gamma, float *A, float *V, float *F);
+
+// Translate a pixel coordinate path into a terrain's position path
+pp_path pp_pix_path2pp_path(int N, float *X, float *Y, double initial_angle, double final_angle);
+ 
+// Produit un tableau pouvant être envoyé à save_buff_to_bitmap (see common/bitmap.h)
+void pp_to_bitmap(uint16_t* pixbmp, int iAngle, int &w, int &h);
+
+
+
 
 //------------------------------------------------------------------------------
 //                                                                            //
@@ -41,23 +193,23 @@ const double pp_map::RAD_ANGLE_RESOL_2 = M_PI_2 / double(PP_ANGLE_RESOL);
 pp_zone::pp_zone(int h)
 {
   cy = h/2;
-  height = h;
+  pp_height = h;
   allocate();
 }
 //------------------------------------------------------------------------------
 pp_zone::pp_zone(int h, int c)
 {
   cy = c;
-  height = h;
+  pp_height = h;
   allocate();
 }
 //------------------------------------------------------------------------------
 void pp_zone::allocate()
 {
-  left  = new int[height];
-  right = new int[height];  
+  left  = new int[pp_height];
+  right = new int[pp_height];  
   
-  for(int y=0; y<height; y++)
+  for(int y=0; y<pp_height; y++)
   {
     left[y] = INT_MAX;
     right[y] = INT_MIN;   
@@ -72,11 +224,11 @@ pp_zone::~pp_zone()
 //------------------------------------------------------------------------------
 pp_zone* pp_zone::operator * (const pp_zone &A)
 {
-  pp_zone* res = new pp_zone(height+A.height-1, cy+A.cy);
+  pp_zone* res = new pp_zone(pp_height+A.pp_height-1, cy+A.cy);
   
   int v;
-  for(int i=0; i<height; i++)
-    for(int j=0; j<A.height; j++)
+  for(int i=0; i<pp_height; i++)
+    for(int j=0; j<A.pp_height; j++)
     {
       v = left[i] + A.left[j];
       if(v < res->left[i+j])
@@ -127,12 +279,12 @@ pp_zone_hbox::pp_zone_hbox(int w, int h) : pp_zone(h)
   }
 }
 //------------------------------------------------------------------------------
-pp_zone_orientbox::pp_zone_orientbox(int width, int depth, double angle) : pp_zone(width*fabs(cos(angle)) + depth*fabs(sin(angle)) + 1)
+pp_zone_orientbox::pp_zone_orientbox(int pp_width, int depth, double angle) : pp_zone(pp_width*fabs(cos(angle)) + depth*fabs(sin(angle)) + 1)
 {
   const double C = cos(angle);
   const double S = sin(angle);
-  const double h_offset = (width*fabs(cos(angle)) + depth*fabs(sin(angle))) / 2.;
-  const double hw = double(width)/2.;
+  const double h_offset = (pp_width*fabs(cos(angle)) + depth*fabs(sin(angle))) / 2.;
+  const double hw = double(pp_width)/2.;
   const double hd = double(depth)/2.;
 
   double w[] = {hw, hw, -hw, -hw};
@@ -245,121 +397,279 @@ void pp_zone_orientbox::swap_int(int* x, int* y)
 //------------------------------------------------------------------------------
 
 
+
+
+
 //------------------------------------------------------------------------------
 //                                                                            //
-//                                  pp_map                                    //
+//                                path planner                                //
 //                                                                            //
 //------------------------------------------------------------------------------
-pp_map::pp_map(double terrainWidth, double terrainHeight, double robotWidth, double robotDepth)
+void pp_init()
 {
-  width = terrainWidth / PP_SPATIAL_RESOL;
-  height = terrainHeight / PP_SPATIAL_RESOL;
-  int robotW = robotWidth / PP_SPATIAL_RESOL;
-  int robotD = robotDepth / PP_SPATIAL_RESOL;
+  pp_width = _LONGUEUR_TER / PP_SPATIAL_RESOL;
+  pp_height = _LARGEUR_TER / PP_SPATIAL_RESOL;
+  int pp_robotW = _LARGEUR_ROBOT / PP_SPATIAL_RESOL;
+  int pp_robotD = _LONGUEUR_ROBOT / PP_SPATIAL_RESOL;
   
-  robot = new pp_zone_orientbox*[PP_ANGLE_RESOL];
-  pix = new pp_dist*[PP_ANGLE_RESOL];
-  pix_gradX = new pp_dist*[PP_ANGLE_RESOL];
-  pix_gradY = new pp_dist*[PP_ANGLE_RESOL];
+  pp_robot = new pp_zone_orientbox*[PP_ANGLE_RESOL];
+  pp_energy = new pp_dist*[PP_ANGLE_RESOL];
+  pp_energy_gradX = new pp_dist*[PP_ANGLE_RESOL];
+  pp_energy_gradY = new pp_dist*[PP_ANGLE_RESOL];
   for(int i=0; i<PP_ANGLE_RESOL; i++)
   {
-    robot[i] = new pp_zone_orientbox(robotW, robotD, double(i)*M_PI/double(PP_ANGLE_RESOL));
-    pix[i] = new pp_dist[width * height];
-    pix_gradX[i] = new pp_dist[width * height];
-    pix_gradY[i] = new pp_dist[width * height];
-    for(int k=0; k<width*height; k++)
-      pix[i][k] = numeric_limits<pp_dist>::infinity();
+    pp_robot[i] = new pp_zone_orientbox(pp_robotW, pp_robotD, double(i)*M_PI/double(PP_ANGLE_RESOL));
+    pp_energy[i] = new pp_dist[pp_width * pp_height];
+    pp_energy_gradX[i] = new pp_dist[pp_width * pp_height];
+    pp_energy_gradY[i] = new pp_dist[pp_width * pp_height];
   }
+  pp_clear_maps();
 }
 //------------------------------------------------------------------------------
-pp_map::~pp_map()
+void pp_clear_maps()
 {
   for(int i=0; i<PP_ANGLE_RESOL; i++)
-  {
-    delete robot[i];  
-    delete[] pix[i];
-    delete[] pix_gradX[i];    
-    delete[] pix_gradY[i];        
-  }
-  delete[] robot;   
-  delete[] pix;
-  delete[] pix_gradX;
-  delete[] pix_gradY;  
+    for(int k=0; k<pp_width*pp_height; k++)
+      pp_energy[i][k] = numeric_limits<pp_dist>::infinity();
 }
 //------------------------------------------------------------------------------
-void pp_map::fillZone(pp_zone *zone, int iAngle, int cx, int cy)
+void pp_draw_config(int configE, int configI)
+{ 
+  if(configE != 0 && configI !=0)
+  {
+    bool FakeCornE[3][3];
+    bool FakeCornI[2];
+    FakeCornE[0][0] = (configE==2 || configE==5 || configE==8);
+    FakeCornE[1][0] = (configE==4 || configE==5 || configE==6);  
+    FakeCornE[2][0] = (configE==7 || configE==8 || configE==9);    
+    FakeCornE[0][1] = (configE==1 || configE==6 || configE==7);
+    FakeCornE[1][1] = (configE==1 || configE==2 || configE==3);  
+    FakeCornE[2][1] = (configI==2 || configI==4);
+    FakeCornE[0][2] = (configE==3 || configE==4 || configE==9);
+    FakeCornE[1][2] = (configI==1 || configI==3);
+    FakeCornE[2][2] = false;      
+    FakeCornI[0] = (configI==1 || configI==2);
+    FakeCornI[1] = (configI==3 || configI==4);
+    
+    for(int i=0;i<3;++i)  
+      for(int j=0;j<3;++j)    
+        if(i != 2 || j != 2)
+        {
+          if(FakeCornE[i][j])
+          {
+            double x,y;
+            x = 0.15 + 0.45*i;
+            y = 2.1 - 1.378 + 0.5*j + 0.25*i;   
+            pp_fillDisc(x, y, 0.025);
+
+            x = _LONGUEUR_TER - 0.15 - 0.45*i;
+            y = 2.1 - 1.378 + 0.5*j + 0.25*i;
+            pp_fillDisc(x, y, 0.025);
+          }
+        }
+        
+    for(int i=0;i<2;++i) 
+    {
+      if(FakeCornI[i])
+      {
+        double x = _LONGUEUR_TER/2.;
+        double y = 2.1 - 0.628 + 0.5*i; 
+        pp_fillDisc(x, y, 0.025);
+      }
+    }
+  }   
+  pp_fillBox(0.74, 0., 1.519, 0.52); 
+  pp_fillBox(0., 0., _LONGUEUR_TER, PP_SPATIAL_RESOL); 
+  pp_fillBox(0., 0.,  PP_SPATIAL_RESOL, _LARGEUR_TER);
+  pp_fillBox(0., _LARGEUR_TER, _LONGUEUR_TER, PP_SPATIAL_RESOL); 
+  pp_fillBox(_LONGUEUR_TER, 0.,  PP_SPATIAL_RESOL, _LARGEUR_TER);
+}
+//------------------------------------------------------------------------------
+void pp_compute_distance_transform()
+{
+  pp_dist *tmppix = new pp_dist[pp_width * pp_height];
+  
+  for(int i=0; i<PP_ANGLE_RESOL; i++)
+  {
+    // Col transformation
+    pp_distance_transform_1D(pp_energy[i], tmppix, true);
+    
+    // Row transformation
+    pp_distance_transform_1D(tmppix, pp_energy[i], false);
+     
+    // Taking square root to have distance  
+    for(int x=0; x<pp_width; x++)
+      for(int y=0; y<pp_height; y++)
+        pp_energy[i][y*pp_width+x] = pp_score(PP_SPATIAL_RESOL*sqrt(pp_energy[i][y*pp_width+x]));       
+  }
+  
+  // Computes energy gradient
+  pp_compute_gradient();
+  
+  delete[] tmppix;
+}
+//------------------------------------------------------------------------------
+pp_path pp_find_path(const position_t &from, const position_t &to)
+{
+  int angle_pix_step = 0.05 / PP_SPATIAL_RESOL;
+  if(angle_pix_step<1) angle_pix_step = 1;  
+  const int xs = pp_clip(from.x / PP_SPATIAL_RESOL, pp_width);
+  const int ys = pp_clip(from.y / PP_SPATIAL_RESOL, pp_height);
+  const int xt = pp_clip(to.x / PP_SPATIAL_RESOL, pp_width);
+  const int yt = pp_clip(to.y / PP_SPATIAL_RESOL, pp_height);
+
+  priority_queue<pp_pix> boundary;
+  priority_queue<pp_pix> boundary_dont_cross;
+  list<pp_pix> pix_poped;
+  bool allow_crossing = false;
+  
+  pp_dist *dist = new pp_dist[pp_width * pp_height];
+  bool *processed = new bool[pp_width * pp_height];
+  for(int x=0; x<pp_width; x++)
+    for(int y=0; y<pp_height; y++)
+    {
+      dist[y*pp_width+x] = numeric_limits<pp_dist>::infinity();
+      processed[y*pp_width+x] = false;
+    }
+      
+  dist[ys*pp_width+xs] = 0;
+  
+  boundary.push(pp_pix(xs, ys, from.a, angle_pix_step));
+    
+  while(true)
+  {
+    while(!boundary.empty())
+    {
+      pix_poped.push_back(boundary.top());
+      boundary.pop();
+      pp_pix &current = pix_poped.back();
+
+      if(processed[current.y*pp_width+current.x]) continue;
+      if(current.x == xt && current.y == yt) 
+      {
+        delete[] processed;
+        delete[] dist;
+        return pp_build_path(&current, from.a, to.a);
+      }
+      processed[current.y*pp_width+current.x] = true; 
+      
+      pp_add_to_boundary(dist, processed, boundary, boundary_dont_cross, allow_crossing, current, -1,  0, xt, yt); 
+      pp_add_to_boundary(dist, processed, boundary, boundary_dont_cross, allow_crossing, current, +1,  0, xt, yt); 
+      pp_add_to_boundary(dist, processed, boundary, boundary_dont_cross, allow_crossing, current,  0, -1, xt, yt); 
+      pp_add_to_boundary(dist, processed, boundary, boundary_dont_cross, allow_crossing, current,  0, +1, xt, yt);
+      pp_add_to_boundary(dist, processed, boundary, boundary_dont_cross, allow_crossing, current, -1, -1, xt, yt); 
+      pp_add_to_boundary(dist, processed, boundary, boundary_dont_cross, allow_crossing, current, -1, +1, xt, yt); 
+      pp_add_to_boundary(dist, processed, boundary, boundary_dont_cross, allow_crossing, current, +1, -1, xt, yt); 
+      pp_add_to_boundary(dist, processed, boundary, boundary_dont_cross, allow_crossing, current, +1, +1, xt, yt);      
+    }
+    // On n'a pas trouvé de chemin, on permet d'aller dans l'infranchissable (l'objectif est peut-être dedans)
+    boundary = boundary_dont_cross;
+    allow_crossing = true;
+  }  
+}
+//------------------------------------------------------------------------------
+bool pp_load_from_file(const char* file)
+{
+  FILE *File = fopen(file, "rb");
+  if(!File) return false;
+  
+  int r;
+  for(int i=0; i<PP_ANGLE_RESOL; i++)
+  {
+    r = fread(pp_energy[i], sizeof(pp_dist), pp_width * pp_height, File);
+    if(r)
+    {
+      r = fread(pp_energy_gradX[i], sizeof(pp_dist), pp_width * pp_height, File);
+      if(r)
+        r = fread(pp_energy_gradY[i], sizeof(pp_dist), pp_width * pp_height, File);        
+      else
+        break;
+    }
+    else
+      break;
+  }
+  fclose(File);
+  return r;
+}
+//------------------------------------------------------------------------------
+void pp_save_to_file(const char* file)
+{
+  FILE *File = fopen(file, "wb+");
+  for(int i=0; i<PP_ANGLE_RESOL; i++)
+  {
+    fwrite(pp_energy[i], sizeof(pp_dist), pp_width * pp_height, File);
+    fwrite(pp_energy_gradX[i], sizeof(pp_dist), pp_width * pp_height, File);
+    fwrite(pp_energy_gradY[i], sizeof(pp_dist), pp_width * pp_height, File);        
+  }
+  fclose(File);
+}
+//------------------------------------------------------------------------------
+void pp_save_to_bmp(const char *file)
+{
+  int w, h;
+  uint16_t *bmp = new uint16_t[PP_ANGLE_RESOL*3*pp_width*pp_height];
+  
+  for(int i=0; i<PP_ANGLE_RESOL; i++)
+    pp_to_bitmap(&bmp[i*3*pp_width*pp_height], i, w, h);
+  
+  save_buff_to_bitmap(file, pp_width, PP_ANGLE_RESOL*pp_height, bmp);
+}
+//------------------------------------------------------------------------------
+
+
+
+
+/*************************  private functions *********************************/
+//------------------------------------------------------------------------------
+void pp_fillZone(pp_zone *zone, int iAngle, int cx, int cy)
 {
   int y,x1,x2;
-  for(int i=0; i<zone->height; i++)
+  for(int i=0; i<zone->pp_height; i++)
   {
     if((y = i+cy-zone->cy) < 0)
       continue;
-    if(y >= height)
+    if(y >= pp_height)
       break;
     x1 = cx + zone->left[i];
     x2 = cx + zone->right[i];
     if(x1<0) x1 = 0;
-    if(x2>=width) x2 = width-1;
-    memset(&pix[iAngle][y*width+x1], 0, (x2-x1+1)*sizeof(pp_dist));
+    if(x2>=pp_width) x2 = pp_width-1;
+    memset(&pp_energy[iAngle][y*pp_width+x1], 0, (x2-x1+1)*sizeof(pp_dist));
   } 
 }
 //------------------------------------------------------------------------------
-void pp_map::to_bitmap(uint16_t *pixbmp, int iAngle, int &w, int &h)
+void pp_to_bitmap(uint16_t *pixbmp, int iAngle, int &w, int &h)
 {
-  w = width;
-  h = height;
+  w = pp_width;
+  h = pp_height;
   
-  for(int y=0;y<height; y++)
-    for(int x=0;x<width; x++)
+  for(int y=0;y<pp_height; y++)
+    for(int x=0;x<pp_width; x++)
     {
-      int c = pix[iAngle][y*width+x] * 255.;
-      int i = 3*(y*width+x);
+      int c = pp_energy[iAngle][y*pp_width+x] * 255.;
+      int i = 3*(y*pp_width+x);
       pixbmp[i+0] = c;
       pixbmp[i+1] = c;
       pixbmp[i+2] = c;
     }
 }
 //------------------------------------------------------------------------------
-void pp_map::compute_distance_transform()
-{
-  pp_dist *tmppix = new pp_dist[width * height];
-  
-  for(int i=0; i<PP_ANGLE_RESOL; i++)
-  {
-    // Col transformation
-    distance_transform_1D(pix[i], tmppix, true);
-    
-    // Row transformation
-    distance_transform_1D(tmppix, pix[i], false);
-     
-    // Taking square root to have distance  
-    for(int x=0; x<width; x++)
-      for(int y=0; y<height; y++)
-        pix[i][y*width+x] = score(PP_SPATIAL_RESOL*sqrt(pix[i][y*width+x]));       
-  }
-  
-  // Computes energy gradient
-  compute_gradient();
-  
-  delete[] tmppix;
-}
-//------------------------------------------------------------------------------
-void pp_map::distance_transform_1D(pp_dist *src_pix, pp_dist *dest_pix, bool vertical)
+void pp_distance_transform_1D(pp_dist *src_pix, pp_dist *dest_pix, bool vertical)
 {
   int x,y;
   int n,m;
   int *i, *j;
   if(vertical)
   {
-    n = height;
-    m = width;
+    n = pp_height;
+    m = pp_width;
     i = &y;
     j = &x;
   }
   else
   {
-    n = width;
-    m = height;
+    n = pp_width;
+    m = pp_height;
     i = &x;
     j = &y;
   }
@@ -381,11 +691,11 @@ void pp_map::distance_transform_1D(pp_dist *src_pix, pp_dist *dest_pix, bool ver
     
     for(q = 0; q <= n; q++)
     {
-      f_q_p_q2 = ((q==n)?0.:src_pix[y*width+x]) + double(q*q);
+      f_q_p_q2 = ((q==n)?0.:src_pix[y*pp_width+x]) + double(q*q);
 
       while(true)
       {  
-        f_vk = (v[k]==-1)?0.:(vertical?src_pix[v[k]*width+x]:src_pix[y*width+v[k]]);
+        f_vk = (v[k]==-1)?0.:(vertical?src_pix[v[k]*pp_width+x]:src_pix[y*pp_width+v[k]]);
         s = ( f_q_p_q2 - (f_vk + double(v[k]*v[k])) ) / (2. * double(q - v[k])); 
            
         if(isfinite(s))
@@ -413,9 +723,9 @@ void pp_map::distance_transform_1D(pp_dist *src_pix, pp_dist *dest_pix, bool ver
       while(z[k+1]<q)
       {
         k++;    
-        f_vk = (v[k]==n)?0.:(vertical?src_pix[v[k]*width+x]:src_pix[y*width+v[k]]);
+        f_vk = (v[k]==n)?0.:(vertical?src_pix[v[k]*pp_width+x]:src_pix[y*pp_width+v[k]]);
       }
-      dest_pix[y*width+x] = f_vk + pow(q-v[k], 2);
+      dest_pix[y*pp_width+x] = f_vk + pow(q-v[k], 2);
     }
   }
    
@@ -423,23 +733,23 @@ void pp_map::distance_transform_1D(pp_dist *src_pix, pp_dist *dest_pix, bool ver
   delete[] z;
 }
 //------------------------------------------------------------------------------
-void pp_map::compute_gradient()
+void pp_compute_gradient()
 {
   for(int i=0; i<PP_ANGLE_RESOL; i++)
-    for(int x=0; x<width; x++)
-      for(int y=0; y<height; y++)
+    for(int x=0; x<pp_width; x++)
+      for(int y=0; y<pp_height; y++)
       {
-        if(x == 0)             pix_gradX[i][y*width]   =  pix[i][y*width+1]     - pix[i][y*width];
-        else if(x == width-1)  pix_gradX[i][y*width+x] =  pix[i][(y+1)*width-1] - pix[i][(y+1)*width-2];
-        else                   pix_gradX[i][y*width+x] = (pix[i][y*width+x+1]   - pix[i][y*width+x-1]) / 2.;
+        if(x == 0)                pp_energy_gradX[i][y*pp_width]   =  pp_energy[i][y*pp_width+1]     - pp_energy[i][y*pp_width];
+        else if(x == pp_width-1)  pp_energy_gradX[i][y*pp_width+x] =  pp_energy[i][(y+1)*pp_width-1] - pp_energy[i][(y+1)*pp_width-2];
+        else                      pp_energy_gradX[i][y*pp_width+x] = (pp_energy[i][y*pp_width+x+1]   - pp_energy[i][y*pp_width+x-1]) / 2.;
         
-        if(y == 0)             pix_gradY[i][x]         =  pix[i][width+x]            - pix[i][x];
-        else if(y == height-1) pix_gradY[i][y*width+x] =  pix[i][(height-1)*width+x] - pix[i][(height-2)*width+x];
-        else                   pix_gradY[i][y*width+x] = (pix[i][(y+1)*width+x]      - pix[i][(y-1)*width+x]) / 2.;
+        if(y == 0)                pp_energy_gradY[i][x]            =  pp_energy[i][pp_width+x]               - pp_energy[i][x];
+        else if(y == pp_height-1) pp_energy_gradY[i][y*pp_width+x] =  pp_energy[i][(pp_height-1)*pp_width+x] - pp_energy[i][(pp_height-2)*pp_width+x];
+        else                      pp_energy_gradY[i][y*pp_width+x] = (pp_energy[i][(y+1)*pp_width+x]         - pp_energy[i][(y-1)*pp_width+x]) / 2.;
       }
 }
 //------------------------------------------------------------------------------
-void pp_map::fillBox(double x, double y, double w, double h)
+void pp_fillBox(double x, double y, double w, double h)
 {
   int xi = x / PP_SPATIAL_RESOL; 
   int yi = y / PP_SPATIAL_RESOL; 
@@ -450,13 +760,13 @@ void pp_map::fillBox(double x, double y, double w, double h)
   
   for(int i=0; i<PP_ANGLE_RESOL; i++)
   {
-    pp_zone *zone = box * (*robot[i]);
-    fillZone(zone, i, xi+wi/2, yi+hi/2);     
+    pp_zone *zone = box * (*pp_robot[i]);
+    pp_fillZone(zone, i, xi+wi/2, yi+hi/2);     
     delete zone;
   }
 }
 //------------------------------------------------------------------------------
-void pp_map::fillDisc(double cx, double cy, double radius)
+void pp_fillDisc(double cx, double cy, double radius)
 {
   int cxi = cx / PP_SPATIAL_RESOL; 
   int cyi = cy / PP_SPATIAL_RESOL; 
@@ -466,150 +776,39 @@ void pp_map::fillDisc(double cx, double cy, double radius)
   
   for(int i=0; i<PP_ANGLE_RESOL; i++)
   {
-    pp_zone *zone = disc * (*robot[i]);
-    fillZone(zone, i, cxi, cyi);
+    pp_zone *zone = disc * (*pp_robot[i]);
+    pp_fillZone(zone, i, cxi, cyi);
     delete zone;
   }
 }
 //------------------------------------------------------------------------------
-void pp_map::draw_config(int configE, int configI)
-{ 
-  if(configE != 0 && configI !=0)
-  {
-    bool FakeCornE[3][3];
-    bool FakeCornI[2];
-    FakeCornE[0][0] = (configE==2 || configE==5 || configE==8);
-    FakeCornE[1][0] = (configE==4 || configE==5 || configE==6);  
-    FakeCornE[2][0] = (configE==7 || configE==8 || configE==9);    
-    FakeCornE[0][1] = (configE==1 || configE==6 || configE==7);
-    FakeCornE[1][1] = (configE==1 || configE==2 || configE==3);  
-    FakeCornE[2][1] = (configI==2 || configI==4);
-    FakeCornE[0][2] = (configE==3 || configE==4 || configE==9);
-    FakeCornE[1][2] = (configI==1 || configI==3);
-    FakeCornE[2][2] = false;      
-    FakeCornI[0] = (configI==1 || configI==2);
-    FakeCornI[1] = (configI==3 || configI==4);
-    
-    for(int i=0;i<3;++i)  
-      for(int j=0;j<3;++j)    
-        if(i != 2 || j != 2)
-        {
-          if(FakeCornE[i][j])
-          {
-            double x,y;
-            x = 0.15 + 0.45*i;
-            y = 2.1 - 1.378 + 0.5*j + 0.25*i;   
-            fillDisc(x, y, 0.025);
-
-            x = _LONGUEUR_TER - 0.15 - 0.45*i;
-            y = 2.1 - 1.378 + 0.5*j + 0.25*i;
-            fillDisc(x, y, 0.025);
-          }
-        }
-        
-    for(int i=0;i<2;++i) 
-    {
-      if(FakeCornI[i])
-      {
-        double x = _LONGUEUR_TER/2.;
-        double y = 2.1 - 0.628 + 0.5*i; 
-        fillDisc(x, y, 0.025);
-      }
-    }
-  }   
-  fillBox(0.74, 0., 1.519, 0.52); 
-  fillBox(0., 0., _LONGUEUR_TER, PP_SPATIAL_RESOL); 
-  fillBox(0., 0.,  PP_SPATIAL_RESOL, _LARGEUR_TER);
-  fillBox(0., _LARGEUR_TER, _LONGUEUR_TER, PP_SPATIAL_RESOL); 
-  fillBox(_LONGUEUR_TER, 0.,  PP_SPATIAL_RESOL, _LARGEUR_TER);
-}
-//------------------------------------------------------------------------------
-pp_dist pp_map::score(double distance)
+pp_dist pp_score(double distance)
 {
   return 1./pow(1.+distance/SECURITY_MARGIN, 2.);
 }
 //------------------------------------------------------------------------------
-pp_path pp_map::find_path(const position_t &from, const position_t &to)
+pp_dist pp_estimate_path_energy(int x1, int y1, int x2, int y2)
 {
-  int angle_pix_step = 0.05 / PP_SPATIAL_RESOL;
-  if(angle_pix_step<1) angle_pix_step = 1;  
-  const int xs = clip(from.x / PP_SPATIAL_RESOL, width);
-  const int ys = clip(from.y / PP_SPATIAL_RESOL, height);
-  const int xt = clip(to.x / PP_SPATIAL_RESOL, width);
-  const int yt = clip(to.y / PP_SPATIAL_RESOL, height);
-
-  priority_queue<pp_pix> boundary;
-  priority_queue<pp_pix> boundary_dont_cross;
-  list<pp_pix> pix_poped;
-  bool allow_crossing = false;
-  
-  pp_dist *dist = new pp_dist[width * height];
-  bool *processed = new bool[width * height];
-  for(int x=0; x<width; x++)
-    for(int y=0; y<height; y++)
-    {
-      dist[y*width+x] = numeric_limits<pp_dist>::infinity();
-      processed[y*width+x] = false;
-    }
-      
-  dist[ys*width+xs] = 0;
-  
-  boundary.push(pp_pix(xs, ys, from.a, angle_pix_step));
-    
-  while(true)
-  {
-    while(!boundary.empty())
-    {
-      pix_poped.push_back(boundary.top());
-      boundary.pop();
-      pp_pix &current = pix_poped.back();
-
-      if(processed[current.y*width+current.x]) continue;
-      if(current.x == xt && current.y == yt) 
-      {
-        delete[] processed;
-        delete[] dist;
-        return build_path(&current, from.a, to.a);
-      }
-      processed[current.y*width+current.x] = true; 
-      
-      add_to_boundary(dist, processed, boundary, boundary_dont_cross, allow_crossing, current, -1,  0, xt, yt); 
-      add_to_boundary(dist, processed, boundary, boundary_dont_cross, allow_crossing, current, +1,  0, xt, yt); 
-      add_to_boundary(dist, processed, boundary, boundary_dont_cross, allow_crossing, current,  0, -1, xt, yt); 
-      add_to_boundary(dist, processed, boundary, boundary_dont_cross, allow_crossing, current,  0, +1, xt, yt);
-      add_to_boundary(dist, processed, boundary, boundary_dont_cross, allow_crossing, current, -1, -1, xt, yt); 
-      add_to_boundary(dist, processed, boundary, boundary_dont_cross, allow_crossing, current, -1, +1, xt, yt); 
-      add_to_boundary(dist, processed, boundary, boundary_dont_cross, allow_crossing, current, +1, -1, xt, yt); 
-      add_to_boundary(dist, processed, boundary, boundary_dont_cross, allow_crossing, current, +1, +1, xt, yt);      
-    }
-    // On n'a pas trouvé de chemin, on permet d'aller dans l'infranchissable (l'objectif est peut-être dedans)
-    boundary = boundary_dont_cross;
-    allow_crossing = true;
-  }  
+  return PIX_COST * sqrt(pow(x1-x2, 2) + pow(y1-y2, 2));
 }
 //------------------------------------------------------------------------------
-pp_dist pp_map::estimate_path_energy(int x1, int y1, int x2, int y2)
-{
-  return pix_cost * sqrt(pow(x1-x2, 2) + pow(y1-y2, 2));
-}
-//------------------------------------------------------------------------------
-int pp_map::clip(int c, int max)
+int pp_clip(int c, int max)
 {
   return c<0?0:(c>=max?max-1:c);
 }
 //------------------------------------------------------------------------------
-void pp_map::add_to_boundary(pp_dist *dist, bool *processed, priority_queue<pp_pix> &boundary, priority_queue<pp_pix> &boundary_dont_cross, bool allow_crossing, pp_pix &p, int dx, int dy, int xt, int yt)
+void pp_add_to_boundary(pp_dist *dist, bool *processed, priority_queue<pp_pix> &boundary, priority_queue<pp_pix> &boundary_dont_cross, bool allow_crossing, pp_pix &p, int dx, int dy, int xt, int yt)
 {
   int x = p.x + dx;
   int y = p.y + dy;
-  if(x >= 0 && x<width && y >= 0 && y<height && !processed[y*width+x])
+  if(x >= 0 && x<pp_width && y >= 0 && y<pp_height && !processed[y*pp_width+x])
   {
-    pp_dist energy = get_pix_energy(x, y, p.angle);
+    pp_dist energy = pp_get_pix_energy(x, y, p.angle);
     pp_dist new_dist = p.dist + energy;
-    if(new_dist < dist[y*width+x])
+    if(new_dist < dist[y*pp_width+x])
     {
-      dist[y*width+x] = new_dist;
-      pp_dist new_score = new_dist + estimate_path_energy(x, y, xt, yt);
+      dist[y*pp_width+x] = new_dist;
+      pp_dist new_score = new_dist + pp_estimate_path_energy(x, y, xt, yt);
       if(energy == 1. && !allow_crossing)
         boundary_dont_cross.push(pp_pix(x, y, new_dist, new_score, &p));
       else
@@ -618,28 +817,28 @@ void pp_map::add_to_boundary(pp_dist *dist, bool *processed, priority_queue<pp_p
   } 
 }
 //------------------------------------------------------------------------------
-pp_dist pp_map::get_pix_energy(int x, int y, double a)
+pp_dist pp_get_pix_energy(int x, int y, double a)
 {
   if(a < 0) a += 2*M_PI;
   int k = a / RAD_ANGLE_RESOL;
   if(a - k*RAD_ANGLE_RESOL > RAD_ANGLE_RESOL_2) k++;
-  while(k>=PP_ANGLE_RESOL)  // symétrie du robot
+  while(k>=PP_ANGLE_RESOL)  // symétrie du pp_robot
     k -= PP_ANGLE_RESOL;
-  return pix[k][y*width+x];
+  return pp_energy[k][y*pp_width+x];
 }
 //------------------------------------------------------------------------------
-void pp_map::get_pix_energy_gradient(int x, int y, double a, pp_dist &dEdx, pp_dist &dEdy)
+void pp_get_pix_energy_gradient(int x, int y, double a, pp_dist &dEdx, pp_dist &dEdy)
 {
   if(a < 0) a += 2*M_PI;
   int k = a / RAD_ANGLE_RESOL;
   if(a - k*RAD_ANGLE_RESOL > RAD_ANGLE_RESOL_2) k++;
-  while(k>=PP_ANGLE_RESOL)  // symétrie du robot
+  while(k>=PP_ANGLE_RESOL)  // symétrie du pp_robot
     k -= PP_ANGLE_RESOL;
-  dEdx = pix_gradX[k][y*width+x];
-  dEdy = pix_gradY[k][y*width+x];
+  dEdx = pp_energy_gradX[k][y*pp_width+x];
+  dEdy = pp_energy_gradY[k][y*pp_width+x];
 }
 //------------------------------------------------------------------------------
-pp_path pp_map::build_path(pp_pix *current, double initial_angle, double final_angle)
+pp_path pp_build_path(pp_pix *current, double initial_angle, double final_angle)
 { 
   int resol = 0.05 / PP_SPATIAL_RESOL;
   if(resol<1) resol = 1;
@@ -678,10 +877,10 @@ pp_path pp_map::build_path(pp_pix *current, double initial_angle, double final_a
   }
 
   // Optimize path
-  optimize_path(n_points, X, Y);
+  pp_optimize_path(n_points, X, Y);
     
   // Convert to pp_path
-  pp_path path = pix_path2pp_path(n_points, X, Y, initial_angle, final_angle);
+  pp_path path = pp_pix_path2pp_path(n_points, X, Y, initial_angle, final_angle);
   
   delete[] X;
   delete[] Y;
@@ -689,7 +888,7 @@ pp_path pp_map::build_path(pp_pix *current, double initial_angle, double final_a
   return path;
 }
 //------------------------------------------------------------------------------
-void pp_map::optimize_path(int N, float *X, float *Y)
+void pp_optimize_path(int N, float *X, float *Y)
 {
   const int n_iter_fast = 150;
   const int n_iter_slow = 50;
@@ -761,7 +960,7 @@ void pp_map::optimize_path(int N, float *X, float *Y)
    
   for(int n=0; n<n_iter; n++)
   {
-    //pp_path path = pix_path2pp_path(N, X, Y, 0.); visu_draw_path(path); usleep(10000);
+    //pp_path path = pp_pix_path2pp_path(N, X, Y, 0., 0.); visu_draw_path(path); usleep(50000);
     
     // Check for new convergence rate  
     if(n == n_iter_fast)
@@ -775,12 +974,12 @@ void pp_map::optimize_path(int N, float *X, float *Y)
       if(i>0 && i<N-1) 
       {
         vector_t v(X[i+1] - X[i-1], Y[i+1] - Y[i-1]);
-        get_pix_energy_gradient(X[i], Y[i], v.to_angle(), Fx[i], Fy[i]);
+        pp_get_pix_energy_gradient(X[i], Y[i], v.to_angle(), Fx[i], Fy[i]);
       }
     
     // Compute x_(t+1) from x_t (the same for y)
-    optimize_path_iter(N, gamma, A, X, Fx);
-    optimize_path_iter(N, gamma, A, Y, Fy);
+    pp_optimize_path_iter(N, gamma, A, X, Fx);
+    pp_optimize_path_iter(N, gamma, A, Y, Fy);
   }
   
   delete[] Fy;
@@ -791,7 +990,7 @@ void pp_map::optimize_path(int N, float *X, float *Y)
   delete[] work;
 }
 //------------------------------------------------------------------------------
-void pp_map::optimize_path_iter(int N, const float &gamma, float *A, float *V, float *F)
+void pp_optimize_path_iter(int N, const float &gamma, float *A, float *V, float *F)
 {
   float *tmp = new float[N];
   for(int i=0; i<N; i++)
@@ -805,7 +1004,7 @@ void pp_map::optimize_path_iter(int N, const float &gamma, float *A, float *V, f
   delete[] tmp;
 }
 //------------------------------------------------------------------------------
-pp_path pp_map::pix_path2pp_path(int N, float *X, float *Y, double initial_angle, double final_angle)
+pp_path pp_pix_path2pp_path(int N, float *X, float *Y, double initial_angle, double final_angle)
 {
   pp_path path;
   path.resize(N+1);
@@ -825,52 +1024,5 @@ pp_path pp_map::pix_path2pp_path(int N, float *X, float *Y, double initial_angle
   path[N] = position_t(X[N-1]*PP_SPATIAL_RESOL, Y[N-1]*PP_SPATIAL_RESOL, final_angle);
   
   return path;
-}
-//------------------------------------------------------------------------------
-bool pp_map::load_from_file(const char* file)
-{
-  FILE *File = fopen(file, "rb");
-  if(!File) return false;
-  
-  int r;
-  for(int i=0; i<PP_ANGLE_RESOL; i++)
-  {
-    r = fread(pix[i], sizeof(pp_dist), width * height, File);
-    if(r)
-    {
-      r = fread(pix_gradX[i], sizeof(pp_dist), width * height, File);
-      if(r)
-        r = fread(pix_gradY[i], sizeof(pp_dist), width * height, File);        
-      else
-        break;
-    }
-    else
-      break;
-  }
-  fclose(File);
-  return r;
-}
-//------------------------------------------------------------------------------
-void pp_map::save_to_file(const char* file)
-{
-  FILE *File = fopen(file, "wb+");
-  for(int i=0; i<PP_ANGLE_RESOL; i++)
-  {
-    fwrite(pix[i], sizeof(pp_dist), width * height, File);
-    fwrite(pix_gradX[i], sizeof(pp_dist), width * height, File);
-    fwrite(pix_gradY[i], sizeof(pp_dist), width * height, File);        
-  }
-  fclose(File);
-}
-//------------------------------------------------------------------------------
-void pp_map::save_to_bmp(const char *file)
-{
-  int w, h;
-  uint16_t *bmp = new uint16_t[PP_ANGLE_RESOL*3*width*height];
-  
-  for(int i=0; i<PP_ANGLE_RESOL; i++)
-    to_bitmap(&bmp[i*3*width*height], i, w, h);
-  
-  save_buff_to_bitmap(file, width, PP_ANGLE_RESOL*height, bmp);
 }
 //------------------------------------------------------------------------------

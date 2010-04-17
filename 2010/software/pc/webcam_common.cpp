@@ -1,4 +1,4 @@
-#include "common.hpp"
+#include "webcam_common.hpp"
 
 image_t& image_t::operator=(const image_t& o)
 {

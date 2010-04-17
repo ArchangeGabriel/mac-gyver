@@ -1,4 +1,4 @@
-#include "utils.hpp"
+#include "webcam_utils.hpp"
 #include <IL/il.h>
 #include <IL/ilu.h>
 

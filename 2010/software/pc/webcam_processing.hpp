@@ -1,7 +1,7 @@
-#ifndef __processing__
-#define __processing__
+#ifndef __webcam_processing__
+#define __webcam_processing__
 
-#include "common.hpp"
+#include "webcam_common.hpp"
 #include <stdexcept>
 
 struct seg_decomp_t

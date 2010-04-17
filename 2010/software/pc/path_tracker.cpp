@@ -17,8 +17,6 @@ using namespace std;
 
 pthread_mutex_t mutex_situ;
 
-pp_map *pathMap = NULL;
-
 void calc_path(const position_t &from, const position_t &to, int type, bool append = false);
 
 //------------------------------------------------------------------------------
@@ -238,49 +236,6 @@ float direct_path_t::normalize(float angle)
 //------------------------------------------------------------------------------
 
 
-
-//------------------------------------------------------------------------------
-pthread_mutex_t* pt_go_to(const position_t &pos, int type, bool append)
-{
-  calc_path(cine_get_position(), pos, type, append);
-
-  pthread_mutex_t *mutex = new pthread_mutex_t;
-  pthread_mutex_init(mutex, NULL);
-  pthread_mutex_lock(mutex);
-  path.back().mutex = mutex;
-  return mutex;
-}
-//------------------------------------------------------------------------------
-pthread_mutex_t* pt_add_step(const position_t &pos)
-{
-  return pt_go_to(pos, tpDEST, true);  
-}
-//------------------------------------------------------------------------------
-void calc_path(const position_t &from, const position_t &to, int type, bool append)
-{
-  pp_path new_path = pathMap->find_path(from, to);
-  visu_draw_path(new_path);    
-
-  if(!append)
-    pt_clear_path(); 
-
-  for(unsigned int i = 0; i<new_path.size(); i++)
-    path.push_back(direct_path_t(new_path[i], i==new_path.size()-1?type:tpWAYPOINT));
-}
-//------------------------------------------------------------------------------
-position_t pt_get_dest()
-{
-  if(path.empty())
-    return cine_get_position();
-  else
-   // return path.back().dest;
-   return path.front().dest;   
-}
-//------------------------------------------------------------------------------
-void pt_clear_path()
-{
-  path.clear();
-}
 //------------------------------------------------------------------------------
 void ppMainLoop()
 {
@@ -318,6 +273,64 @@ void ppMainLoop()
   }
 }
 //------------------------------------------------------------------------------
+void pt_init(int config_terrain)
+{
+  pp_init();
+
+  char file[300];  
+  sprintf(file, "data/config%d.dat", config_terrain);
+  if(!pp_load_from_file(file))
+  {
+    printf("LOADING OF PRECOMPUTED DISTANCE MAPS FAILED !!\n");
+    printf("You should use tools/energyMap_tool to generate them and place the configxx.dat file into the ./data directory (create it if necessary).\n");
+    pp_draw_config((config_terrain%100)/10, config_terrain%10);
+    pp_compute_distance_transform();
+  } 
+//  else
+//    pp_save_to_bmp("maps.bmp");
+}
+//------------------------------------------------------------------------------
+pthread_mutex_t* pt_go_to(const position_t &pos, int type, bool append)
+{
+  calc_path(cine_get_position(), pos, type, append);
+
+  pthread_mutex_t *mutex = new pthread_mutex_t;
+  pthread_mutex_init(mutex, NULL);
+  pthread_mutex_lock(mutex);
+  path.back().mutex = mutex;
+  return mutex;
+}
+//------------------------------------------------------------------------------
+pthread_mutex_t* pt_add_step(const position_t &pos)
+{
+  return pt_go_to(pos, tpDEST, true);  
+}
+//------------------------------------------------------------------------------
+void calc_path(const position_t &from, const position_t &to, int type, bool append)
+{
+  pp_path new_path = pp_find_path(from, to);
+  visu_draw_path(new_path);    
+
+  if(!append)
+    pt_clear_path(); 
+
+  for(unsigned int i = 0; i<new_path.size(); i++)
+    path.push_back(direct_path_t(new_path[i], i==new_path.size()-1?type:tpWAYPOINT));
+}
+//------------------------------------------------------------------------------
+position_t pt_get_dest()
+{
+  if(path.empty())
+    return cine_get_position();
+  else
+   return path.front().dest;   
+}
+//------------------------------------------------------------------------------
+void pt_clear_path()
+{
+  path.clear();
+}
+//------------------------------------------------------------------------------
 void pt_stop(int id)
 {
   picMotorsPower(0.,0.);
@@ -327,21 +340,4 @@ void pt_stop(int id)
   pos.x += N.x * 0.03;
   pos.y += N.y * 0.03;
   path.push_front(direct_path_t(pos,tpDEST));
-}
-//------------------------------------------------------------------------------
-void pt_init(int config_terrain)
-{
-  char file[300];
-  pathMap = new pp_map(_LONGUEUR_TER, _LARGEUR_TER, _LARGEUR_ROBOT, _LONGUEUR_ROBOT);
-  
-  sprintf(file, "data/config%d.dat", config_terrain);
-  if(!pathMap->load_from_file(file))
-  {
-    printf("LOADING OF PRECOMPUTED DISTANCE MAPS FAILED !!\n");
-    printf("You should use tools/energyMap_tool to generate them and place the configxx.dat file into the ./data directory (create it if necessary).\n");
-    pathMap->draw_config((config_terrain%100)/10, config_terrain%10);
-    pathMap->compute_distance_transform();
-  } 
-//  else
-//    pathMap->save_to_bmp("maps.bmp");
 }
