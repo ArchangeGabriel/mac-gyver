@@ -2,7 +2,7 @@
 #define DIST_TRSFRM_H
 
 #include <vector>
-#include "types.h"
+#include "common.h"
 
 using namespace std;
 

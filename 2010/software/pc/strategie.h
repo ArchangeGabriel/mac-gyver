@@ -1,9 +1,7 @@
 #ifndef STRATEGIEH
 #define STRATEGIEH
 
-#include "types.h"
-
-enum{clBLUE,clYELLOW};
+#include "common.h"
 
 //------------------------------------------------------------------------------
 /*
@@ -12,13 +10,6 @@ Lance la reconnaissance vidéo de la configuration
 */
 void strat_init();
 bool is_strat_ready();
-
-//------------------------------------------------------------------------------
-/*
-Règle/Renvoie la couleur
-*/
-void strat_set_color(int _color);
-int strat_get_color();
 
 //------------------------------------------------------------------------------
 /*
@@ -32,12 +23,6 @@ int strat_get_config_terrain();
 Appelé lorsque le Jack est retiré
 */
 void strat_lets_go();
-
-//------------------------------------------------------------------------------
-/*
-Prend une position pour le robot en haut à gauche et renvoit la position adaptée à la couleur
-*/
-position_t symetrize(position_t pos);
 
 //------------------------------------------------------------------------------
 /*

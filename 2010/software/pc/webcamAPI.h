@@ -2,7 +2,7 @@
 #define WEBCAM_API
 
 #include "../common/simul.h"
-#include "types.h"
+#include "common.h"
 #include <vector>
 
 struct palet_t

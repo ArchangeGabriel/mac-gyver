@@ -1,10 +1,13 @@
 include ../makeopt
 
 all: make_common main.o
-	$(CC) -o ../client ../common/console.o ../common/comm.o ../common/bitmap.o usb.o cinematik.o webcamAPI.o path_planner.o picAPI.o anticol.o path_tracker.o strategie.o sdl.o visualizer.o pc_main.o main.o webcam_processing.o webcam_utils.o webcam_common.o webcam.o -f90lib -llapack -lblas $(LDFLAGS)
+	$(CC) -o ../client ../common/console.o ../common/comm.o ../common/bitmap.o common.o usb.o cinematik.o webcamAPI.o path_planner.o picAPI.o anticol.o path_tracker.o strategie.o sdl.o visualizer.o pc_main.o main.o webcam_processing.o webcam_utils.o webcam_common.o webcam.o -f90lib -llapack -lblas $(LDFLAGS)
 
 make_common:
 	make -C ../common
+	
+common.o: common.cpp common.h
+	$(CC) -o common.o -c common.cpp $(CFLAGS)
 	
 usb.o: usb.cpp usb.h simul/usb.cpp ../common/comm.h ../common/simul.h
 	$(CC) -o usb.o -c usb.cpp $(CFLAGS)
@@ -24,10 +27,10 @@ picAPI.o: picAPI.cpp picAPI.h usb.o cinematik.o ../common/simul.h
 anticol.o: anticol.cpp anticol.h
 	$(CC) -o anticol.o -c anticol.cpp $(CFLAGS)	
 
-path_tracker.o: path_tracker.cpp path_tracker.h path_planner.o ../common/simul.h types.h
+path_tracker.o: path_tracker.cpp path_tracker.h path_planner.o ../common/simul.h common.o
 	$(CC) -o path_tracker.o -c path_tracker.cpp $(CFLAGS)
 
-strategie.o: strategie.cpp strategie.h path_tracker.o picAPI.o ../common/simul.h types.h ../common/const.h
+strategie.o: strategie.cpp strategie.h path_tracker.o picAPI.o ../common/simul.h common.o ../common/const.h
 	$(CC) -o strategie.o -c strategie.cpp $(CFLAGS)
 		
 sdl.o: sdl.cpp sdl.h
@@ -36,10 +39,10 @@ sdl.o: sdl.cpp sdl.h
 visualizer.o: visualizer.cpp visualizer.h sdl.o
 	$(CC) -o visualizer.o -c visualizer.cpp $(CFLAGS)
 		
-pc_main.o: pc_main.cpp pc_main.h usb.o anticol.o strategie.o ../common/simul.h types.h sdl.o visualizer.o
+pc_main.o: pc_main.cpp pc_main.h usb.o anticol.o strategie.o ../common/simul.h common.o sdl.o visualizer.o
 	$(CC) -o pc_main.o -c pc_main.cpp $(CFLAGS)
 
-main.o: main.cpp main.h pc_main.o ../common/simul.h types.h webcamAPI.o
+main.o: main.cpp main.h pc_main.o ../common/simul.h common.o webcamAPI.o
 	$(CC) -o main.o -c main.cpp $(CFLAGS)
 
 webcam.o: webcam.cpp webcam.hpp webcam_common.o
@@ -58,4 +61,4 @@ webcam_common.o: webcam_common.cpp webcam_common.hpp
 	$(CC) -o webcam_common.o -c webcam_common.cpp $(CFLAGS)
 
 clean:
-	rm -f *.c~ simul/*.c~ *.h~ *.hpp~ *.cpp~ *.ini~ *.o makefile~ simulateur
+	rm -rf *.c~ simul/*.c~ *.h~ *.hpp~ *.cpp~ *.ini~ *.o makefile~ simulateur

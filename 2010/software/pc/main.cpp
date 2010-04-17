@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include "pc_main.h"
-#include "types.h"
+#include "common.h"
 #include "picAPI.h"
 #include "../common/console.h"
 #include "../common/const.h"

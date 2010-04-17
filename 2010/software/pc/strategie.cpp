@@ -24,9 +24,6 @@ using namespace std;
 // Strategie prête
 bool strat_ready = false;
 
-// Couleur du robot
-int color;
-
 // Gestion du temps
 bool started;
 bool game_over;
@@ -88,16 +85,6 @@ void stratMainLoop()
   }   
 }
 //------------------------------------------------------------------------------
-void strat_set_color(int _color)
-{
-  color = _color;
-}
-//------------------------------------------------------------------------------
-int strat_get_color()
-{
-  return color;
-}
-//------------------------------------------------------------------------------
 void strat_set_config_terrain(int c)
 {
   #ifdef VISUALIZE
@@ -148,17 +135,6 @@ void wait_for_it(pthread_mutex_t *mutex)
   pthread_mutex_unlock(mutex);      
   pthread_mutex_destroy(mutex);      
   delete mutex;
-}
-//------------------------------------------------------------------------------
-position_t symetrize(position_t pos)
-{
-  if(color == clYELLOW)
-  {
-    pos.x = _LONGUEUR_TER - pos.x;
-    pos.a = M_PI - pos.a;
-    while(pos.a>M_PI) pos.a -= 2.*M_PI;
-  }
-  return pos;  
 }
 //------------------------------------------------------------------------------
 void strat_recallage()

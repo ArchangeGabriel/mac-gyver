@@ -2,7 +2,7 @@
 #define PATH_TRACKERH
 
 #include <pthread.h>
-#include "types.h"
+#include "common.h"
 
 //------------------------------------------------------------------------------
 /*
