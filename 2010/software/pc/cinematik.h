@@ -1,7 +1,7 @@
 #ifndef CINEMATIKH
 #define CINEMATIKH
 
-#include "types.h"
+#include "common.h"
 
 /*
 Appelée pour initialisation

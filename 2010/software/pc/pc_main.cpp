@@ -63,7 +63,7 @@ int pc_main(int argc, char **argv)
     fprintf(stderr,"Pas de couleur spécifiée, supposé blue. (Utiliser -b ou -y pour spécifier la couleur)\n");
   }
 
-  strat_set_color(color);
+  set_color(color);
   
   #ifdef VISUALIZE
   initSDL();

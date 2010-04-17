@@ -1,7 +1,7 @@
-// comm.h //
+// pic_interface.h //
 
-#ifndef _COMM_H
-#define _COMM_H
+#ifndef _PIC_INTERFACE_H
+#define _PIC_INTERFACE_H
 
 // Toutes ces fonctions retournent -1 en cas d'erreur, et un resultat >= 0 si tout s'est bien passe.
 // get_codeuses, get_digital_in, init_analog_in, get_analog_in peuvent retourner des valeurs interessantes (genre leur resultat quoi !).
@@ -21,4 +21,5 @@ int setup_usb_connexions(); // Initialise les connexions usb avec la carte. Reto
 void shut_usb(); // Ferme proprement les connexions usb.
 int repare_usb(); // Tente de reparer les connexions usb cassees. Retourne 1 si tout fonctionne, un resultat negatif sinon.
 
-#endif // _COMM_H
+#endif // _PIC_INTERFACE_H
+
