@@ -8,7 +8,7 @@ using namespace std;
 #include <usb.h>
 #include "usbdeviceinout.h"
 
-#include "proto.h"
+#include "../../pic/protocole/proto.h"
 
 #define EP_OUT 1
 #define EP_IN 2

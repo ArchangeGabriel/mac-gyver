@@ -16,25 +16,28 @@
 
 bool time_out;
 
+// Dernier reçu de la valeur des codeuses
+double cine_last_time = 0;
+
 // position et vitesse actuelles
 position_t pos; // Position du centre des roues
 vector_t speed;
-float aspeed;
+double aspeed;
 
 // Ancienne valeur des codeuses
 int coder[2];
 
 // vitesse de rotation instantanée de la roue (en rad/s)
-float w[2];
+double w[2];
 
-float W_consigne[2];  // Vitesse demandée
-float L_E[2];         // dernière erreur
-float U_consigne[2];  // Tension demandée
-float U_safe[2];      // Tension antidérapage
+double W_consigne[2];  // Vitesse demandée
+double L_E[2];         // dernière erreur
+double U_consigne[2];  // Tension demandée
+double U_safe[2];      // Tension antidérapage
 #define MAX_INTEGRAL  1000
 
-float Cr;
-float ULim;
+double Cr;
+double ULim;
 
 // Calcule la tension antidérapage: mettre force à true pour forcément envoyer la tension aux moteurs
 void refresh_U_safe(bool force = false);
@@ -121,35 +124,36 @@ vector_t cine_get_speed()
   return speed;
 }
 //------------------------------------------------------------------------------
-float cine_get_speed_wheel(int wheel)
+double cine_get_speed_wheel(int wheel)
 {
   return w[wheel] * _RAYON_ROUE / _MOTOR_K;
 }
 //------------------------------------------------------------------------------
-float cine_get_aspeed()
+double cine_get_aspeed()
 {
   return aspeed;
 }
 //------------------------------------------------------------------------------
-
-//struct timeval ltime;   
-void cine_OnCoderRecv(int left, int right)
+void cine_OnCoderRecv(double time, int left, int right)
 {  
+  double dt = time - cine_last_time;
+  if(dt == 0.) return;
+  cine_last_time = time;
+    
   int dleft = left - coder[0];
   int dright = right - coder[1];
-  float distL = ((float)dleft)  / ((float)(_FREQ_CODER * _MOTOR_K)) * _RAYON_ROUE;
-  float distR = ((float)dright) / ((float)(_FREQ_CODER * _MOTOR_K)) * _RAYON_ROUE;
-  float dt = ((float)TIMER_CODER) * 0.001;
+  double distL = ((double)dleft)  / ((double)(_FREQ_CODER * _MOTOR_K)) * _RAYON_ROUE;
+  double distR = ((double)dright) / ((double)(_FREQ_CODER * _MOTOR_K)) * _RAYON_ROUE;
 
-  float da = (distL - distR) / _ROUE_Y;
-  float dx = (distL+distR)/2.*cos(pos.a);
-  float dy = (distL+distR)/2.*sin(pos.a);
+  double da = (distL - distR) / _ROUE_Y;
+  double dx = (distL+distR)/2.*cos(pos.a);
+  double dy = (distL+distR)/2.*sin(pos.a);
   pos.x+=dx;
   pos.y+=dy;
   pos.a+=da;
   
-  w[0] = ((float)dleft)  / ((float)(_FREQ_CODER)) / dt;
-  w[1] = ((float)dright) / ((float)(_FREQ_CODER)) / dt;  
+  w[0] = ((double)dleft)  / ((double)(_FREQ_CODER)) / dt;
+  w[1] = ((double)dright) / ((double)(_FREQ_CODER)) / dt;  
   
   vector_t N = vector_t(cos(pos.a), sin(pos.a));
   speed = N * ((w[0]+w[1]) * _RAYON_ROUE / (2. * _MOTOR_K));
@@ -163,7 +167,7 @@ void cine_OnCoderRecv(int left, int right)
   if(strat_is_started() && strat_elapsed_time()>90.)
   {
     time_out = true;
-    while(picMotorsPower(0., 0.)<0)
+    while(pic_MotorsPower(0., 0.)<0)
       usleep(1000);     
     strat_game_over();   
   }
@@ -171,7 +175,7 @@ void cine_OnCoderRecv(int left, int right)
 //------------------------------------------------------------------------------
 void make_asserv(bool force)
 {
-  float E;
+  double E;
   for(int i=0; i<2 ; i++)
   {
     E = W_consigne[i] - w[i];    
@@ -200,7 +204,7 @@ void refresh_U_safe(bool force)
   }
     
   //Antidérapage
-  float U,Umin,Umax;  // Calcul intermédiaire
+  double U,Umin,Umax;  // Calcul intermédiaire
   
   for(int i=0;i<2;i++)  
   {    
@@ -227,9 +231,9 @@ void refresh_U_safe(bool force)
     if(is_SDL_ready())
     {
       LigneVerticaleSDL(trace_X,0,2*max_Y+10,makeColorSDL(0,0,0));
-      setPixelVerif(trace_X, max_Y+(int)((float)(max_Y)*U_safe[0]), makeColorSDL(0,0,255));    
-      setPixelVerif(trace_X, max_Y+(int)((float)(max_Y)*W_consigne[0]*_RAYON_ROUE / _MOTOR_K/1.31), makeColorSDL(0,255,0));        
-      setPixelVerif(trace_X, max_Y+(int)((float)(max_Y)*w[0]*_RAYON_ROUE / _MOTOR_K/1.31), makeColorSDL(255,0,0));            
+      setPixelVerif(trace_X, max_Y+(int)((double)(max_Y)*U_safe[0]), makeColorSDL(0,0,255));    
+      setPixelVerif(trace_X, max_Y+(int)((double)(max_Y)*W_consigne[0]*_RAYON_ROUE / _MOTOR_K/1.31), makeColorSDL(0,255,0));        
+      setPixelVerif(trace_X, max_Y+(int)((double)(max_Y)*w[0]*_RAYON_ROUE / _MOTOR_K/1.31), makeColorSDL(255,0,0));            
       LigneHorizontaleSDL(0,max_Y,max_X,makeColorSDL(255,255,255));
       trace_X++;
       if(trace_X==max_X) trace_X=0;
@@ -237,12 +241,12 @@ void refresh_U_safe(bool force)
     }
     #endif  */
     //printf("%f; %f; %f; %f; %f; %f\n",U_safe[0],U_safe[1], W_consigne[0]*_RAYON_ROUE / _MOTOR_K, W_consigne[1]*_RAYON_ROUE / _MOTOR_K,w[0]*_RAYON_ROUE / _MOTOR_K, w[1]*_RAYON_ROUE / _MOTOR_K);     
-    while(picMotorsPower(U_safe[0], U_safe[1])<0)
+    while(pic_MotorsPower(U_safe[0], U_safe[1])<0)
       usleep(1000);
   }
 }
 //------------------------------------------------------------------------------  
-void cine_motors(float left, float right)
+void cine_motors(double left, double right)
 {
   W_consigne[0] = left  / _RAYON_ROUE * _MOTOR_K;  
   W_consigne[1] = right / _RAYON_ROUE * _MOTOR_K; 

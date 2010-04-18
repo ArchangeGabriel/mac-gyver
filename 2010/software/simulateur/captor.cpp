@@ -93,7 +93,7 @@ void dist_captor_t::init_params()
 //----------------------------------------------------------------------------
 int dist_captor_t::measure()
 {
-  float dist = MAX_DIST_CAPT;
+/*  float dist = MAX_DIST_CAPT;
   float tmp;
   vector<object_t*> *obj = &robot->simul_info->objets;
   vector_t P,D;
@@ -108,7 +108,8 @@ int dist_captor_t::measure()
         dist = tmp;  
     }
     
-  return ((int)(logf(dist / COEFF_A_DIST) / logf(COEFF_B_DIST))) << 6;
+  return ((int)(logf(dist / COEFF_A_DIST) / logf(COEFF_B_DIST))) << 6;*/
+  return 1;
 } 
 //----------------------------------------------------------------------------
 void dist_captor_t::draw()

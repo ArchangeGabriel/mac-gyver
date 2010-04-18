@@ -177,9 +177,9 @@ int robot_t::pic_io(robot_t* robot,int captor_type, int captor_id, int value)
       if(0<=captor_id && captor_id<robot->nbr_dist_captors)
         return robot->dist_captors[captor_id].measure();
     break;   
-    case MOTORS:
+    case MSG_MOTORS:
       if(captor_id==0 || captor_id==1) 
-        robot->tension_moteur[captor_id]=value;
+        robot->tension_moteur[captor_id]=double(value-128)/127.;
       return 0;
     break;
   }
@@ -198,14 +198,13 @@ void robot_t::calc_forces()
 
   for(int i=0;i<2;i++)
   {
-    force_value=moteur[i].calc_force(((double)tension_moteur[i])*tension/((double)RANGE_MOTOR),get_speed(R[i])|N);
+    force_value=moteur[i].calc_force(tension_moteur[i]*tension,get_speed(R[i])|N);
     F = N*force_value;
     add_force(R[i],F);
     capacite-=fabs(moteur[i].I)*simul_info->dt; 
   }
 }
 //----------------------------------------------------------------------------
-
 void robot_t::calc_frottements()
 {
   vector_t O,F;

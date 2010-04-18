@@ -48,3 +48,4 @@ interface.o: interface.cpp simulateur.o
 
 clean:
 	rm -f *.c~ *.h~ *.cpp~ *.ini~ *.o makefile~ simulateur
+	make -s -C pic clean

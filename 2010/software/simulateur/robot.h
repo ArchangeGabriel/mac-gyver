@@ -36,7 +36,7 @@ class robot_t : public union_obj_t
   double rayon_roue;      // rayon des roues du robot   
 
   motor_t moteur[2];
-  int tension_moteur[2];
+  double tension_moteur[2];
   
   int nbr_color_captors;
   vector<color_captor_t> color_captors;

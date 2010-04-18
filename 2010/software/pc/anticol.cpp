@@ -15,9 +15,6 @@ void anticolMainLoop()
   fprintf(stderr,"AC thread...                    ok\n");  fflush(stdout);
   while(true)
   {
-    if(picDistCaptors() == 0)
-      usleep(100000);
-    else
       usleep(100000);
   }  
 }

@@ -333,7 +333,7 @@ void pt_clear_path()
 //------------------------------------------------------------------------------
 void pt_stop(int id)
 {
-  picMotorsPower(0.,0.);
+  pic_MotorsPower(0.,0.);
   position_t pos = cine_get_position();
   vector_t N = vector_t(cos(pos.a), sin(pos.a));
   if(id == 0 || id == 1) N = -N;

@@ -1,41 +1,62 @@
-#include "main.h"
-
 #include <pthread.h>
-#include <stdlib.h>
-#include <math.h>
-#include "pc_main.h"
-#include "common.h"
-#include "picAPI.h"
+#include <stdio.h>
+#include <unistd.h>
+
+#define PC_INCLUDE
+#include "../common/simul.h"
 #include "../common/console.h"
-#include "../common/const.h"
-#include "../common/comm.h"
 #include "picAPI.h"
-#include "webcamAPI.h"
-#include "cinematik.h"
-#include "path_tracker.h"
 #include "strategie.h"
+#include "path_tracker.h"
 #include "cinematik.h"
+#include "anticol.h"
 #include "sdl.h"
+#include "visualizer.h"
+#include "picAPI/pic_interface.h"
 
-#define VERSION     0
-#define SUBVERSION  2
+#define VERSION     1
+#define SUBVERSION  0
 
-void change_dest(position_t *d, int type=0);
+// A décommenter pour utiliser la console
+#define CONSOLE
+
+pthread_t IAThread;
+void* start_IA(void*);
+
+pthread_t PPThread;
+void* start_PP(void*);
+
+pthread_t ACThread;
+void* start_AC(void*);
+
+#ifdef VISUALIZE
+pthread_t SDLThread;
+void* start_SDL(void*);
+#endif
+
+#ifdef CONSOLE
+pthread_t ConsoleThread;
+#endif
 
 #ifdef SIMULATION
-
 extern char *addr;
 extern long port;
 extern long robot_id;
+#endif
+
+void* console(void*);
+void exiting();
+void change_dest(position_t *d, int type=0);
 
 //------------------------------------------------------------------------------
-int main(int argc, char** argv)
-{
+int main(int argc, char **argv)
+{ 
+  int i;
+  #ifdef SIMULATION
   addr = (char*)malloc(sizeof(char)*30);
   strcpy(addr,"127.0.0.1");
   port=11111;
   robot_id=0;
-  int i;
     
   while((i = getopt(argc, argv, "a:p:i:rg")) > 0)
     switch(i)
@@ -51,24 +72,96 @@ int main(int argc, char** argv)
       case 'i':
       robot_id = strtol(optarg, NULL, 10);
       break;
-      case 'r':
-      case 'g':
+      case 'b':
+      case 'y':
       break;
       default:
       printf("La syntaxe est la suivante: ./client -a adresse -p port -i robot_id [-r/-g]\n");
       return -1;
     }
+  #endif
 
-  pc_main(argc,argv);
-   
+  int color = -1; 
+
+  optind = 1;
+  while((i = getopt(argc, argv, "by")) > 0)
+  {
+    switch(i)
+    {
+      case 'b':
+      color = clBLUE;
+      fprintf(stderr,"Je suis bleu!\n");      
+      break;
+      case 'y':
+      color = clYELLOW;
+      fprintf(stderr,"Je suis jaune!\n");
+      break;
+      default:
+      break;
+    }
+  }
+  
+  if(color == -1)
+  {
+    color = clBLUE;
+    fprintf(stderr,"Pas de couleur spécifiée, supposé blue. (Utiliser -b ou -y pour spécifier la couleur)\n");
+  }
+
+  set_color(color);
+  
+  #ifdef VISUALIZE
+  initSDL();
+  visu_draw_background(0);
+  Load_SDL_Background();  
+  pthread_create(&SDLThread, NULL, start_SDL, NULL);   // Affichage SDL
+  while(!is_SDL_ready()) usleep(10000);
+  #endif
+
+  // Initialise les fonction de callback
+  pic_OnRecvJack(strat_lets_go);
+  pic_OnRecvCoder(cine_OnCoderRecv);  
+  pic_RecvReset(strat_init);
+
+  pthread_create(&IAThread, NULL, start_IA, NULL);   // Intelligence Artificielle
+  while(!is_strat_ready()) usleep(10000);
+    
+  pthread_create(&PPThread, NULL, start_PP, NULL);   // Path Planner
+  pthread_create(&ACThread, NULL, start_AC, NULL);   // Anti Collision
+  
+  #ifdef CONSOLE
+  pthread_create(&ConsoleThread, NULL, console, NULL);   // Console
+  #endif
+  
+  atexit(exiting);
+  pic_MainLoop();
+  
   return 0;
-}  
+}
 //------------------------------------------------------------------------------
-
-
-#endif
-
-
+void* start_IA(void*)
+{
+  strat_init(); 
+  return NULL;
+}
+//------------------------------------------------------------------------------
+void* start_PP(void*)
+{
+  ppMainLoop(); 
+  return NULL;
+}
+//------------------------------------------------------------------------------
+void* start_AC(void*)
+{
+  anticolMainLoop(); 
+  return NULL;
+}
+//------------------------------------------------------------------------------
+void* start_SDL(void*)
+{
+  visu_draw_robot(); 
+  return NULL;
+}
+//------------------------------------------------------------------------------
 void* console(void*)
 {
   char Buff[CONSOLE_MAX_LEN_LINE];
@@ -128,10 +221,10 @@ void* console(void*)
 		      break;
 		    if(c==' ')
 		    {
-          picMotorsPower(0., 0.);        
+          pic_MotorsPower(0., 0.);        
 		    }
 		    if(c=='8')
-          picMotorsPower(1., 1.);        
+          pic_MotorsPower(1., 1.);        
 		    else if(c==27)     // échappement
 		    {
 		      read(STDIN_FILENO, &c, 1);
@@ -142,19 +235,19 @@ void* console(void*)
 		        {
 		          case 'A':
 		          //haut
-              picMotorsPower(0.7, 0.7);
+              pic_MotorsPower(0.7, 0.7);
 		          break;
 		          case 'B': 
 		          //bas
-              picMotorsPower(-0.2, -0.2); 					          
+              pic_MotorsPower(-0.2, -0.2); 					          
 		          break;
 		          case 'C':
 		          //droite
-              picMotorsPower(0.3, -0.3); 	
+              pic_MotorsPower(0.3, -0.3); 	
 		          break;              				          
 		          case 'D':
 		          //gauche
-              picMotorsPower(-0.5, 0.5); 				          
+              pic_MotorsPower(-0.5, 0.5); 				          
 		          break;              
 		        } 
 		      }  
@@ -267,7 +360,10 @@ void change_dest(position_t *pos, int type)
 //------------------------------------------------------------------------------
 void exiting()
 {
+  shut_usb();
+  #ifdef CONSOLE
   reset_console();
+  #endif
 }
 //------------------------------------------------------------------------------
 

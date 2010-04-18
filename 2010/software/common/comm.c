@@ -25,14 +25,13 @@ int get_msg_header_size(char *msg)
       return sizeof(int);    
     break;
     #endif
-    case BEGIN:
     case JACK:
     case EMPTY_MSG:
       return 0;
     break;
     case QUERY:    
     case ACK:
-    case MOTORS:
+    case MSG_MOTORS:
     case CODER:    
     case PRINTF:
       return sizeof(int);
@@ -62,7 +61,6 @@ int get_msg_data_size(char *msg)
       return sizeof(picInfo_t) - 2*sizeof(int);
     break;
     #endif  
-    case BEGIN:
     case JACK:
     case EMPTY_MSG:
       return 0;
@@ -72,7 +70,7 @@ int get_msg_data_size(char *msg)
     case PRINTF:
       return sizeof(MSG_INT1_t) - 2*sizeof(int);
     break;
-    case MOTORS:
+    case MSG_MOTORS:
     case CODER: 
       return sizeof(MSG_INT2_t) - 2*sizeof(int);
     break;

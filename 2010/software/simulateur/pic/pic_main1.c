@@ -9,6 +9,7 @@
 #include "../../common/const.h"
 #include "../../common/comm.h"
 #include "../../common/simul.h"
+#include "../../pc/picAPI.h"   // pour TIMER_CODER
 #include "usb.h"
 #include "io1.h"
 
@@ -17,6 +18,8 @@
 #endif
 
 #include "pic_main1.h"
+
+int send_coder = 0;
 
 //------------------------------------------------------------------------------
 #ifdef SIMULATION
@@ -29,7 +32,6 @@ void* pic_main1(void *)
   pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS,NULL);  
   PIC_ARG *Simul=(PIC_ARG *)Args;
   int last_iter_send_coder = 0;
-  int msg_id;  
   #endif
   int comm_id=-1;   // pour les communications avec le pc  
   
@@ -41,13 +43,12 @@ void* pic_main1(void *)
   int gauche, dgauche;
   int droite, ddroite;
   
-  struct timeval last_send_coder,act_time,last_time;
-  gettimeofday(&last_send_coder,NULL);   
+  struct timeval act_time,last_time;
   gettimeofday(&last_time,NULL);       
 
   //Initialisation du calcul de la position    
-  set_output1(SIMULARG4(Simul,MOTORS,0,0));
-  set_output1(SIMULARG4(Simul,MOTORS,1,0));       
+  set_output1(SIMULARG4(Simul,MSG_MOTORS,0,128));
+  set_output1(SIMULARG4(Simul,MSG_MOTORS,1,128));       
   codeuse[0]=get_input1(SIMULARG3(Simul,CODER,0));
   codeuse[1]=get_input1(SIMULARG3(Simul,CODER,1));  
   gauche = codeuse[0];
@@ -78,16 +79,22 @@ void* pic_main1(void *)
       if(Simul->robot->simul_info->dt * ((double)Simul->robot->simul_info->Iterations - last_iter_send_coder) >(((double)TIMER_CODER) / 1000.))
       {
         last_iter_send_coder = Simul->robot->simul_info->Iterations;
-        gettimeofday(&last_send_coder,NULL);  
+        last_time.tv_usec += TIMER_CODER * 1000;
+        if(last_time.tv_usec >= 1000000)
+        {
+          last_time.tv_sec++;
+          last_time.tv_usec = 0;
+        }
+        send_coder++;
         MSG_INT2_t msg;
         msg.type = CODER;
-        msg.msg_id = msg_id--;    
+        msg.msg_id = send_coder;    
         msg.value1 = get_input1(SIMULARG3(Simul,CODER,0));
         msg.value2 = get_input1(SIMULARG3(Simul,CODER,1));        
         if(write_usb(SIMULARG3(comm_id,&msg,sizeof(msg)))<0)
         {    
-          set_output1(SIMULARG4(Simul,MOTORS,0,0));    
-          set_output1(SIMULARG4(Simul,MOTORS,1,0));             
+          set_output1(SIMULARG4(Simul,MSG_MOTORS,0,128));    
+          set_output1(SIMULARG4(Simul,MSG_MOTORS,1,128));             
           close_connection(&comm_id);  
         }
       }
@@ -95,18 +102,18 @@ void* pic_main1(void *)
       int type = read_usb(SIMULARG2(comm_id, &_msg));
       if(type<0)
       {     
-        set_output1(SIMULARG4(Simul,MOTORS,0,0));    
-        set_output1(SIMULARG4(Simul,MOTORS,1,0));                
+        set_output1(SIMULARG4(Simul,MSG_MOTORS,0,128));    
+        set_output1(SIMULARG4(Simul,MSG_MOTORS,1,128));                
         close_connection(&comm_id);
       }
       else switch(type)
       {
         case EMPTY_MSG: break;
-        case MOTORS:
+        case MSG_MOTORS:
         {
           MSG_INT2_t *msg = (MSG_INT2_t *)_msg;
-          set_output1(SIMULARG4(Simul,MOTORS,0,msg->value1));    
-          set_output1(SIMULARG4(Simul,MOTORS,1,msg->value2));    
+          if(msg->value1) set_output1(SIMULARG4(Simul,MSG_MOTORS,0,msg->value1));
+          if(msg->value2) set_output1(SIMULARG4(Simul,MSG_MOTORS,1,msg->value2));    
         }
         break;
         default:

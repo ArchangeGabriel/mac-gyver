@@ -1,5 +1,9 @@
 #include <pthread.h>
-#include "../picAPI.h"
+
+// Defined in pic_interface.cpp
+pthread_mutex_t* picWebcam(int id, int *W, int *H, uint16_t *data = NULL);
+
+//------------------------------------------------------------------------------
 
 webcam_t::webcam_t(const std::string& dev,size_t,size_t)
     :m_image(image_t::yuv_format,0,0)
@@ -22,32 +26,32 @@ webcam_t::webcam_t(const std::string& dev,size_t,size_t)
 webcam_t::~webcam_t()
 {
 }
-
+//------------------------------------------------------------------------------
 void webcam_t::start()
 {
     m_image=image_t(image_t::yuv_format,m_width,m_height);
 }
-
+//------------------------------------------------------------------------------
 void webcam_t::stop()
 {
 }
-
+//------------------------------------------------------------------------------
 size_t webcam_t::get_width()
 {
     return m_width;
 }
-
+//------------------------------------------------------------------------------
 size_t webcam_t::get_height()
 {
     return m_height;
 }
-
+//------------------------------------------------------------------------------
 void webcam_t::capture(image_t& img)
 {
     do_capture();
     get_image(img);
 }
-
+//------------------------------------------------------------------------------
 void webcam_t::do_capture()
 {
   int w,h; 
@@ -60,13 +64,14 @@ void webcam_t::do_capture()
   pthread_mutex_destroy(mutex);      
   delete mutex;  
 }
-
+//------------------------------------------------------------------------------
 void webcam_t::get_image(image_t& img)
 {
     img=m_image;
 }
-
+//------------------------------------------------------------------------------
 const image_t& webcam_t::get_image2() const
 {
     return m_image;
 }
+//------------------------------------------------------------------------------

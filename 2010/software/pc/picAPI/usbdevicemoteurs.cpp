@@ -8,7 +8,7 @@ using namespace std;
 #include <usb.h>
 #include "usbdevicemoteurs.h"
 
-#include "proto.h"
+#include "../../pic/protocole/proto.h"
 
 #define EP_OUT 1
 #define EP_IN 2
@@ -130,7 +130,7 @@ int USBDeviceMoteur::repare()
 void USBDeviceMoteur::sendorder(unsigned char vitesse_gauche, unsigned char vitesse_droite) // Attention, 1 > marche arriere toute, 128 > arret, 255 avant toute. 0 EST INTERDIT !! (l'ordre ne sera pas compris comme tel)
 { 
     int c;
-    unsigned char sent_bytes[3], buffer[8];
+    unsigned char sent_bytes[3];
 
     sent_bytes[0] = SETPWM;
     sent_bytes[1] = vitesse_gauche;
