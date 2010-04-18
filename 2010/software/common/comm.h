@@ -3,7 +3,6 @@
 
 #include "../common/simul.h"
 
-
 // Protocole
 typedef struct MSG_INT1_t
 {
@@ -30,24 +29,11 @@ typedef struct MSG_INTn_t
   int n;
 }MSG_INTn_t;
 
-#define RANGE_MOTOR          127   // Entrée des moteurs entre -RANGE_MOTOR et RANGE_MOTOR
-#define RANGE_DIST_CAPT      400   // Sortie des capteurs de distance entre 0 et RANGE_DIST_CAPT
-#define MAX_DIST_CAPT        0.32  // Distance max des capteurs de distance
-#define MIN_DIST_CAPT        0.004 // Distance min des capteurs de distance
-#define TIMER_CODER          5.3   // Envoie des valeurs des codeuses toutes les TIMER_CODER ms
-
-// Etalonnage capteur de distance
-#define VALUE_FOR_0cm_DIST   620.
-#define VALUE_FOR_15cm_DIST  182.
-#define COEFF_A_DIST         0.48320478134
-#define COEFF_B_DIST         0.994212066
-
 // Type de message
 // (ne pas oublier de les ajouter à get_size_msg ci-dessous)
 enum{EMPTY_MSG, // réservé pour dire qu'il n'y a pas de message
      QUERY,   // de type MSG_INT1_t, value := DIST
-     BEGIN,   // DOIT ETRE EN 2
-     MOTORS,  // de type MSG_INT2_t, value1 := pow_left, value2 := pow_right, entre RANGE_MOTOR et -RANGE_MOTOR (cf ci-dessus)
+     MSG_MOTORS,  // de type MSG_INT2_t, value1 := pow_left, value2 := pow_right, entre RANGE_MOTOR et -RANGE_MOTOR (cf ci-dessus)
      JACK,    // de type MSG_INT1_t, jack retiré     
      DIST,    // de type MSG_INTn_t, values := valeur des capteurs de distance, entre 0 et RANGE_CAPTOR
      COUL,    // de type MSG_INTn_t, values := valeur des capteurs de couleur

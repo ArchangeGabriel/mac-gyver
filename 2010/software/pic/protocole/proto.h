@@ -27,6 +27,8 @@
 #define SERVOS     0x04
 #define DIGITS     0x05
 
+//////////////////////////////////////
 
+#define NB_ANALOGS 4
 
 #endif // PROTO_H_

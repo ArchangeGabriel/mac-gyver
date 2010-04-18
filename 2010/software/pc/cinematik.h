@@ -19,12 +19,12 @@ position_t cine_get_wheel_center_position();
 Donne la vitesse (du robot et de la roue 0 gauche, 1 droite)
 */
 vector_t cine_get_speed();
-float cine_get_speed_wheel(int wheel);
+double cine_get_speed_wheel(int wheel);
 
 /*
 Fonction de callback: appellé lorsque le pc recoit les valeurs des codeuses
 */
-void cine_OnCoderRecv(int left, int right);
+void cine_OnCoderRecv(double time, int left, int right);
 
 /*
 Règle la vitesse de consigne des moteurs (paramètre left et right: vitesses de consigne en m/s)
@@ -32,6 +32,6 @@ Règle la vitesse de consigne des moteurs (paramètre left et right: vitesses de
 -> Gère l'antidérapage: ajuste la puissance des moteurs pour éviter les dérapages
 -> Transmet au pic.
 */
-void cine_motors(float left, float right);
+void cine_motors(double left, double right);
 
 #endif

@@ -1,4 +1,10 @@
 // pic_interface.cxx //
+#include "../../common/simul.h"
+#include "pic_interface.h"
+
+#ifdef SIMULATION
+#include "../simul/pic_interface.cpp"
+#else
 
 using namespace std;
 
@@ -8,7 +14,7 @@ using namespace std;
 
 #include "usbdevicemoteurs.h"
 #include "usbdeviceinout.h"
-#include "proto.h"
+
 
 #define DEVICEMOTEUR 0xf0
 #define DEVICEINOUT  0x0f
@@ -99,7 +105,7 @@ int setup_usb_connexions()
     int res;
     res = 0;
     c = find_usb(DEVICEMOTEUR | DEVICEINOUT);
-    if(c != DEVICEMOTEUR | DEVICEINOUT)
+    if(c != (DEVICEMOTEUR | DEVICEINOUT))
     {
         //if(!(c & DEVICEMOTEUR)) cout << "Carte moteur absente" << endl;
       //  if(!(c & DEVICEINOUT)) cout << "Carte InOut absente" << endl;
@@ -134,7 +140,7 @@ int repare_usb()
     return 1;
 }
 
-void shut_usb(void)
+void shut_usb(void)#include "../common/simul.h"
 {
     if(devicemoteur != NULL) delete devicemoteur;
     if(deviceinout != NULL) delete deviceinout;
@@ -182,3 +188,5 @@ int set_servo(unsigned char number, unsigned char position)
 {
     catcherror(deviceinout->servo_order(number, position));
 }
+
+#endif

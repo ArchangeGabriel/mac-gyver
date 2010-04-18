@@ -3,6 +3,8 @@
 #ifndef _PIC_INTERFACE_H
 #define _PIC_INTERFACE_H
 
+#include "../../pic/protocole/proto.h"
+
 // Toutes ces fonctions retournent -1 en cas d'erreur, et un resultat >= 0 si tout s'est bien passe.
 // get_codeuses, get_digital_in, init_analog_in, get_analog_in peuvent retourner des valeurs interessantes (genre leur resultat quoi !).
 

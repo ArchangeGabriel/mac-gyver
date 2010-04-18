@@ -99,7 +99,6 @@ void* pic_main2(void *)
       {
         case EMPTY_MSG: break;
         #ifdef SIMULATION
-        case BEGIN:
         case JACK:
         break;
         case MSG_INFO:

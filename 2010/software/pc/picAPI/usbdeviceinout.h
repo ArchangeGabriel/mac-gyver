@@ -12,8 +12,8 @@
 
 
 //#include "../../Divers/application/analogs.h"
-
-#define NB_ANALOGS 4
+// NB_ANALOGS a déménagé dans ../../pic/protocole/proto.h
+//#define NB_ANALOGS 4
 
 class USBDeviceInOut
 {

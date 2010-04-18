@@ -110,10 +110,10 @@ You're using the keyboard!\n\
       {
         if(u[1]!=0.) u[1]/=2.; else {u[0]=1.; u[1]=-1.;}
       }
-      int UG=vitesse*u[0]*((double)RANGE_MOTOR);
-      int UD=vitesse*u[1]*((double)RANGE_MOTOR);
-      set_output(Simul,MOTORS,0,UG);
-      set_output(Simul,MOTORS,1,UD);    
+      int UG=vitesse*u[0];
+      int UD=vitesse*u[1];
+      set_output(Simul,MSG_MOTORS,0,UG);
+      set_output(Simul,MSG_MOTORS,1,UD);    
       event.type=!(SDL_KEYDOWN|SDL_KEYUP);       
     }   
       

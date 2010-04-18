@@ -1,36 +1,31 @@
 #ifndef PICAPI
 #define PICAPI
 
-#include <pthread.h>
-#include <stdint.h>
-#include "../common/simul.h"
-
+#define TIMER_CODER   5   // Envoie des valeurs des codeuses toutes les TIMER_CODER ms
 
 /*
 Boucle infinie gérant les connections
 */
-void picMainLoop();
+void pic_MainLoop();
 
 
 /***************** PC --> PIC *****************/
-
-// Lance le PIC
-int picBegin();
+/*
+Signale que le jack a été retiré
+*/
+void pic_Jack();
 
 /*
 Envoie la puissance des moteurs pour le mouvement
 Comprise entre -1 (recule) et 1 (avance)
 Renvoie 0 en cas de succès, un nombre non nul sinon
 */
-int picMotorsPower(float pwleft, float pwright);
-
+int pic_MotorsPower(double pwleft, double pwright);
 
 /*
-Demande la valeur des capteurs de distance indiqués par Flag (cf common/comm.h)
-Renvoie 0 en cas de succès, un nombre non nul sinon 
+réinitialise les PIC
 */
-int picDistCaptors();
-
+void pic_Reset();
 
 /***************** PIC --> PC *****************/
 // Fonction de callback
@@ -39,54 +34,16 @@ int picDistCaptors();
 /*
 Appelé lorsque le jack est retiré
 */
-void picOnRecvJack(void (*fun)(void));
+void pic_OnRecvJack(void (*fun)(void));
 
 /*
 Réception de la valeur des codeuses
 */
-void picOnRecvCoder(void (*fun)(int /*coder_left*/, int /*coder_right*/));
+void pic_OnRecvCoder(void (*fun)(double /*time*/, int /*coder_left*/, int /*coder_right*/));
 
 /*
-Réception de la valeur des capteurs de distance
+Fonction appelée en cas de reset du robot
 */
-void picOnRecvDistCaptors(void (*fun)(int /*n*/, float* /*dist*/));
-
-/*
-Fonction à appeler en cas de reconnection intempestive avec le pic
-*/
-void picOnReconnectPIC1(void (*fun)());
-void picOnReconnectPIC2(void (*fun)());
-
-//---------------------------------------------------------------------------//
-
-
-
-
-
-
-
-
-/*
-Utile seulement pour la simulation
-*/
-#ifdef SIMULATION
-
-/*
-Pour visualiser la position supposée et la destination
-*/
-int picSendInfo(float posX, float posY, float posA,
-                float destX, float destY, float destA);
-
-/*
-Pour obtenir une image de la webcam
-*/
-pthread_mutex_t* picWebcam(int id, int *W, int *H, uint16_t *data = NULL);
-
-/*
-Fonction appelé en cas de "re" dans le simulateur
-*/
-void picRecvReset(void (*fun)(void));
-
-#endif
+void pic_RecvReset(void (*fun)(void));
 
 #endif
