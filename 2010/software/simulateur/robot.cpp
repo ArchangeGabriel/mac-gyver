@@ -1,4 +1,5 @@
 #include "../common/comm.h"
+#include "../pic/protocole/proto.h"
 #include "the_cup/colors.h"
 
 #include "robot.h"
@@ -164,19 +165,23 @@ int robot_t::pic_io(robot_t* robot,int captor_type, int captor_id, int value)
 {
   switch(captor_type)
   {
-    case JACK: return 1; break;
-    case CODER: 
+    case MSG_CODER: 
       if(captor_id==0 || captor_id==1) 
         return ((int)(robot->moteur[captor_id].a*robot->periodes_codeuse)); 
     break;
-    case COUL:
-      if(0<=captor_id && captor_id<robot->nbr_color_captors)
-        return robot->color_captors[captor_id].measure();
+    case MSG_DIGIT:
+    {
+      int state = DIGIT_JACK;
+      return state;
+    }
     break;
-    case DIST:
-      if(0<=captor_id && captor_id<robot->nbr_dist_captors)
-        return robot->dist_captors[captor_id].measure();
-    break;   
+    case MSG_ANALOG:
+      return 0;
+    break;
+    case MSG_DCMOTOR:
+    case MSG_SERVOMOTOR:
+      return 0;
+    break;
     case MSG_MOTORS:
       if(captor_id==0 || captor_id==1) 
         robot->tension_moteur[captor_id]=double(value-128)/127.;

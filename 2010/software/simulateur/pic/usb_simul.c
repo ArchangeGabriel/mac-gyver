@@ -34,7 +34,7 @@ int read_usb(int comm_id, char **msg)
   if(read(comm_id,buff,len_type)<=0)
   {
     if(errno!=EAGAIN) return -1;
-    else return EMPTY_MSG;  
+    else return MSG_EMPTY;  
   }
 
   len_header = get_msg_header_size(buff);
@@ -50,7 +50,7 @@ int read_usb(int comm_id, char **msg)
   
   len=len_type+len_header+len_data;  
   *msg=(char*)malloc(len*sizeof(char));
-  if(*msg == NULL) return EMPTY_MSG;  
+  if(*msg == NULL) return MSG_EMPTY;  
   memcpy(*msg,buff,len);
   return get_msg_type(*msg);   
 }

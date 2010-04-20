@@ -41,8 +41,8 @@ extern sem_t pic_sem;
   angle = _POS_INIT_A;
   
   long codeuse[2];
-  codeuse[0]=get_input(Simul,CODER,0);
-  codeuse[1]=get_input(Simul,CODER,1);    
+  codeuse[0]=get_input(Simul,MSG_CODER,0);
+  codeuse[1]=get_input(Simul,MSG_CODER,1);    
   long gauche = codeuse[0], dgauche;
   long droite = codeuse[1], ddroite;
   double distgauche, distdroite, dalpha, dx, dy;
@@ -118,8 +118,8 @@ You're using the keyboard!\n\
     }   
       
     //Calcul de la position
-    codeuse[0]=get_input(Simul,CODER,0);
-    codeuse[1]=get_input(Simul,CODER,1);
+    codeuse[0]=get_input(Simul,MSG_CODER,0);
+    codeuse[1]=get_input(Simul,MSG_CODER,1);
     
     dgauche = codeuse[0] - gauche;
     ddroite = codeuse[1] - droite;  

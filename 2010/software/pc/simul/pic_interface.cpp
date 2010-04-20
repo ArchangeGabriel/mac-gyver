@@ -1,7 +1,7 @@
-#include <pthread.h>
 #include <stdint.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <map>
 
 #define PC_INCLUDE
 #include "../../common/comm.h"
@@ -11,6 +11,8 @@
 #include "../cinematik.h"
 #include "../path_tracker.h"
 
+using namespace std;
+
 // Compteur de messages
 int msg_id;
 
@@ -19,25 +21,23 @@ pthread_mutex_t *mut_webcam = NULL;
 uint16_t *webcam_data;
 int *webcam_W;
 int *webcam_H;
-
+#include "../common.h"
 // Gère les moteurs
 void* pic1_handle_msg(void *);
-pthread_t thread_pic1;  
+pthread_t picI_thread_pic1;  
 
 // Gère les reste
 void* pic2_handle_msg(void *);
-pthread_t thread_pic2;
+pthread_t picI_thread_pic2;
 
 // Pour visualiser la position supposée et la destination sur le simulateur
 int SendInfo();
                 
-// Compteur de messages
-pthread_mutex_t *mut_hpos;
-pthread_mutex_t *mut_vpos;
-pthread_mutex_t *mut_clamp;
-int msg_id_hpos;
-int msg_id_vpos;
-int msg_id_clamp;   
+// Mutex/valeur des messages
+map<int, pthread_mutex_t *> picI_digit_mutex;
+map<int, int> picI_digit_value;
+map<int, pthread_mutex_t *> picI_analog_mutex;
+map<int, int> picI_analog_value;
 
 // Valeur des codeuses
 int last_coder_L = 0;
@@ -54,15 +54,14 @@ int coder_id = 0;
 //------------------------------------------------------------------------------
 // change la vitesse des moteurs en ces valeurs (0 ne change rien, 1 arriere toute, 128 arret, 255 avant toute). Retourne 1 si ok, -1 sinon
 int set_speed(unsigned char vitesse1, unsigned char vitesse2)
-{
-   
+{ 
   MSG_INT2_t msg;
   msg.type   = MSG_MOTORS;
   msg.msg_id = msg_id++;
   msg.value1 = vitesse1;
   msg.value2 = vitesse2;  
   
-  return write_usb(PIC1, &msg, sizeof(msg));
+  return (write_usb(PIC1, &msg, sizeof(msg)) < 0)?-1:1;
 }
 //------------------------------------------------------------------------------
 // met les valeurs courantes des codeuses dans codeuse1 et codeuse2, et les sens dans sens1 et sens2 / Retourne l'indice de l'echange usb (il s'incremente tous les pas de temps, au cas ou on a rate une trame usb) si ok, -1 sinon
@@ -79,8 +78,31 @@ int get_codeuses(int *codeuse1, unsigned char *sens1, int *codeuse2, unsigned ch
 // retourne de 0 à 127 (ie les 7 entrees numeriques) si ok, -1 sinon
 int get_digital_in(void)
 {
-  // TODO
-  return 0;
+  int id = msg_id++;
+  
+  MSG_INT1_t msg;
+  msg.type   = MSG_QUERY;
+  msg.msg_id = id;
+  msg.value  = MSG_DIGIT;  
+  
+  picI_digit_mutex[id] = new pthread_mutex_t;
+  pthread_mutex_init(picI_digit_mutex[id],NULL);
+  pthread_mutex_lock(picI_digit_mutex[id]);
+  
+  if(write_usb(PIC2, &msg, sizeof(msg)) < 0)
+    return -1;
+  else
+  {
+    wait_for_it(picI_digit_mutex[id]);
+    int res = picI_digit_value[id];
+    
+    map<int, pthread_mutex_t*> :: iterator it1 = picI_digit_mutex.find(id);
+    picI_digit_mutex.erase(it1);  
+    map<int, int> :: iterator it2 = picI_digit_value.find(id);
+    picI_digit_value.erase(it2);
+    
+    return res;
+  }
 }
 //------------------------------------------------------------------------------
 // defini le nombre NB_ANALOG d'entrees analogiques. Retourne min(number, NB max d'analogiques de la carte) si ok, -1 sinon. Doit etre appelee avant le premier get_analog_in.
@@ -92,37 +114,61 @@ int init_analog_in(unsigned char number)
 // rempli result des length (ou NB_ANALOG si length trop grand) premieres entrees analogiques. Retourne ne nombre de valeurs effectivement ecrites (ie min(length, NB_ANALOG)) si ok, -1 sinon
 int get_analog_in(unsigned short *result, unsigned char length)
 {
-  // TODO
-  return 0;
+  int id = msg_id++;
+  
+  MSG_INT1_t msg;
+  msg.type   = MSG_QUERY;
+  msg.msg_id = id;
+  msg.value  = MSG_ANALOG;  
+  
+  picI_analog_mutex[id] = new pthread_mutex_t;
+  pthread_mutex_init(picI_analog_mutex[id],NULL);
+  pthread_mutex_lock(picI_analog_mutex[id]);
+  
+  if(write_usb(PIC2, &msg, sizeof(msg)) < 0)
+    usleep(10000);
+    
+  wait_for_it(picI_analog_mutex[id]);
+  *result = picI_analog_value[id];
+  
+  map<int, pthread_mutex_t*> :: iterator it1 = picI_analog_mutex.find(id);
+  picI_analog_mutex.erase(it1);  
+  map<int, int> :: iterator it2 = picI_analog_value.find(id);
+  picI_analog_value.erase(it2);
+  
+  return length;
 }
 //------------------------------------------------------------------------------
 // met le moteur number (1-4) dans le sens sens (-1, 0 arret, 1). Retourne 1 si ok, -1 sinon.
 int set_DC_motor(unsigned char number, char sens)
 {
-  // TODO
-  return 0;
+  MSG_INT2_t msg;
+  msg.type   = MSG_DCMOTOR;
+  msg.msg_id = msg_id++;
+  msg.value1 = number;
+  msg.value2 = sens;  
+  
+  return (write_usb(PIC2, &msg, sizeof(msg)) < 0)?-1:1;
 }
 //------------------------------------------------------------------------------
 //met le servo number (1-4) en position position (1-255) (position = 0 rend le servo libre). Retourne 1 si ok, -1 sinon
 int set_servo(unsigned char number, unsigned char position)
 {
-  // TODO
-  return 0;
+  MSG_INT2_t msg;
+  msg.type   = MSG_SERVOMOTOR;
+  msg.msg_id = msg_id++;
+  msg.value1 = number;
+  msg.value2 = position;  
+  
+  return (write_usb(PIC2, &msg, sizeof(msg)) < 0)?-1:1;
 }
 //------------------------------------------------------------------------------
 // Initialise les connexions usb avec la carte. Retourne 1 si tout fonctionne, un resultat negatif sinon.
 int setup_usb_connexions()
 {
   msg_id = 1;
-  mut_hpos = NULL;   
-  mut_vpos = NULL;
-  mut_clamp = NULL;    
-  msg_id_hpos = 0;
-  msg_id_vpos = 0;
-  msg_id_clamp = 0;  
-
-  pthread_create(&thread_pic1, NULL, &pic1_handle_msg, NULL);  
-  pthread_create(&thread_pic2, NULL, &pic2_handle_msg, NULL);    
+  pthread_create(&picI_thread_pic1, NULL, &pic1_handle_msg, NULL);  
+  pthread_create(&picI_thread_pic2, NULL, &pic2_handle_msg, NULL);    
   return 1;
 }
 //------------------------------------------------------------------------------
@@ -136,8 +182,10 @@ void shut_usb()
 // Tente de reparer les connexions usb cassees. Retourne 1 si tout fonctionne, un resultat negatif sinon.
 int repare_usb()
 {
-  // TODO
-  return 1;
+  shut_usb();
+  bool f1 = connect_usb(PIC1)<0;
+  bool f2 = connect_usb(PIC2)<0;
+  return (f1 || f2)?-1:1;
 }
 //-------------------------------------------------------------------------------
 void* pic1_handle_msg(void *)
@@ -162,15 +210,15 @@ void* pic1_handle_msg(void *)
     {
       if(_msg==NULL)
         break;
-      
+        
       switch(get_msg_type(_msg))
       {
-        case EMPTY_MSG:
+        case MSG_EMPTY:
         fprintf(stderr,"<picInterface.cpp> PIC1: Connexion réinitialisée.\n");
         fflush(stdout); 
         pic_Reset();
         break;      
-        case CODER:
+        case MSG_CODER:
         {   
           SendInfo();
           MSG_INT2_t *msg = (MSG_INT2_t *)_msg;          
@@ -181,7 +229,7 @@ void* pic1_handle_msg(void *)
           coder_id = msg->msg_id;
         }
         break;
-        case PRINTF:
+        case MSG_PRINTF:
         {
           MSG_INT1_t *msg = (MSG_INT1_t *)_msg;          
           printf("from pic %d: %d\n",1,msg->value);
@@ -228,12 +276,12 @@ void* pic2_handle_msg(void *)
       //printf("Recv PIC2: %d\n",get_msg_type(_msg));     
       switch(get_msg_type(_msg))
       {
-        case EMPTY_MSG:       
+        case MSG_EMPTY:       
         fprintf(stderr,"<picInterface.cpp> PIC2: Connexion réinitialisée.\n");
         fflush(stdout); 
         pic_Reset();
         break;
-        case WEBCAM:
+        case MSG_WEBCAM:
         {
           char *f = (char*)(_msg+sizeof(MSG_INT1_t));
           FILE *file = fopen(f, "rb");
@@ -261,14 +309,27 @@ void* pic2_handle_msg(void *)
           //save_buff_to_bitmap("img.bmp", *webcam_W, *webcam_H, webcam_data);           
         }
         break;
-        case JACK:
+        case MSG_DIGIT:
         {
-          pic_Jack();
-          int buf = JACK;
-          if(write_usb(PIC2, &buf, sizeof(int))<0) break;
+          MSG_INT1_t *msg = (MSG_INT1_t *)_msg;
+          if(picI_digit_mutex[msg->msg_id])
+          {
+            picI_digit_value[msg->msg_id] = msg->value;
+            pthread_mutex_unlock(picI_digit_mutex[msg->msg_id]);
+          }
         }
-        break;  
-        case PRINTF:
+        break;
+        case MSG_ANALOG:
+        {
+          MSG_INT1_t *msg = (MSG_INT1_t *)_msg;
+          if(picI_analog_mutex[msg->msg_id])
+          {
+            picI_analog_value[msg->msg_id] = msg->value;
+            pthread_mutex_unlock(picI_analog_mutex[msg->msg_id]);
+          }
+        }
+        break;        
+        case MSG_PRINTF:
         {
           MSG_INT1_t *msg = (MSG_INT1_t *)_msg;          
           printf("from pic %d: %d\n",2,msg->value);
@@ -292,7 +353,7 @@ void* pic2_handle_msg(void *)
 pthread_mutex_t* picWebcam(int id, int *W, int *H, uint16_t *data)
 {
   MSG_INT1_t msg;
-  msg.type   = WEBCAM_QUERY;
+  msg.type   = MSG_WEBCAM_QUERY;
   msg.msg_id = msg_id++;
   msg.value = id;
   

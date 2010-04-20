@@ -36,7 +36,7 @@ int config_terrain;
 bool recallage_necessaire;
 
 // Boucle principale de la strategie
-void stratMainLoop();
+void strat_MainLoop();
 
 //------------------------------------------------------------------------------
 void strat_init()
@@ -63,15 +63,15 @@ void strat_init()
     usleep(10000);
   }
   
-  stratMainLoop();
+  strat_MainLoop();
 }
 //------------------------------------------------------------------------------
-bool is_strat_ready()
+bool strat_is_ready()
 {
   return strat_ready;
 }
 //------------------------------------------------------------------------------
-void stratMainLoop()
+void strat_MainLoop()
 {
   fprintf(stderr,">>> Let's go!\n");  fflush(stdout);
   
@@ -109,9 +109,12 @@ float strat_elapsed_time()
 //------------------------------------------------------------------------------
 void strat_lets_go()
 {
-  gettimeofday(&start_time,NULL); 
-   
+  gettimeofday(&start_time,NULL);
   started = true;
+  
+  // reset's position of the robot
+  position_t pos = symetrize(position_t(_POS_INIT_X,_POS_INIT_Y,_POS_INIT_A*M_PI/180.));
+  cine_set_position(pos);
 }
 //------------------------------------------------------------------------------
 bool strat_is_started()
@@ -125,16 +128,6 @@ void strat_game_over()
   fflush(stdout);
   sleep(1000);
   game_over = true;  
-}
-//------------------------------------------------------------------------------
-void wait_for_it(pthread_mutex_t *mutex)
-{
-  if(mutex == NULL) return;
-    
-  pthread_mutex_lock(mutex);    
-  pthread_mutex_unlock(mutex);      
-  pthread_mutex_destroy(mutex);      
-  delete mutex;
 }
 //------------------------------------------------------------------------------
 void strat_recallage()

@@ -4,6 +4,7 @@
 #include <unistd.h>
 
 #define PC_INCLUDE
+#include "strategie.h"
 #include "picAPI.h"
 #include "picAPI/pic_interface.h"
 
@@ -23,7 +24,7 @@ void pic_MainLoop()
     fprintf(stderr,"SETUP UBS FAILED !\n");
     exit(1);
   }
-  else if(init_analog_in(NB_ANALOGS) < 0)
+  else if(init_analog_in(0) < 0)
   {
     fprintf(stderr,"INIT ANALOG FAILED !\n");
     exit(1);
@@ -40,9 +41,16 @@ void pic_MainLoop()
         int coder_left, coder_right;
         unsigned char dir_left, dir_right;
         int iter = get_codeuses(&coder_left, &dir_left, &coder_right, &dir_right);
-        callbackRecvCoder(double(iter)*double(TIMER_CODER)/1000., coder_left, coder_right);        
+        if(iter == -1)
+          repare_usb();
+        else
+          callbackRecvCoder(double(iter)*PIC_FREQ, coder_left, coder_right);        
       }
-      usleep(TIMER_CODER*1000);
+    
+      if(!strat_is_started() && (get_digital_in() & DIGIT_JACK))
+        strat_lets_go();
+        
+      usleep(TIMER_CODER);
     }
   }
 }
@@ -60,7 +68,10 @@ int pic_MotorsPower(double pwleft, double pwright)
   if(pwright>1.) pwright = 1.;
   if(pwright<-1.) pwright = -1.;
   
-  return (set_speed(int(127.*pwleft)+128, int(127.*pwright)+128) == 1) ? 0 : 1;
+  if(set_speed(int(127.*pwleft)+128, int(127.*pwright)+128) == 1)
+    return 0;
+  else
+    return (repare_usb() == 1) ? 0 : 1;
 }
 //------------------------------------------------------------------------------
 void pic_Reset()

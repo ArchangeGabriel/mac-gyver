@@ -1,7 +1,8 @@
 #ifndef PICAPI
 #define PICAPI
 
-#define TIMER_CODER   5   // Envoie des valeurs des codeuses toutes les TIMER_CODER ms
+#define PIC_FREQ  (1./45.7763671875)   // Fréquence d'horloge du PIC
+#define TIMER_CODER   20000            // Regarde les valeurs des codeuses toutes les TIMER_CODER µs (dans l'idéal un peu plus faible que PIC_FREQ)
 
 /*
 Boucle infinie gérant les connections
