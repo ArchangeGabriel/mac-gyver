@@ -1,6 +1,7 @@
 #ifndef TYPESH
 #define TYPESH
 
+#include <pthread.h>
 #include "../common/lin_alg.h"
 
 typedef struct position_t
@@ -34,5 +35,11 @@ int get_color();
 Prend une position pour le robot en haut à gauche et renvoit la position adaptée à la couleur
 */
 position_t symetrize(position_t pos);
+
+//------------------------------------------------------------------------------
+/*
+Attend qu'un mutex se libère et le détruit
+*/
+void wait_for_it(pthread_mutex_t *mutex);
 
 #endif

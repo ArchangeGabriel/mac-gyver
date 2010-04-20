@@ -123,7 +123,7 @@ int main(int argc, char **argv)
   pic_RecvReset(strat_init);
 
   pthread_create(&IAThread, NULL, start_IA, NULL);   // Intelligence Artificielle
-  while(!is_strat_ready()) usleep(10000);
+  while(!strat_is_ready()) usleep(10000);
     
   pthread_create(&PPThread, NULL, start_PP, NULL);   // Path Planner
   pthread_create(&ACThread, NULL, start_AC, NULL);   // Anti Collision

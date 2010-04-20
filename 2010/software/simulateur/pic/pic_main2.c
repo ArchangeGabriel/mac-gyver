@@ -14,50 +14,29 @@
 #include "usb.h"
 #include "io2.h"
 
-#ifdef SIMULATION
 #include "simul.h"
-#endif
 
 #include "pic_main2.h"
 
-#ifdef SIMULATION
 int query_webcam = -1;
 int msg_webcam;
 uint16_t *pixels;
-#endif
 
 //------------------------------------------------------------------------------
-#ifdef SIMULATION
 void* pic_main2(void *Args)
-#else
-void* pic_main2(void *)
-#endif
 {
-  #ifdef SIMULATION
   pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS,NULL);  
   PIC_ARG *Simul=(PIC_ARG*)Args;
-  #endif
   int comm_id=-1;             // pour les communications avec le pc  
-  
-  int msg_id=-1;
   char *_msg;
-  bool started = false;
          
   while(1)
   {  
     //Communication avec le pc    
     if(comm_id<0)
-    {
-      #ifdef SIMULATION      
       connect_to_pc(Simul->my_id,Simul->my_nbr,&comm_id);   
-      started = false;      
-      #else
-      connect_to_pc();         
-      #endif
-    }
     else
     {
-      #ifdef SIMULATION
       if(query_webcam != -1)
       {
         int size = Simul->robot->webcams[query_webcam].getPicture(&pixels);  
@@ -77,7 +56,7 @@ void* pic_main2(void *)
           MSG_INT1_t *msg = (MSG_INT1_t*)buffer;
           char *data = &buffer[sizeof(MSG_INT1_t)];
           
-          msg->type = WEBCAM;
+          msg->type = MSG_WEBCAM;
           msg->msg_id = msg_webcam;
           msg->value = strlen(f) + 1;
           strcpy(data, f);
@@ -89,7 +68,6 @@ void* pic_main2(void *)
           free(buffer);
         }
       }
-      #endif         
       int type = read_usb(SIMULARG2(comm_id, &_msg));
       if(type<0)
       {        
@@ -97,10 +75,7 @@ void* pic_main2(void *)
       }
       else switch(type)
       {
-        case EMPTY_MSG: break;
-        #ifdef SIMULATION
-        case JACK:
-        break;
+        case MSG_EMPTY: break;
         case MSG_INFO:
         {
           picInfo_t *msg = (picInfo_t*)_msg;
@@ -112,20 +87,40 @@ void* pic_main2(void *)
           Simul->robot->data[Simul->my_nbr].angle=msg->posA;
         }
         break;  
-        case WEBCAM_QUERY:
+        case MSG_WEBCAM_QUERY:
         {
           MSG_INT1_t *msg = (MSG_INT1_t *)_msg; 
           query_webcam = msg->value;
           msg_webcam = msg->msg_id;
         }
         break;         
-        #endif     
-        case QUERY:
+        case MSG_QUERY:
         {
           MSG_INT1_t *msg = (MSG_INT1_t *)_msg;
           switch(msg->value)
           {
-            case DIST:
+            case MSG_DIGIT:
+            {
+              MSG_INT1_t answer;
+              answer.type   = MSG_DIGIT;
+              answer.msg_id = msg->msg_id;
+              answer.value  = get_input2(SIMULARG3(Simul,MSG_DIGIT,0));
+              if(write_usb(comm_id,&answer,sizeof(MSG_INT1_t))<0)
+                close_connection(&comm_id);  
+            }
+            break;
+            case MSG_ANALOG:
+            {
+              MSG_INT2_t *msg = (MSG_INT2_t *)_msg;
+              MSG_INT1_t answer;
+              answer.type   = MSG_ANALOG;
+              answer.msg_id = msg->msg_id;
+              answer.value  = get_input2(SIMULARG3(Simul,MSG_ANALOG,msg->value2));
+              if(write_usb(comm_id,&answer,sizeof(MSG_INT1_t))<0)
+                close_connection(&comm_id);  
+            }            
+            break;
+/*          case DIST:
             {
               MSG_INTn_t *msg2;
               int *values;
@@ -144,36 +139,30 @@ void* pic_main2(void *)
                 close_connection(&comm_id);
               free(buff);
             }
-            break;
+            break;*/
             default:
-            #ifdef SIMULATION               
-            printf("<pic_main2.c> PIC2 Unknown query type %d.\n",type);
+            printf("<pic_main2.c> PIC2 Unknown MSG_QUERY type %d.\n",type);
             fflush(stdout);     
-            #endif       
             break;                  
           }
         }
         break;
+        case MSG_DCMOTOR:
+        case MSG_SERVOMOTOR:
+        {
+          MSG_INT2_t *msg = (MSG_INT2_t *)_msg;
+          set_output2(SIMULARG4(Simul,type,msg->value1,msg->value2));
+        }
+        break;
         default:
-        #ifdef SIMULATION           
         printf("<pic_main2.c> Unknown message type %d.\n",type);
         fflush(stdout);            
-        #endif
         break;             
       }      
-      if(!started && get_input2(SIMULARG3(Simul,JACK,0)))
-      {
-        started = true;
-        int msg;
-        msg = JACK;
-        if(write_usb(SIMULARG3(comm_id,&msg,sizeof(int)))<0)
-          close_connection(&comm_id);  
-      }
       if(type>0)
         free(_msg);
     }
     
-    #ifdef SIMULATION
     pthread_barrier_wait(Simul->barrier);
     pthread_barrier_wait(Simul->barrier);      
     if(*Simul->STOP)
@@ -181,11 +170,8 @@ void* pic_main2(void *)
       *Simul->alive_thread = *Simul->alive_thread-1;
       break;
     }
-    #endif
   }
-  #ifdef SIMULATION
   free(Args);
-  #endif  
   return NULL;
 }
 //------------------------------------------------------------------------------

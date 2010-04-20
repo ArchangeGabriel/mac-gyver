@@ -9,7 +9,7 @@ Appelé au démarrage du programme, color est la couleur du robot (clRED ou clGR
 Lance la reconnaissance vidéo de la configuration
 */
 void strat_init();
-bool is_strat_ready();
+bool strat_is_ready();
 
 //------------------------------------------------------------------------------
 /*
@@ -23,12 +23,6 @@ int strat_get_config_terrain();
 Appelé lorsque le Jack est retiré
 */
 void strat_lets_go();
-
-//------------------------------------------------------------------------------
-/*
-Attend qu'un mutex se libère et le détruit
-*/
-void wait_for_it(pthread_mutex_t *mutex);
 
 //------------------------------------------------------------------------------
 /*

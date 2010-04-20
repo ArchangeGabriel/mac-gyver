@@ -27,3 +27,13 @@ position_t symetrize(position_t pos)
   return pos;  
 }
 //------------------------------------------------------------------------------
+void wait_for_it(pthread_mutex_t *mutex)
+{
+  if(mutex == NULL) return;
+    
+  pthread_mutex_lock(mutex);    
+  pthread_mutex_unlock(mutex);      
+  pthread_mutex_destroy(mutex);      
+  delete mutex;
+}
+//------------------------------------------------------------------------------

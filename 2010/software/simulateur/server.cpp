@@ -131,7 +131,7 @@ void get_connection_id(int robot_id, int pic_id, int* comm_id)
   for(iter = connect_list.begin(); iter != connect_list.end(); iter++) 
     if((*iter).first.first==robot_id && (*iter).first.second==pic_id)   
     {
-      int msg=EMPTY_MSG;
+      int msg=MSG_EMPTY;
       write((*iter).second,&msg,sizeof(int));    
       *comm_id=(*iter).second;
       printf("PC connecté au pic n°%d, robot %d...\n>>> ",pic_id, robot_id);

@@ -83,7 +83,7 @@ int connect_usb(int picID)
     return -1;  
   }
   
-  if(msg!=EMPTY_MSG)
+  if(msg!=MSG_EMPTY)
   {
     printf("ERREUR: Protocole non respecté. Connection au pic en émulation USB impossible.\n");
     fflush(stdout);  

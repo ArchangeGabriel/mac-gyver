@@ -15,33 +15,34 @@ int get_msg_header_size(char *msg)
  switch(get_msg_type(msg))
   {
     #ifdef SIMULATION
-    case WEBCAM:
+    case MSG_WEBCAM:
       return 2*sizeof(int);
     break;
-    case WEBCAM_QUERY:
+    case MSG_WEBCAM_QUERY:
       return sizeof(int);
     break;    
     case MSG_INFO:
       return sizeof(int);    
     break;
     #endif
-    case JACK:
-    case EMPTY_MSG:
+    case MSG_EMPTY:
       return 0;
     break;
-    case QUERY:    
-    case ACK:
+    case MSG_QUERY:    
     case MSG_MOTORS:
-    case CODER:    
-    case PRINTF:
+    case MSG_CODER:    
+    case MSG_PRINTF:
+    case MSG_DIGIT:
+    case MSG_DCMOTOR:
+    case MSG_SERVOMOTOR:
       return sizeof(int);
     break;
-    case DIST:     
-      return 2*sizeof(int);
-    break;  
+    case MSG_ANALOG:
+      return 2*sizeof(int);    
+    break;
     default:
-    //fprintf(stderr,"<comm.c> get_msg_header_size() : Unknown message type. %d\n",get_msg_type(msg));
-    //fflush(stdout);
+    fprintf(stderr,"<comm.c> get_msg_header_size() : Unknown message type. %d\n",get_msg_type(msg));
+    fflush(stdout);
     break;  
   }
   return 0;
@@ -52,34 +53,35 @@ int get_msg_data_size(char *msg)
   switch(get_msg_type(msg))
   {
     #ifdef SIMULATION
-    case WEBCAM:
+    case MSG_WEBCAM:
       return ((MSG_INT1_t*)msg)->value;
-    case WEBCAM_QUERY:
+    case MSG_WEBCAM_QUERY:
       return sizeof(MSG_INT1_t) - 2*sizeof(int);
     break;
     case MSG_INFO:
       return sizeof(picInfo_t) - 2*sizeof(int);
     break;
     #endif  
-    case JACK:
-    case EMPTY_MSG:
+    case MSG_EMPTY:
       return 0;
     break;    
-    case QUERY:
-    case ACK:
-    case PRINTF:
+    case MSG_QUERY:
+    case MSG_PRINTF:
+    case MSG_DIGIT:    
       return sizeof(MSG_INT1_t) - 2*sizeof(int);
     break;
     case MSG_MOTORS:
-    case CODER: 
+    case MSG_CODER: 
+    case MSG_DCMOTOR:
+    case MSG_SERVOMOTOR:
       return sizeof(MSG_INT2_t) - 2*sizeof(int);
     break;
-    case DIST:   
+    case MSG_ANALOG:
       return sizeof(int)*((MSG_INTn_t*)msg)->n;
-    break;  
+    break;
     default:
-    //fprintf(stderr,"<comm.c> get_msg_data_size() : Unknown message type. %d\n",get_msg_type(msg));
-    //fflush(stdout);
+    fprintf(stderr,"<comm.c> get_msg_data_size() : Unknown message type. %d\n",get_msg_type(msg));
+    fflush(stdout);
     break;  
   }
   return 0;
