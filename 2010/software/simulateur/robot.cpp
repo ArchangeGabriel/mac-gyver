@@ -13,9 +13,27 @@ robot_t::robot_t()
   robot->type=OBJ_ROBOT;
   robot->couleur=clRobot;    
   add_object(robot);
-
+  robot=new ObjBox;
+  robot->type=OBJ_ROBOT;
+  robot->couleur=clRobot;    
+  add_object(robot);
+  robot=new ObjBox;
+  robot->type=OBJ_ROBOT;
+  robot->couleur=clRobot;    
+  add_object(robot); 
+  
+  ObjBox *pusher=new ObjBox;
+  pusher->type=OBJ_ROBOT;
+  pusher->couleur=clGray;  
+  add_object(pusher);
+  
+/*  ObjBox *porte=new ObjBox;
+  porte->type=OBJ_ROBOT;
+  porte->couleur=clGray;  
+  add_object(porte);   */
+  
   for(int i=0;i<2;i++)
-    tension_moteur[i]=0;
+    tension_moteur[i]=0;  
   
   webcams.clear();
   color_captors.clear();
@@ -66,7 +84,58 @@ void robot_t::init_params()
   ((ObjBox*)objects[0])->z=z;    
   objects_pos[0].x=0.;  
   objects_pos[0].y=0.;
+  
+  const double dim_collecteur_width = 0.185;
+  const double dim_collecteur_depth = 0.24;  
+  z = surelev + hauteur/2.;
+  
+  // robot
+  ((ObjBox*)objects[0])->dimX=dimX;
+  ((ObjBox*)objects[0])->dimY=(dimY-dim_collecteur_width)/2.;
+  ((ObjBox*)objects[0])->hauteur=hauteur;  
+  ((ObjBox*)objects[0])->z=z;    
+  ((ObjBox*)objects[1])->dimX=dimX-dim_collecteur_depth;
+  ((ObjBox*)objects[1])->dimY = dim_collecteur_width;
+  ((ObjBox*)objects[1])->hauteur=hauteur;  
+  ((ObjBox*)objects[1])->z=z;        
+  ((ObjBox*)objects[2])->dimX=dimX;
+  ((ObjBox*)objects[2])->dimY=(dimY-dim_collecteur_width)/2.;
+  ((ObjBox*)objects[2])->hauteur=hauteur;
+  ((ObjBox*)objects[2])->z=z; 
+  
+  objects_pos[0].x=0.;  
+  objects_pos[0].y=(dimY+dim_collecteur_width)/4.;
+  objects_pos[1].x=-dim_collecteur_depth/2;  
+  objects_pos[1].y=0.;  
+  objects_pos[2].x=0.;
+  objects_pos[2].y=-(dimY+dim_collecteur_width)/4.;
+  
+  // pusher
+  pusher_minX = dimX/2.-dim_collecteur_depth;
+  pusher_maxX = dimX/2.-0.02;  
+  motor_pusher = 0;
+    
+  ((ObjBox*)objects[3])->dimX=0.02;
+  ((ObjBox*)objects[3])->dimY=dim_collecteur_width;
+  ((ObjBox*)objects[3])->hauteur=hauteur;
+  ((ObjBox*)objects[3])->z=z;
 
+  objects_pos[3].x=0.;  
+  objects_pos[3].y=0.; 
+  motor_pusher = 0;
+   
+  // door
+ /* ((ObjBox*)objects[4])->dimX=dimX;
+  ((ObjBox*)objects[4])->dimY=dim_collecteur_width;
+  ((ObjBox*)objects[4])->hauteur=hauteur/2;
+  ((ObjBox*)objects[4])->z=z;
+
+  ((ObjBox*)objects[4])->dimX=dimX;
+  ((ObjBox*)objects[4])->dimY=dim_collecteur_width;
+  ((ObjBox*)objects[4])->hauteur=hauteur/2;
+  ((ObjBox*)objects[4])->z=z;*/
+
+  // rest of the parameters
   position.x       = double_param_value("position_x");  
   position.y       = double_param_value("position_y");
   angle            = double_param_value("angle")*M_PI/180.;  
@@ -94,15 +163,13 @@ void robot_t::init_params()
   printf("ok\n");
   fflush(stdout); 
   
-  
-  char *file;
-  
+  char *file;  
   /* Motors */
   file = string_param_value("params_file_motor");
   for(int i=0;i<2;i++)
   {
     moteur[i].dt=simul_info->dt;
-    moteur[i].r=rayon_roue;
+    moteur[i].r=rayon_roue; 
     moteur[i].m=masse/2.;
     moteur[i].g=simul_info->g;
     moteur[i].e=simul_info->coeff_frott_roue;
@@ -179,6 +246,9 @@ int robot_t::pic_io(robot_t* robot,int captor_type, int captor_id, int value)
       return 0;
     break;
     case MSG_DCMOTOR:
+      if(captor_id == MOTOR_PUSHER)
+        robot->motor_pusher = value;
+      return 0;
     case MSG_SERVOMOTOR:
       return 0;
     break;
@@ -199,6 +269,7 @@ void robot_t::calc_forces()
   R[0]=roue[0].rotate_spec(cosinus,sinus);
   R[1]=roue[1].rotate_spec(cosinus,sinus); 
   
+  move_parts();
   calc_frottements();
 
   for(int i=0;i<2;i++)
@@ -217,6 +288,24 @@ void robot_t::calc_frottements()
   add_force(O,F);  
   F = T*(-coeff_frott_t*(speed|T)*masse/simul_info->dt);  
   add_force(O,F);
+}
+//----------------------------------------------------------------------------
+void robot_t::move_parts()
+{
+  const double h_speed_move = 0.08;  // en m/s
+  const double dx = h_speed_move * simul_info->dt;
+  
+  if(motor_pusher == MOTOR_PUSHER_FORWARD)
+    objects_pos[3].x += dx;
+  if(motor_pusher == MOTOR_PUSHER_BACKWARD)
+    objects_pos[3].x -= dx;
+    
+  bug ici!!! le poussoir devrait avancer (objects_pos[3].x augmente périodiquement)
+    
+  if(objects_pos[3].x < pusher_minX)
+    objects_pos[3].x = pusher_minX;
+  if(objects_pos[3].x > pusher_maxX)
+    objects_pos[3].x = pusher_maxX;
 }
 //----------------------------------------------------------------------------
 void robot_t::draw()

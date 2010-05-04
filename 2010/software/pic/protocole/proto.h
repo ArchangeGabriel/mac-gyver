@@ -34,6 +34,9 @@
 // Motors
 #define MOTOR_PUSHER 1
 
+#define MOTOR_PUSHER_FORWARD   1
+#define MOTOR_PUSHER_BACKWARD -1
+
 // Servo-motors
 #define SERVOM_DOOR  1
 

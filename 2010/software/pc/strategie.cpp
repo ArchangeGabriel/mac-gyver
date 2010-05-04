@@ -75,8 +75,10 @@ void strat_MainLoop()
 {
   fprintf(stderr,">>> Let's go!\n");  fflush(stdout);
   
+  pic_move_pusher(MOTOR_PUSHER_FORWARD);
+  
   while(!config_terrain) usleep(10000);    
-   
+     
   wait_for_it(pt_go_to(symetrize(position_t(2.7,1.8,M_PI_2)),tpDEST,false));
 
   while(true)

@@ -74,6 +74,11 @@ int pic_MotorsPower(double pwleft, double pwright)
     return (repare_usb() == 1) ? 0 : 1;
 }
 //------------------------------------------------------------------------------
+int pic_move_pusher(int direction)
+{
+  return (set_DC_motor(MOTOR_PUSHER, direction) == 1) ? 0 : 1;
+}
+//------------------------------------------------------------------------------
 void pic_Reset()
 {
   if(callbackRecvReset)

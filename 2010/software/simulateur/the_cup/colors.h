@@ -7,6 +7,8 @@
 
 #define clWhite COLOR_SDL(255,255,255)
 #define glWhite COLOR_GL(255,255,255)
+#define clGray  COLOR_SDL(128,128,128)
+#define glGray  COLOR_GL(128,128,128)
 #define clBlack COLOR_SDL(0,0,0)
 #define glBlack COLOR_GL(0,0,0)
 

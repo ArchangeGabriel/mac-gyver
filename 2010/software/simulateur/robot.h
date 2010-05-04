@@ -17,6 +17,9 @@ class robot_t : public union_obj_t
   private:
   double coeff_frott_n;   // coefficient de frottement dans le sens des déplacements
   double coeff_frott_t;   // coefficient de frottement pour les déplacements orthogonaux aux roues
+  int motor_pusher;
+  double pusher_minX;
+  double pusher_maxX;
   
   public:
   vector<camera_t> webcams;
@@ -52,6 +55,7 @@ class robot_t : public union_obj_t
   void calc_forces();
   void calc_frottements();
   void calc_forces_moteur();
+  void move_parts();
   void additional_op_simul();
   void draw();
 };
