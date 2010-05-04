@@ -4,6 +4,8 @@
 #define PIC_FREQ  (1./45.7763671875)   // Fréquence d'horloge du PIC
 #define TIMER_CODER   20000            // Regarde les valeurs des codeuses toutes les TIMER_CODER µs (dans l'idéal un peu plus faible que PIC_FREQ)
 
+#include "../pic/protocole/proto.h"
+
 /*
 Boucle infinie gérant les connections
 */
@@ -22,6 +24,12 @@ Comprise entre -1 (recule) et 1 (avance)
 Renvoie 0 en cas de succès, un nombre non nul sinon
 */
 int pic_MotorsPower(double pwleft, double pwright);
+
+/*
+Avance ou recule le poussoir (voir ../../pic/protocole/proto.h)
+Renvoie 0 en cas de succès, un nombre non nul sinon
+*/
+int pic_move_pusher(int direction); 
 
 /*
 réinitialise les PIC
