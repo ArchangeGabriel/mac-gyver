@@ -239,24 +239,23 @@ int robot_t::pic_io(robot_t* robot,int captor_type, int captor_id, int value)
     case MSG_DIGIT:
     {
       int state = DIGIT_JACK;
+      if(robot->objects_pos[3].x == robot->pusher_minX) state |= DIGIT_PUSHER_BACK;
+      if(robot->objects_pos[3].x == robot->pusher_maxX) state |= DIGIT_PUSHER_FRONT;              
       return state;
     }
     break;
     case MSG_ANALOG:
       return 0;
-    break;
     case MSG_DCMOTOR:
       if(captor_id == MOTOR_PUSHER)
         robot->motor_pusher = value;
       return 0;
     case MSG_SERVOMOTOR:
       return 0;
-    break;
     case MSG_MOTORS:
       if(captor_id==0 || captor_id==1) 
         robot->tension_moteur[captor_id]=double(value-128)/127.;
       return 0;
-    break;
   }
   return -1;
 }
@@ -295,17 +294,41 @@ void robot_t::move_parts()
   const double h_speed_move = 0.08;  // en m/s
   const double dx = h_speed_move * simul_info->dt;
   
-  if(motor_pusher == MOTOR_PUSHER_FORWARD)
+  if(motor_pusher == MOTOR_PUSHER_FORWARD && objects_pos[3].x < pusher_maxX)
+  {
     objects_pos[3].x += dx;
-  if(motor_pusher == MOTOR_PUSHER_BACKWARD)
+    objects_last_pos[3].x += dx;
+    objects[3]->speed = N*dx;     
+  }
+  else if(motor_pusher == MOTOR_PUSHER_BACKWARD && objects_pos[3].x > pusher_minX)
+  {
     objects_pos[3].x -= dx;
-    
-  bug ici!!! le poussoir devrait avancer (objects_pos[3].x augmente périodiquement)
+    objects_last_pos[3].x -= dx;    
+    objects[3]->speed = -N*dx;     
+  }
+  else
+  {
+    objects[3]->speed.x = 0.; 
+    objects[3]->speed.y = 0.;     
+  }
     
   if(objects_pos[3].x < pusher_minX)
+  {
     objects_pos[3].x = pusher_minX;
+    objects_last_pos[3].x = pusher_minX;
+    objects[3]->speed.x = 0.; 
+    objects[3]->speed.y = 0.;     
+  }
   if(objects_pos[3].x > pusher_maxX)
+  {
     objects_pos[3].x = pusher_maxX;
+    objects_last_pos[3].x = pusher_maxX;
+    objects[3]->speed.x = 0.; 
+    objects[3]->speed.y = 0.;     
+  }
+
+  objects[3]->G_init=G_init-objects_pos[3]; 
+  objects[3]->maj_const_vars();
 }
 //----------------------------------------------------------------------------
 void robot_t::draw()

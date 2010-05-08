@@ -74,9 +74,32 @@ int pic_MotorsPower(double pwleft, double pwright)
     return (repare_usb() == 1) ? 0 : 1;
 }
 //------------------------------------------------------------------------------
-int pic_move_pusher(int direction)
+int pic_move_pusher(int position)
 {
-  return (set_DC_motor(MOTOR_PUSHER, direction) == 1) ? 0 : 1;
+  return (set_DC_motor(MOTOR_PUSHER, position) == 1) ? 0 : 1;
+}
+//------------------------------------------------------------------------------
+bool pic_where_pusher(int position)
+{
+  if(position == MOTOR_PUSHER_FORWARD)
+    return get_digital_in() & DIGIT_PUSHER_FRONT;
+  else if(position == MOTOR_PUSHER_BACKWARD)
+    return get_digital_in() & DIGIT_PUSHER_BACK;
+  else
+    return !(get_digital_in() & (DIGIT_PUSHER_FRONT | DIGIT_PUSHER_BACK));
+}
+//------------------------------------------------------------------------------
+int pic_move_door(int position)
+{
+  return (set_servo(SERVOM_DOOR, position) == 1) ? 0 : 1;
+}
+//------------------------------------------------------------------------------
+bool pic_where_door(int position)
+{
+  if(position == MOTOR_DOOR_OPEN)
+    return get_digital_in() & DIGIT_DOOR_OPEN;
+  else
+    return get_digital_in() & DIGIT_DOOR_CLOSED;
 }
 //------------------------------------------------------------------------------
 void pic_Reset()

@@ -18,8 +18,8 @@ class robot_t : public union_obj_t
   double coeff_frott_n;   // coefficient de frottement dans le sens des déplacements
   double coeff_frott_t;   // coefficient de frottement pour les déplacements orthogonaux aux roues
   int motor_pusher;
-  double pusher_minX;
-  double pusher_maxX;
+  float pusher_minX;   // comme vector_t est float, on peut pas mettre double
+  float pusher_maxX;
   
   public:
   vector<camera_t> webcams;
