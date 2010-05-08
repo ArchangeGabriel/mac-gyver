@@ -29,7 +29,13 @@ int pic_MotorsPower(double pwleft, double pwright);
 Avance ou recule le poussoir (voir ../../pic/protocole/proto.h)
 Renvoie 0 en cas de succès, un nombre non nul sinon
 */
-int pic_move_pusher(int direction); 
+int pic_move_pusher(int position);
+
+/*
+teste la position du poussoir
+*/
+bool pic_where_pusher(int position);
+
 
 /*
 réinitialise les PIC

@@ -75,7 +75,9 @@ void strat_MainLoop()
 {
   fprintf(stderr,">>> Let's go!\n");  fflush(stdout);
   
-  pic_move_pusher(MOTOR_PUSHER_FORWARD);
+  pic_move_pusher(MOTOR_PUSHER_BACKWARD);
+  while(!pic_where_pusher(MOTOR_PUSHER_BACKWARD))
+    usleep(10000);
   
   while(!config_terrain) usleep(10000);    
      

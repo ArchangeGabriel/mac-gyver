@@ -35,10 +35,13 @@
 #define MOTOR_PUSHER 1
 
 #define MOTOR_PUSHER_FORWARD   1
+#define MOTOR_PUSHER_STOP      0
 #define MOTOR_PUSHER_BACKWARD -1
 
 // Servo-motors
 #define SERVOM_DOOR  1
+#define MOTOR_DOOR_OPEN    1
+#define MOTOR_DOOR_CLOSED  255
 
 // Capteurs digitaux
 #define DIGIT_PUSHER_BACK  1
