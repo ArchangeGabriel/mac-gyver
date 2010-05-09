@@ -4,25 +4,41 @@
 #include "webcam_processing.hpp"
 #include "webcam_utils.hpp"
 #include "../common/const.h"
-#include "../simulateur/the_cup/webcam_list.h"
 #include "cinematik.h"
+#include "sdl.h"
 
-//webcam_t video_front(WEBCAM1,640,480);
-//webcam_t video_top(WEBCAM2,640,480);
+#include "../common/simul.h"
+
+#ifdef SIMULATION
+#define WEBCAM1 "0"
+#define WEBCAM2 "1"
+#else
+#define WEBCAM1 "/dev/video1"
+#define WEBCAM2 "/dev/video2"
+#endif
+
+webcam_t video_front(WEBCAM1,640,480);
+webcam_t video_top(WEBCAM2,640,480);
+
+#ifdef VISUALIZE
+sdlWindow output_wc1(640, 480, "Webcam1");
+sdlWindow output_wc2(640, 480, "Webcam2");
+#endif
 
 void webcam_init()
 {
-/*    init_utils();
+  #ifndef SIMULATION
+  init_utils();
+  #endif
     
-    video_front.start();
-    video_top.stop();*/
+  video_front.start();
+  video_top.start();
 }
 
 int wc_reco_config()
 {
 
-/*  webcam_t WC("0", 640, 480);
-  WC.start();
+/*
   WC.do_capture();
   image_t img = WC.get_image2();*/
  

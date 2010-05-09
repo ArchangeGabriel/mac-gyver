@@ -110,11 +110,7 @@ int main(int argc, char **argv)
   set_color(color);
   
   #ifdef VISUALIZE
-  initSDL();
-  visu_draw_background(0);
-  Load_SDL_Background();  
   pthread_create(&SDLThread, NULL, start_SDL, NULL);   // Affichage SDL
-  while(!is_SDL_ready()) usleep(10000);
   #endif
 
   // Initialise les fonction de callback
