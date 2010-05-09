@@ -1,5 +1,4 @@
 #include <unistd.h>
-#include <pthread.h>
 
 #define PC_INCLUDE
 #include "../common/const.h"
@@ -8,30 +7,26 @@
 #include "anticol.h"
 #include "sdl.h"
 
-SDL_Surface* affichage=NULL;
-SDL_Surface* background=NULL;
-Uint32 *back_pixels;
-
-pthread_mutex_t using_background;
+bool sdlWindow::init_done = false;
 
 //------------------------------------------------------------------------------
-void initSDL()
+sdlWindow::sdlWindow(int width, int height, const char *title)
 {
-  printf("SDL initialization...           ");
-  fflush(stdout);  
-
   pthread_mutex_init(&using_background, NULL); 
 
-  if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-    fprintf(stderr, "Error during SDL initialization : %s\n", SDL_GetError());
-    exit(EXIT_FAILURE);
+  if(!init_done)
+  {
+    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+      fprintf(stderr, "Error during SDL initialization : %s\n", SDL_GetError());
+      exit(EXIT_FAILURE);
+    }
+    init_done = true;
+    printf"INIT!!!!!\n");
   }
-
-  int Width = _LONGUEUR_TER * _SCALE_SDL;
-  int Height = _LARGEUR_TER * _SCALE_SDL;  
-  back_pixels = new Uint32[4*Width*Height];
+ 
+  back_pixels = new Uint32[4*width*height];
   
-  affichage = SDL_SetVideoMode(Width,Height, 32, SDL_HWSURFACE|SDL_DOUBLEBUF/*|SDL_FULLSCREEN*/);
+  affichage = SDL_SetVideoMode(width,height, 32, SDL_HWSURFACE|SDL_DOUBLEBUF/*|SDL_FULLSCREEN*/);
 
   if (affichage == NULL || back_pixels == NULL) {
     fprintf(stderr, "Cannot activate the graphic mode : %s\n", SDL_GetError());
@@ -40,42 +35,10 @@ void initSDL()
   printf("ok\nSetting title...                ");
   fflush(stdout); 
   
-  SDL_WM_SetCaption("Feed the world", NULL);
-  printf("ok\n");
-  fflush(stdout);  
+  SDL_WM_SetCaption(title, NULL);
 }
 //------------------------------------------------------------------------------
-bool is_SDL_ready()
-{
-  return affichage!=NULL;  
-}
-//------------------------------------------------------------------------------
-void Load_SDL_Background()
-{
-  pthread_mutex_lock(&using_background);
-  memcpy(back_pixels,affichage->pixels,4*affichage->w*affichage->h);
-  if(background) SDL_FreeSurface(background);
-  background=SDL_CreateRGBSurfaceFrom(back_pixels,affichage->w,affichage->h,32,4*affichage->w,0,0,0,0);
-  if(!background) {
-    fprintf(stderr, "Cannot create background : %s\n", SDL_GetError());
-    exit(EXIT_FAILURE);
-  }  
-  pthread_mutex_unlock(&using_background);  
-}
-//------------------------------------------------------------------------------
-void Draw_SDL_Background()
-{
-  pthread_mutex_lock(&using_background);
-  SDL_BlitSurface(background,NULL,affichage,NULL);
-  pthread_mutex_unlock(&using_background);  
-}
-//------------------------------------------------------------------------------
-inline Uint32 makeColorSDL(int R, int G, int B)
-{
-  return SDL_MapRGB(affichage->format, R, G, B);
-}
-//------------------------------------------------------------------------------
-Uint32 makeColorSDL(char *color)
+Uint32 sdlWindow::makeColorSDL(char *color)
 {
   int r=0,g=0,b=0;
   if('0'<=color[0] && color[0]<='9') r+=16*(color[0]-'0');
@@ -101,32 +64,13 @@ Uint32 makeColorSDL(char *color)
   return makeColorSDL(r,g,b);
 }
 //------------------------------------------------------------------------------
-inline void setPixel(int x, int y, Uint32 coul)
-{
-  *((Uint32*)(affichage->pixels) + x + y * affichage->w) = coul;
-}
-//------------------------------------------------------------------------------
-inline void setPixelVerif(int x, int y, Uint32 coul)
-{
-  if (x >= 0 && x < affichage->w &&
-      y >= 0 && y < affichage->h)
-    setPixel(x, y, coul);
-}
-//------------------------------------------------------------------------------
-inline void echangerEntiers(int* x, int* y)
-{
-  int t = *x;
-  *x = *y;
-  *y = t;
-}
-//------------------------------------------------------------------------------
-void RefreshSDL(void)
+void sdlWindow::RefreshSDL(void)
 {
   SDL_Flip(affichage);
 //  SDL_PumpEvents(); 
 }
 //------------------------------------------------------------------------------
-void LigneHorizontaleSDL(int x, int y, int w, Uint32 coul)
+void sdlWindow::LigneHorizontaleSDL(int x, int y, int w, Uint32 coul)
 {
   SDL_Rect r;
 
@@ -138,7 +82,7 @@ void LigneHorizontaleSDL(int x, int y, int w, Uint32 coul)
   SDL_FillRect(affichage, &r, coul);
 }
 //------------------------------------------------------------------------------
-void LigneVerticaleSDL(int x, int y, int h, Uint32 coul)
+void sdlWindow::LigneVerticaleSDL(int x, int y, int h, Uint32 coul)
 {
   SDL_Rect r;
 
@@ -150,7 +94,7 @@ void LigneVerticaleSDL(int x, int y, int h, Uint32 coul)
   SDL_FillRect(affichage, &r, coul);
 }
 //------------------------------------------------------------------------------
-void LigneSDL(int x1, int y1, int x2, int y2, Uint32 coul)
+void sdlWindow::LigneSDL(int x1, int y1, int x2, int y2, Uint32 coul)
 {
   int d, dx, dy, aincr, bincr, xincr, yincr, x, y;
   
@@ -160,8 +104,8 @@ void LigneSDL(int x1, int y1, int x2, int y2, Uint32 coul)
 
     if (y1 > y2)
     {
-      echangerEntiers(&x1, &x2);
-      echangerEntiers(&y1, &y2);
+      swapInts(&x1, &x2);
+      swapInts(&y1, &y2);
     }
 
     xincr = x2 > x1 ? 1 : -1;
@@ -193,8 +137,8 @@ void LigneSDL(int x1, int y1, int x2, int y2, Uint32 coul)
     /* parcours par l'axe horizontal */
     if (x1 > x2)
     {
-      echangerEntiers(&x1, &x2);
-      echangerEntiers(&y1, &y2);
+      swapInts(&x1, &x2);
+      swapInts(&y1, &y2);
     }
 
     yincr = y2 > y1 ? 1 : -1;
@@ -223,7 +167,7 @@ void LigneSDL(int x1, int y1, int x2, int y2, Uint32 coul)
   }    
 }
 //------------------------------------------------------------------------------
-void PolylineSDL(point_t *Points, int nbr, Uint32 coul)
+void sdlWindow::PolylineSDL(point_t *Points, int nbr, Uint32 coul)
 {
   int i;
   for(i=1;i<nbr;i++)
@@ -231,7 +175,7 @@ void PolylineSDL(point_t *Points, int nbr, Uint32 coul)
   LigneSDL(Points[nbr-1].x, Points[nbr-1].y, Points[0].x, Points[0].y, coul);
 }
 //------------------------------------------------------------------------------
-void FillRectSDL(int x, int y, int w, int h, Uint32 coul)
+void sdlWindow::FillRectSDL(int x, int y, int w, int h, Uint32 coul)
 {
   SDL_Rect r;
 
@@ -243,7 +187,7 @@ void FillRectSDL(int x, int y, int w, int h, Uint32 coul)
   SDL_FillRect(affichage, &r, coul);
 }
 //------------------------------------------------------------------------------
-void CercleSDL(int cx, int cy, int rayon, Uint32 coul)
+void sdlWindow::CercleSDL(int cx, int cy, int rayon, Uint32 coul)
 {
   int d, y, x;
 
@@ -272,7 +216,7 @@ void CercleSDL(int cx, int cy, int rayon, Uint32 coul)
   }
 }
 //------------------------------------------------------------------------------
-void DisqueSDL(int cx, int cy, int rayon, Uint32 coul)
+void sdlWindow::DisqueSDL(int cx, int cy, int rayon, Uint32 coul)
 {
   int d, y, x;
 
@@ -295,5 +239,25 @@ void DisqueSDL(int cx, int cy, int rayon, Uint32 coul)
 
     x++;
   }
+}
+//------------------------------------------------------------------------------
+void sdlWindow::Load_SDL_Background()
+{
+  pthread_mutex_lock(&using_background);
+  memcpy(back_pixels,affichage->pixels,4*affichage->w*affichage->h);
+  if(background) SDL_FreeSurface(background);
+  background=SDL_CreateRGBSurfaceFrom(back_pixels,affichage->w,affichage->h,32,4*affichage->w,0,0,0,0);
+  if(!background) {
+    fprintf(stderr, "Cannot create background : %s\n", SDL_GetError());
+    exit(EXIT_FAILURE);
+  }  
+  pthread_mutex_unlock(&using_background);  
+}
+//------------------------------------------------------------------------------
+void sdlWindow::Draw_SDL_Background()
+{
+  pthread_mutex_lock(&using_background);
+  SDL_BlitSurface(background,NULL,affichage,NULL);
+  pthread_mutex_unlock(&using_background);  
 }
 //------------------------------------------------------------------------------

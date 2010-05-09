@@ -9,32 +9,33 @@
 #include "visualizer.h"
 
 pp_path path_planned;
+sdlWindow visu_window(_LONGUEUR_TER * _SCALE_SDL, _LARGEUR_TER * _SCALE_SDL, "Feed the world");
 
 //------------------------------------------------------------------------------
 void visu_draw_background(int config_terrain)
 {
   // sol
-  FillRectSDL(0,0,int(_SCALE_SDL*_LONGUEUR_TER),int(_SCALE_SDL*_LARGEUR_TER),clGround);  
+  visu_window.FillRectSDL(0,0,int(_SCALE_SDL*_LONGUEUR_TER),int(_SCALE_SDL*_LARGEUR_TER),clGround);  
   // départ 1
-  FillRectSDL(0,0,int(_SCALE_SDL*0.5),int(_SCALE_SDL*0.5),clTeam1);
-  FillRectSDL(int(_SCALE_SDL*(_LONGUEUR_TER-0.5)),int(_SCALE_SDL*(_LARGEUR_TER-0.522)),int(_SCALE_SDL*0.5),int(_SCALE_SDL*0.522),clDeposeTeam1);  
+  visu_window.FillRectSDL(0,0,int(_SCALE_SDL*0.5),int(_SCALE_SDL*0.5),clTeam1);
+  visu_window.FillRectSDL(int(_SCALE_SDL*(_LONGUEUR_TER-0.5)),int(_SCALE_SDL*(_LARGEUR_TER-0.522)),int(_SCALE_SDL*0.5),int(_SCALE_SDL*0.522),clDeposeTeam1);  
   // départ 2
-  FillRectSDL(int(_SCALE_SDL*(_LONGUEUR_TER-0.5)),0,int(_SCALE_SDL*0.5),int(_SCALE_SDL*0.5),clTeam2);
-  FillRectSDL(0.,int(_SCALE_SDL*(_LARGEUR_TER-0.522)),int(_SCALE_SDL*0.5),int(_SCALE_SDL*0.522),clDeposeTeam2);  
+  visu_window.FillRectSDL(int(_SCALE_SDL*(_LONGUEUR_TER-0.5)),0,int(_SCALE_SDL*0.5),int(_SCALE_SDL*0.5),clTeam2);
+  visu_window.FillRectSDL(0.,int(_SCALE_SDL*(_LARGEUR_TER-0.522)),int(_SCALE_SDL*0.5),int(_SCALE_SDL*0.522),clDeposeTeam2);  
   // Hors Terrain
-  FillRectSDL(int(_SCALE_SDL*0.5),int(_SCALE_SDL*2.122),int(_SCALE_SDL*2.),int(_SCALE_SDL*0.5),clBlack);
+  visu_window.FillRectSDL(int(_SCALE_SDL*0.5),int(_SCALE_SDL*2.122),int(_SCALE_SDL*2.),int(_SCALE_SDL*0.5),clBlack);
   // Mur Bas
-  FillRectSDL(int(_SCALE_SDL*0.5),int(_SCALE_SDL*2.1),int(_SCALE_SDL*2.),int(_SCALE_SDL*0.022),clWall);    
-  FillRectSDL(int(_SCALE_SDL*0.5),int(_SCALE_SDL*2.122),int(_SCALE_SDL*0.022),int(_SCALE_SDL*0.5),clWall);         
-  FillRectSDL(int(_SCALE_SDL*(_LONGUEUR_TER-0.522)),int(_SCALE_SDL*2.122),int(_SCALE_SDL*0.022),int(_SCALE_SDL*0.5),clWall);                         
+  visu_window.FillRectSDL(int(_SCALE_SDL*0.5),int(_SCALE_SDL*2.1),int(_SCALE_SDL*2.),int(_SCALE_SDL*0.022),clWall);    
+  visu_window.FillRectSDL(int(_SCALE_SDL*0.5),int(_SCALE_SDL*2.122),int(_SCALE_SDL*0.022),int(_SCALE_SDL*0.5),clWall);         
+  visu_window.FillRectSDL(int(_SCALE_SDL*(_LONGUEUR_TER-0.522)),int(_SCALE_SDL*2.122),int(_SCALE_SDL*0.022),int(_SCALE_SDL*0.5),clWall);                         
   // Colline
-  FillRectSDL(int(_SCALE_SDL*0.67),0,int(_SCALE_SDL*1.66),int(_SCALE_SDL*0.5),clHill);
+  visu_window.FillRectSDL(int(_SCALE_SDL*0.67),0,int(_SCALE_SDL*1.66),int(_SCALE_SDL*0.5),clHill);
   // Mur colline
-  FillRectSDL(int(_SCALE_SDL*0.74),int(_SCALE_SDL*0.5),int(_SCALE_SDL*1.52),int(_SCALE_SDL*0.022),clWall); 
-  LigneVerticaleSDL(int(_SCALE_SDL*0.74), 0, int(_SCALE_SDL*0.5), clBlack);               
-  LigneVerticaleSDL(int(_SCALE_SDL*(_LONGUEUR_TER-0.74)), 0, int(_SCALE_SDL*0.5), clBlack);                 
-  LigneVerticaleSDL(int(_SCALE_SDL*1.24), 0, int(_SCALE_SDL*0.5), clBlack);                                    
-  LigneVerticaleSDL(int(_SCALE_SDL*(_LONGUEUR_TER-1.24)), 0, int(_SCALE_SDL*0.5), clBlack); 
+  visu_window.FillRectSDL(int(_SCALE_SDL*0.74),int(_SCALE_SDL*0.5),int(_SCALE_SDL*1.52),int(_SCALE_SDL*0.022),clWall); 
+  visu_window.LigneVerticaleSDL(int(_SCALE_SDL*0.74), 0, int(_SCALE_SDL*0.5), clBlack);               
+  visu_window.LigneVerticaleSDL(int(_SCALE_SDL*(_LONGUEUR_TER-0.74)), 0, int(_SCALE_SDL*0.5), clBlack);                 
+  visu_window.LigneVerticaleSDL(int(_SCALE_SDL*1.24), 0, int(_SCALE_SDL*0.5), clBlack);                                    
+  visu_window.LigneVerticaleSDL(int(_SCALE_SDL*(_LONGUEUR_TER-1.24)), 0, int(_SCALE_SDL*0.5), clBlack); 
   
   int configE = (config_terrain%100)/10;
   int configI = config_terrain%10;
@@ -64,11 +65,11 @@ void visu_draw_background(int config_terrain)
             double x,y;
             x = 0.15 + 0.45*i;
             y = 2.1 - 1.378 + 0.5*j + 0.25*i;            
-            DisqueSDL(int(_SCALE_SDL*x), int(_SCALE_SDL*y), (_SCALE_SDL*0.025), clBlack);
+            visu_window.DisqueSDL(int(_SCALE_SDL*x), int(_SCALE_SDL*y), (_SCALE_SDL*0.025), clBlack);
             
             x = _LONGUEUR_TER - 0.15 - 0.45*i;
             y = 2.1 - 1.378 + 0.5*j + 0.25*i;
-            DisqueSDL(int(_SCALE_SDL*x), int(_SCALE_SDL*y), (_SCALE_SDL*0.025), clBlack);
+            visu_window.DisqueSDL(int(_SCALE_SDL*x), int(_SCALE_SDL*y), (_SCALE_SDL*0.025), clBlack);
           }
         }
         
@@ -78,10 +79,11 @@ void visu_draw_background(int config_terrain)
       {
         double x = _LONGUEUR_TER/2.;
         double y = 2.1 - 0.628 + 0.5*i; 
-        DisqueSDL(int(_SCALE_SDL*x), int(_SCALE_SDL*y), (_SCALE_SDL*0.025), clBlack);        
+        visu_window.DisqueSDL(int(_SCALE_SDL*x), int(_SCALE_SDL*y), (_SCALE_SDL*0.025), clBlack);        
       }
     }
-  }              
+  }      
+  visu_window.Load_SDL_Background();          
 }
 //------------------------------------------------------------------------------
 void visu_draw_robot()
@@ -91,13 +93,15 @@ void visu_draw_robot()
 
   position_t pos,dest;
   
+  visu_draw_background(0);
+  
   while(true)
   {
-    Draw_SDL_Background();  
+    visu_window.Draw_SDL_Background();  
     
     // Draw path
     for(unsigned int i=1; i<path_planned.size(); i++)
-      LigneSDL((int)(_SCALE_SDL*path_planned[i-1].x), (int)(_SCALE_SDL*path_planned[i-1].y),
+      visu_window.LigneSDL((int)(_SCALE_SDL*path_planned[i-1].x), (int)(_SCALE_SDL*path_planned[i-1].y),
                (int)(_SCALE_SDL*path_planned[i].x), (int)(_SCALE_SDL*path_planned[i].y), clBlack);//makeColorSDL(255,0,0));
 
     // Draw
@@ -117,20 +121,20 @@ void visu_draw_robot()
     point[2].y=((int)((pos.y-N.y*_LONGUEUR_ROBOT/2.-T.y*_LARGEUR_ROBOT/2.)*_SCALE_SDL));
     point[3].x=((int)((pos.x-N.x*_LONGUEUR_ROBOT/2.+T.x*_LARGEUR_ROBOT/2.)*_SCALE_SDL));
     point[3].y=((int)((pos.y-N.y*_LONGUEUR_ROBOT/2.+T.y*_LARGEUR_ROBOT/2.)*_SCALE_SDL)); 
-    PolylineSDL(point, 4, clRobot);
-    LigneSDL(point[2].x, point[2].y, ((int)(pos.x*_SCALE_SDL)), ((int)(pos.y*_SCALE_SDL)), clRobot); 
-    LigneSDL(point[3].x, point[3].y, ((int)(pos.x*_SCALE_SDL)), ((int)(pos.y*_SCALE_SDL)), clRobot);
+    visu_window.PolylineSDL(point, 4, clRobot);
+    visu_window.LigneSDL(point[2].x, point[2].y, ((int)(pos.x*_SCALE_SDL)), ((int)(pos.y*_SCALE_SDL)), clRobot); 
+    visu_window.LigneSDL(point[3].x, point[3].y, ((int)(pos.x*_SCALE_SDL)), ((int)(pos.y*_SCALE_SDL)), clRobot);
 
     // Destination
     N.x=cos(dest.a);
     N.y=sin(dest.a);
     T.x=-sin(dest.a)*0.03;
     T.y=cos(dest.a)*0.03; 
-    LigneSDL(((int)(_SCALE_SDL*dest.x)), ((int)(_SCALE_SDL*dest.y)), 
+    visu_window.LigneSDL(((int)(_SCALE_SDL*dest.x)), ((int)(_SCALE_SDL*dest.y)), 
              ((int)(_SCALE_SDL*(dest.x+N.x*0.1))), ((int)(_SCALE_SDL*(dest.y+N.y*0.1))), clBlack);
-    LigneSDL(((int)(_SCALE_SDL*(dest.x+N.x*0.1))), ((int)(_SCALE_SDL*(dest.y+N.y*0.1))), 
+    visu_window.LigneSDL(((int)(_SCALE_SDL*(dest.x+N.x*0.1))), ((int)(_SCALE_SDL*(dest.y+N.y*0.1))), 
              ((int)(_SCALE_SDL*(dest.x+N.x*0.07+T.x))), ((int)(_SCALE_SDL*(dest.y+N.y*0.07+T.y))), clBlack);
-    LigneSDL(((int)(_SCALE_SDL*(dest.x+N.x*0.1))), ((int)(_SCALE_SDL*(dest.y+N.y*0.1))), 
+    visu_window.LigneSDL(((int)(_SCALE_SDL*(dest.x+N.x*0.1))), ((int)(_SCALE_SDL*(dest.y+N.y*0.1))), 
              ((int)(_SCALE_SDL*(dest.x+N.x*0.07-T.x))), ((int)(_SCALE_SDL*(dest.y+N.y*0.07-T.y))), clBlack);
     
     // Captors
@@ -149,7 +153,7 @@ void visu_draw_robot()
                 ((int)(_SCALE_SDL*pos.y)),
                 ((int)(_SCALE_SDL*0.01)),color);        
     } */ 
-    RefreshSDL();             
+    visu_window.RefreshSDL();             
     usleep(40000);
   }
 }

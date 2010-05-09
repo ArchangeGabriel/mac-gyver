@@ -93,7 +93,6 @@ void strat_set_config_terrain(int c)
 {
   #ifdef VISUALIZE
   visu_draw_background(c);  
-  Load_SDL_Background();  
   #endif
 
   config_terrain = c;
