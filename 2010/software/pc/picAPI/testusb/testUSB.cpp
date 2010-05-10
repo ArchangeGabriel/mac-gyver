@@ -121,7 +121,10 @@ void* console(void*)
         printf("- init_analog_in(n) : configure n entrees analogiques\n");
         printf("- get_analog_in(n) : affiche les valeurs des entrees analogiques 0 a n-1\n");
         printf("- set_DC_motor(n,s) : fait tourner le moteur n (1 a 4) dans le sens s (-1,0 ou 1)\n");
-        printf("- set_servo(n,p) : met le servo n (1 a 4) en position p (0 a 255)\n\n");
+        printf("- set_servo(n,p) : met le servo n (1 a 4) en position p (0 a 255)\n");
+        printf("- debug : affiche les donnees de debug\n");
+        printf("- chariot_av : avance le chariot\n");
+        printf("- chariot_arr : recule le chariot\n\n");
       }
     }
     else if(!strcmp(Buff,"q"))
@@ -198,6 +201,12 @@ void* console(void*)
       printf("Codeuse droite : %8d Sens : %d\n",codeusedroite,sensdroit/2);
       printf("Codeuse gauche : %8d Sens : %d\n",codeusegauche,sensgauche);
     }
+    else if((set_up_inout) && (!strcmp(Buff,"debug")))
+    {
+      int c;
+      c = get_debug();
+      if(c == -1) printf("Erreur USB\n");
+    }
     else if((set_up_inout) && (!strcmp(Buff,"get_digital_in")))
     {
       int c;
@@ -254,6 +263,16 @@ void* console(void*)
       else if((s&0xfe)&&(s!=-1)) printf("Erreur : sens invalide. Il faut -1, 0 ou 1.\n");
       else if(set_DC_motor(n,s) == -1) printf("Erreur USB\n");
       else printf("Moteur %d dans le sens %d\n",n,s);
+    }
+    else if((set_up_inout) && (!strcmp(Buff,"chariot_arr")))
+    {
+      if(set_DC_motor(1,1) == -1) printf("Erreur USB\n");
+      else if(set_DC_motor(2,1) == -1) printf("Erreur USB\n");
+    }
+    else if((set_up_inout) && (!strcmp(Buff,"chariot_av")))
+    {
+      if(set_DC_motor(1,-1) == -1) printf("Erreur USB\n");
+      else if(set_DC_motor(2,-1) == -1) printf("Erreur USB\n");
     }
     else if((set_up_inout) && (!memcmp(Buff,"set_servo(",10)))
     {
