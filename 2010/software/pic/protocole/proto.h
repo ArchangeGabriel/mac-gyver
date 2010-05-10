@@ -1,5 +1,5 @@
 // proto.h / Definition du protocole //
-
+//modif pour le spam
 
 #ifndef PROTO_H_
 #define PROTO_H_
