@@ -10,16 +10,15 @@
 #include "strategie.h"
 
 //------------------------------------------------------------------------------
-void anticolMainLoop()
+void* ac_MainLoop(void*)
 {
-  fprintf(stderr,"AC thread...                    ok\n");  fflush(stdout);
   while(true)
   {
-      usleep(100000);
+    usleep(100000);
   }  
 }
 //------------------------------------------------------------------------------
-void anticolOnRecvCaptors(int n, float *values)
+void ac_OnRecvCaptors(int n, float *values)
 {
   if(n != 4)
   {

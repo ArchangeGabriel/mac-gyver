@@ -140,7 +140,7 @@ void console()
       else
       {
         if(((unsigned long)r)>=Simul.robot_list.size())
-          printf("Index de robot invalide. Max. index = %u\n",Simul.robot_list.size()-1);
+          printf("Index de robot invalide. Max. index = %lu\n",Simul.robot_list.size()-1);
         else
           monitor(r);       
       }
@@ -163,10 +163,10 @@ void console()
         if(!error)
         {
           if(r>=Simul.robot_list.size())
-            printf("Index de robot invalide. Max. index = %u\n",Simul.robot_list.size()-1);
+            printf("Index de robot invalide. Max. index = %lu\n",Simul.robot_list.size()-1);
           else
             if(i>=Simul.robot_list[r]->webcams.size())
-              printf("Index de webcam invalide. Max. index = %u\n",Simul.robot_list[r]->webcams.size()-1);       
+              printf("Index de webcam invalide. Max. index = %lu\n",Simul.robot_list[r]->webcams.size()-1);       
             else
             {
               Simul.robot_list[r]->webcams[i].start();

@@ -21,17 +21,11 @@
 #define CONSOLE
 
 pthread_t IAThread;
-void* start_IA(void*);
-
 pthread_t PPThread;
-void* start_PP(void*);
-
 pthread_t ACThread;
-void* start_AC(void*);
 
 #ifdef VISUALIZE
 pthread_t SDLThread;
-void* start_SDL(void*);
 #endif
 
 #ifdef CONSOLE
@@ -110,7 +104,7 @@ int main(int argc, char **argv)
   set_color(color);
   
   #ifdef VISUALIZE
-  pthread_create(&SDLThread, NULL, start_SDL, NULL);   // Affichage SDL
+  pthread_create(&SDLThread, NULL, visu_draw_robot, NULL);   // Affichage SDL
   #endif
 
   // Initialise les fonction de callback
@@ -118,11 +112,10 @@ int main(int argc, char **argv)
   pic_OnRecvCoder(cine_OnCoderRecv);  
   pic_RecvReset(strat_init);
 
-  pthread_create(&IAThread, NULL, start_IA, NULL);   // Intelligence Artificielle
-  while(!strat_is_ready()) usleep(10000);
-    
-  pthread_create(&PPThread, NULL, start_PP, NULL);   // Path Planner
-  pthread_create(&ACThread, NULL, start_AC, NULL);   // Anti Collision
+  // Lance les threads
+  pthread_create(&IAThread, NULL, strat_MainLoop, NULL);   // Intelligence Artificielle   
+  pthread_create(&PPThread, NULL, pt_MainLoop   , NULL);   // Path Planner
+  pthread_create(&ACThread, NULL, ac_MainLoop   , NULL);   // Anti Collision
   
   #ifdef CONSOLE
   pthread_create(&ConsoleThread, NULL, console, NULL);   // Console
@@ -132,30 +125,6 @@ int main(int argc, char **argv)
   pic_MainLoop();
   
   return 0;
-}
-//------------------------------------------------------------------------------
-void* start_IA(void*)
-{
-  strat_init(); 
-  return NULL;
-}
-//------------------------------------------------------------------------------
-void* start_PP(void*)
-{
-  ppMainLoop(); 
-  return NULL;
-}
-//------------------------------------------------------------------------------
-void* start_AC(void*)
-{
-  anticolMainLoop(); 
-  return NULL;
-}
-//------------------------------------------------------------------------------
-void* start_SDL(void*)
-{
-  visu_draw_robot(); 
-  return NULL;
 }
 //------------------------------------------------------------------------------
 void* console(void*)

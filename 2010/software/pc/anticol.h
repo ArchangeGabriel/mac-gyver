@@ -6,12 +6,12 @@
 /*
 Boucle principale
 */
-void anticolMainLoop();
+void* ac_MainLoop(void*);
 
 /*
 CallBack pour les capteurs
 */
-void anticolOnRecvCaptors(int n, float *values);
+void ac_OnRecvCaptors(int n, float *values);
 
 
 #endif

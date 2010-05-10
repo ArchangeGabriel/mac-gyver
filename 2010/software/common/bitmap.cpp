@@ -26,7 +26,7 @@ void save_buff_to_bitmap(const char *file, unsigned int w, unsigned int h, uint1
   n = 0;   fwrite(&n,4,1,F);  
   n = 0;   fwrite(&n,4,1,F);  
   
-  for(unsigned int y=h-1;y<h /* Non signé: MAX_INT == -1*/;y--)
+  for(unsigned int y=0;y<h /* Non signé: MAX_INT == -1*/;y++)
   {
     for(unsigned int x=0;x<w;x++)
     {

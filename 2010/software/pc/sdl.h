@@ -30,12 +30,6 @@
 // Robot
 #define clRobot COLOR_SDL(255,255,255)
 
-typedef struct point_t
-{
-  int x;
-  int y;
-} point_t;
-
 class sdlWindow
 {
   static bool init_done;

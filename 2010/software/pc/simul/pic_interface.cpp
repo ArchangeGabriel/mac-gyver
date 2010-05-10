@@ -19,8 +19,8 @@ int msg_id;
 // La webcam est gérée par le serveur dans le cas de la simulation
 pthread_mutex_t *mut_webcam = NULL;
 uint16_t *webcam_data;
-int *webcam_W;
-int *webcam_H;
+unsigned int *webcam_W;
+unsigned int *webcam_H;
 #include "../common.h"
 // Gère les moteurs
 void* pic1_handle_msg(void *);
@@ -292,7 +292,7 @@ void* pic2_handle_msg(void *)
           {
             fread(webcam_data, sizeof(uint16_t)*3*(*webcam_W)*(*webcam_H), 1, file);  
             // Convertit de RGB à YUV
-            for(int i=0; i<3*(*webcam_W)*(*webcam_H); i+=3)
+            for(unsigned int i=0; i<3*(*webcam_W)*(*webcam_H); i+=3)
             {
               const double R = webcam_data[i+0]&255;
               const double G = webcam_data[i+1]&255;
@@ -350,7 +350,7 @@ void* pic2_handle_msg(void *)
   return NULL;
 }
 //------------------------------------------------------------------------------
-pthread_mutex_t* picWebcam(int id, int *W, int *H, uint16_t *data)
+pthread_mutex_t* picWebcam(int id, unsigned int *W, unsigned int *H, uint16_t *data)
 {
   MSG_INT1_t msg;
   msg.type   = MSG_WEBCAM_QUERY;

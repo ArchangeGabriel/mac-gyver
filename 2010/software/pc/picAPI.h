@@ -10,6 +10,7 @@
 Boucle infinie gérant les connections
 */
 void pic_MainLoop();
+bool pic_is_ready();
 
 
 /***************** PC --> PIC *****************/

@@ -6,6 +6,12 @@
 
 //------------------------------------------------------------------------------
 /*
+Boucle principale, appelée par pc_main
+*/
+void* pt_MainLoop(void*);
+
+//------------------------------------------------------------------------------
+/*
 Initialise le path planner avec la configuration du terrain
 */
 void pt_init(int config_terrain);
@@ -41,12 +47,6 @@ void pt_clear_path();
 //------------------------------------------------------------------------------
 // Stop le robot 
 void pt_stop(int id);
-
-//------------------------------------------------------------------------------
-/*
-Boucle principale, appelée par pc_main
-*/
-void ppMainLoop();
 
 
 #endif

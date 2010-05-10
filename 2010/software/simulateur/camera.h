@@ -16,6 +16,7 @@ class camera_t : public params_t
   vector_t *G;  
   vector_t *pos;
   double *z;
+  double h_focal;
   bool reshaped;
   bool capture;
   bool done;
