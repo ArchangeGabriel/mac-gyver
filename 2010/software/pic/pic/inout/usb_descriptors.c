@@ -37,8 +37,8 @@ const USB_Default_Composite_Descriptor default_cfg = {
     1,                      // Number of interfaces in this configuration
     1,                      // Index value of this configuration
     4,                      // Configuration string index
-    DEFAULT, // Attributes
-    255},                     // Max power consumption (2X mA)
+    DEFAULT | SELF_POWERED, // Attributes
+    0},                     // Max power consumption (2X mA)
     
     // Boot Interface Descriptor
     {sizeof(USB_Interface_Descriptor),   // Size of this descriptor in bytes
@@ -60,8 +60,8 @@ const USB_Flash_Composite_Descriptor flash_cfg = {
     1,                      // Number of interfaces in this configuration
     2,                      // Index value of this configuration
     5,                      // Configuration string index
-    DEFAULT, // Attributes
-    255},                     // Max power consumption (2X mA)
+    DEFAULT | SELF_POWERED, // Attributes
+    0},                     // Max power consumption (2X mA)
     
     // Flash Interface Descriptor
     {sizeof(USB_Interface_Descriptor),   // Size of this descriptor in bytes
@@ -98,8 +98,8 @@ const USB_Application_Composite_Descriptor application_cfg = {
     1,                      // Number of interfaces in this configuration
     3,                      // Index value of this configuration
     4,                      // Configuration string index
-    DEFAULT, // Attributes
-    255},                     // Max power consumption (2X mA)
+    DEFAULT | SELF_POWERED, // Attributes
+    0},                     // Max power consumption (2X mA)
     
     // Boot Interface Descriptor
     {sizeof(USB_Interface_Descriptor),   // Size of this descriptor in bytes

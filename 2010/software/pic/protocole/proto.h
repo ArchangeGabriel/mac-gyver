@@ -18,14 +18,15 @@
 
 //////////////////////////////////////
 #define ISDEAD     0xf0
+#define DEBUGS     0xa0
 //////////////////////////////////////
-
 
 #define MOTORS     0x01
 #define ANALOG     0x02
 #define INITAN     0x03
 #define SERVOS     0x04
 #define DIGITS     0x05
+#define SETFDC     0x06
 
 //////////////////////////////////////
 

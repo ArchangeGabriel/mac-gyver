@@ -31,14 +31,14 @@ void init_pwm(void) // Configure CCP1, CCP2 et Timer2
 
 void application_main(void) 
 {
-    TRISDEBUG = 0;
-    PINDEBUG = 1;
+//    TRISDEBUG = 0;
+//    PINDEBUG = 1;
     
     setalim();
     init_pwm();
     init_codeuses();
     
-    SET_DEVICE_STATUS(DEVICE_BUS_POWERED | REMOTE_WAKEUP_DIS);
+    SET_DEVICE_STATUS(REMOTE_WAKEUP_DIS);
 
     // Interruptions
     
@@ -57,6 +57,7 @@ void application_main(void)
         dispatch_usb_event();
     }
     cutalim();
+    TRISC |= 0x06;
     PINDEBUG = 0;
 }
 

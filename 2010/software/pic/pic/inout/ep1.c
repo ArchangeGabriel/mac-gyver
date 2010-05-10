@@ -8,8 +8,11 @@
 #include "servos.h"
 #include "analogs.h"
 #include "digitals.h"
-#include "moteurs.h"
+//#include "moteurs.h"
+#include "findecourse.h"
 #include "proto.h"
+
+#include "debugs.h"
 
 volatile uchar __at(0x500) ep1_OutBuffer[MY_EP1_BUFFER_SIZE];
 
@@ -28,7 +31,9 @@ void my_ep1_out(void)
     {
         switch(ep1_OutBuffer[0])
         {
-            case MOTORS: set_motors(ep1_OutBuffer[1]); break;
+            case MOTORS: //set_motors(ep1_OutBuffer[1]); break;
+                         verif_fdc(ep1_OutBuffer[1]); break;
+            case SETFDC: set_fdc(&ep1_OutBuffer[1],EP_OUT_BD(1).Cnt - 1); break;
             case ANALOG: send_an_data(ep1_OutBuffer[1]); break;
             case INITAN: init_adconversion(ep1_OutBuffer[1]); break;
             case SERVOS: set_servo(ep1_OutBuffer[1]-1, ep1_OutBuffer[2]); break;
@@ -40,6 +45,7 @@ void my_ep1_out(void)
                 alive[0] = ISDEAD;
                 my_prepare_ep2_in();
                 break;
+            case DEBUGS: send_debug(); break;
             default: break;
         }
         

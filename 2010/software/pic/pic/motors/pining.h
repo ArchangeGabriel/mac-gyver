@@ -9,5 +9,6 @@
 #define PINSSCOD1 PORTBbits.RB3
 
 #define PINALIM PORTDbits.RD1
+#define TRISALIM TRISDbits.TRISD1
 
 #endif

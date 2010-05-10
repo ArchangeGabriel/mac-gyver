@@ -8,7 +8,8 @@ lkr_PIC_TYPE = 18f4550
 application_hex_OBJECTS = application_iface.o \
 	main.o usb_descriptors.o\
 	ep1.o ep2.o moteurs.o suspend.o\
-	analogs.o servos.o digitals.o usb_status.o
+	analogs.o servos.o digitals.o usb_status.o\
+        debugs.o findecourse.o
 
 
 COMPILE = $(SDCC) -mpic16 $(DEBUG) -p$(sdcc_PIC_TYPE) -I$(INCLUDE) -c
@@ -27,6 +28,8 @@ all:
 	$(COMPILE) -c analogs.c
 	$(COMPILE) -c servos.c
 	$(COMPILE) -c digitals.c
+	$(COMPILE) -c debugs.c
+	$(COMPILE) -c findecourse.c
 	$(LINK) $(application_hex_OBJECTS)
 
 clean:
