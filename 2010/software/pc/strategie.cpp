@@ -39,11 +39,38 @@ bool recallage_necessaire;
 void strat_MainLoop();
 
 //------------------------------------------------------------------------------
+void* strat_MainLoop(void*)
+{	 
+ 	// On initialise tout 
+  strat_init();
+  
+  strat_ready = true;  
+         
+  // Waits until the starting signal is given
+  fprintf(stderr,">>> Waiting for jack...\n");  fflush(stdout);
+  while(!started)
+  {       
+    usleep(10000);
+  }
+  
+  // et c'est parti!
+  fprintf(stderr,">>> Let's go!\n");  fflush(stdout);  
+       
+  while(!config_terrain) usleep(10000);    
+     
+  wait_for_it(pt_go_to(symetrize(position_t(2.7,1.8,M_PI_2)),tpDEST,false));
+
+  while(true)
+  {
+    usleep(100000);    
+  }  
+  
+  return NULL;
+}
+//------------------------------------------------------------------------------
 void strat_init()
 {
-  fprintf(stderr,"IA thread...                    ok\n");  fflush(stdout);
-
-  started = false;
+	started = false;
   game_over = false;
   recallage_necessaire = false;  
   config_terrain = 0;
@@ -54,39 +81,19 @@ void strat_init()
   // Initialise la webcam
   webcam_init();
   
-  strat_ready = true; 
-         
-  // Waits until the starting signal is given
-  fprintf(stderr,">>> Waiting for jack...\n");  fflush(stdout);
-  while(!started)
-  {       
+  // Vérifie la connection avec les pics
+  while(!pic_is_ready())
     usleep(10000);
-  }
-  
-  strat_MainLoop();
+	 
+	// Place les composants
+  pic_move_pusher(MOTOR_PUSHER_BACKWARD);
+  while(!pic_where_pusher(MOTOR_PUSHER_BACKWARD))
+    usleep(10000);
 }
 //------------------------------------------------------------------------------
 bool strat_is_ready()
 {
   return strat_ready;
-}
-//------------------------------------------------------------------------------
-void strat_MainLoop()
-{
-  fprintf(stderr,">>> Let's go!\n");  fflush(stdout);
-  
-  pic_move_pusher(MOTOR_PUSHER_BACKWARD);
-  while(!pic_where_pusher(MOTOR_PUSHER_BACKWARD))
-    usleep(10000);
-  
-  while(!config_terrain) usleep(10000);    
-     
-  wait_for_it(pt_go_to(symetrize(position_t(2.7,1.8,M_PI_2)),tpDEST,false));
-
-  while(true)
-  {
-    usleep(100000);    
-  }   
 }
 //------------------------------------------------------------------------------
 void strat_set_config_terrain(int c)

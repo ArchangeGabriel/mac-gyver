@@ -237,15 +237,16 @@ float direct_path_t::normalize(float angle)
 
 
 //------------------------------------------------------------------------------
-void ppMainLoop()
+void* pt_MainLoop(void*)
 {
   pthread_mutex_init(&mutex_situ, NULL);
   
+  // Attend que le robot soit prêt
+  while(!strat_is_ready()) usleep(10000);
+  
   // Try to find configuration
   int config = wc_reco_config();
-  pt_init(config);   
-     
-  fprintf(stderr,"PP thread...                    ok\n");  fflush(stdout);
+  pt_init(config);       
   
   strat_set_config_terrain(config);
 
@@ -286,8 +287,6 @@ void pt_init(int config_terrain)
     pp_draw_config((config_terrain%100)/10, config_terrain%10);
     pp_compute_distance_transform();
   } 
-//  else
-//    pp_save_to_bmp("maps.bmp");
 }
 //------------------------------------------------------------------------------
 pthread_mutex_t* pt_go_to(const position_t &pos, int type, bool append)

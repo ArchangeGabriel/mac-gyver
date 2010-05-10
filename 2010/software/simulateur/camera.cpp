@@ -33,7 +33,8 @@ void camera_t::init_params()
   offset[2]    = float_param_value("OffsetZ");    
   direction[0] = float_param_value("DirX");  
   direction[1] = float_param_value("DirY");   
-  direction[2] = float_param_value("DirZ");  
+  direction[2] = float_param_value("DirZ");
+  h_focal      = float_param_value("Hfocal");   
   
   reshaped = false;
   done = false;
@@ -133,7 +134,7 @@ void camera_t::reshape(int , int )
   glViewport(0,0,WC->W,WC->H);
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-  gluPerspective(_DEMI_FOCALE,float(WC->W)/float(WC->H),0.1,100); 	//Pour les explications, lire le tutorial sur OGL et win
+  gluPerspective(WC->h_focal,float(WC->W)/float(WC->H),0.1,100); 	//Pour les explications, lire le tutorial sur OGL et win
   glMatrixMode(GL_MODELVIEW);	
   
   WC->reshaped = true; 

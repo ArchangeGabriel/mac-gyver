@@ -4,6 +4,12 @@
 #include <pthread.h>
 #include "../common/lin_alg.h"
 
+typedef struct point_t
+{
+  int x;
+  int y;
+} point_t;
+
 typedef struct position_t
 {
   float x,y,a;

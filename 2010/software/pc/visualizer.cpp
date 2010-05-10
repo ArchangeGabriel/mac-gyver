@@ -86,7 +86,7 @@ void visu_draw_background(int config_terrain)
   visu_window.Load_SDL_Background();          
 }
 //------------------------------------------------------------------------------
-void visu_draw_robot()
+void* visu_draw_robot(void*)
 {
   vector_t N,T,u,v;
   point_t point[4];

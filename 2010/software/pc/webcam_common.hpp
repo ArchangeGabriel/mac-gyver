@@ -28,19 +28,21 @@ struct image_t
 
     enum image_format_t
     {
-        rgb_format,
-        yuv_format
+      rgb_format,
+      yuv_format
     };
 
     image_t(image_format_t fmt,size_t w,size_t h)
         :fmt(fmt),w(w),h(h)
     {
-        data=new pixel_type_t[w*h*3];
+      data=new pixel_type_t[w*h*3];
     }
+    image_t(const image_t& o);
+    image_t& operator=(const image_t& o);
 
     ~image_t()
     {
-        delete[] data;
+      delete[] data;
     }
 
     image_format_t fmt;
@@ -56,8 +58,6 @@ struct image_t
     {
         return &data[3*(y*w+x)];
     }
-
-    image_t& operator=(const image_t& o);
 };
 
 #endif // __common__

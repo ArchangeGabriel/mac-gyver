@@ -8,6 +8,7 @@
 Appelé au démarrage du programme, color est la couleur du robot (clRED ou clGREEN)
 Lance la reconnaissance vidéo de la configuration
 */
+void* strat_MainLoop(void*);
 void strat_init();
 bool strat_is_ready();
 

@@ -13,6 +13,8 @@ void (*callbackOnJack)(void) = NULL;
 void (*callbackRecvCoder)(double,int,int) = NULL;
 void (*callbackRecvReset)(void) = NULL;
 
+bool pic_ready = false;
+
 //------------------------------------------------------------------------------
 void pic_MainLoop()
 {    
@@ -21,7 +23,7 @@ void pic_MainLoop()
   fflush(stdout);
   if(setup_usb_connexions() < 0)
   {
-    fprintf(stderr,"SETUP UBS FAILED !\n");
+    fprintf(stderr,"SETUP USB FAILED !\n");
     exit(1);
   }
   else if(init_analog_in(0) < 0)
@@ -33,6 +35,8 @@ void pic_MainLoop()
   {
     fprintf(stderr,"ok\n");  
     fflush(stdout);
+    
+    pic_ready = true;
 
     while(true)
     {
@@ -42,7 +46,11 @@ void pic_MainLoop()
         unsigned char dir_left, dir_right;
         int iter = get_codeuses(&coder_left, &dir_left, &coder_right, &dir_right);
         if(iter == -1)
+        {
+          pic_ready = false;
           repare_usb();
+          pic_ready = true;
+        }
         else
           callbackRecvCoder(double(iter)*PIC_FREQ, coder_left, coder_right);        
       }
@@ -53,6 +61,11 @@ void pic_MainLoop()
       usleep(TIMER_CODER);
     }
   }
+}
+//------------------------------------------------------------------------------
+bool pic_is_ready()
+{
+  return pic_ready;
 }
 //------------------------------------------------------------------------------
 void pic_Jack()
