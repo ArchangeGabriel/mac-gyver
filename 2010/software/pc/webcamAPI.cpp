@@ -15,8 +15,8 @@
 #define WEBCAM1 "0"
 #define WEBCAM2 "1"
 #else
-#define WEBCAM1 "/dev/video1"
-#define WEBCAM2 "/dev/video2"
+#define WEBCAM1 "/dev/video0"
+#define WEBCAM2 "/dev/video1"
 #endif
 
 webcam_t video_front(WEBCAM1,WC1_resX,WC1_resY);

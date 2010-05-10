@@ -37,6 +37,7 @@ void* pic_main2(void *Args)
       connect_to_pc(Simul->my_id,Simul->my_nbr,&comm_id);   
     else
     {
+      #ifdef SIMULATION
       if(query_webcam != -1)
       {
         int size = Simul->robot->webcams[query_webcam].getPicture(&pixels);  
@@ -68,6 +69,7 @@ void* pic_main2(void *Args)
           free(buffer);
         }
       }
+      #endif
       int type = read_usb(SIMULARG2(comm_id, &_msg));
       if(type<0)
       {        
@@ -76,6 +78,7 @@ void* pic_main2(void *Args)
       else switch(type)
       {
         case MSG_EMPTY: break;
+        #ifdef SIMULATION
         case MSG_INFO:
         {
           picInfo_t *msg = (picInfo_t*)_msg;
@@ -93,7 +96,8 @@ void* pic_main2(void *Args)
           query_webcam = msg->value;
           msg_webcam = msg->msg_id;
         }
-        break;         
+        break;  
+        #endif               
         case MSG_QUERY:
         {
           MSG_INT1_t *msg = (MSG_INT1_t *)_msg;

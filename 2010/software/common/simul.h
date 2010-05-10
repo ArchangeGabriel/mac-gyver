@@ -6,19 +6,18 @@
 #define SIMULATION
 #endif
 
-
 #define VISUALIZE
 
 // Ne pas commenter
-#ifdef SIMULATION
+//#ifdef SIMULATION
 #define SIMULARG2(x,y)     x,y
 #define SIMULARG3(x,y,z)   x,y,z
 #define SIMULARG4(w,x,y,z) w,x,y,z
-#else
-#define SIMULARG2(x,y)     y
-#define SIMULARG3(x,y,z)   y,z
-#define SIMULARG4(w,x,y,z) x,y,z
-#endif
+//#else
+//#define SIMULARG2(x,y)     y
+//#define SIMULARG3(x,y,z)   y,z
+//#define SIMULARG4(w,x,y,z) x,y,z
+//#endif
 
 
 

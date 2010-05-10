@@ -55,15 +55,16 @@ void* strat_MainLoop(void*)
   
   // et c'est parti!
   fprintf(stderr,">>> Let's go!\n");  fflush(stdout);  
-       
+  
+  // on attend qu'on ait la config du terrain     
   while(!config_terrain) usleep(10000);    
      
+  // on va à un endroit improbable   
   wait_for_it(pt_go_to(symetrize(position_t(2.7,1.8,M_PI_2)),tpDEST,false));
 
+  // on attend et on sert à rien
   while(true)
-  {
-    usleep(100000);    
-  }  
+    usleep(100000);
   
   return NULL;
 }
