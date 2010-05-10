@@ -359,7 +359,7 @@ void* console_func(void*)
   console();   
   cancel_simul();
   
-  printf("Stopping serveur...             ");
+  printf("Stopping server...             ");
   fflush(stdout); 
   close_connections();  
   pthread_cancel(ServeurThread);

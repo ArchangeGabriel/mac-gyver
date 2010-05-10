@@ -39,13 +39,15 @@
 #define _LONGUEUR_TER   3.
 #define _LARGEUR_TER    2.1
 /*
-#define _POS_INIT_X     0.2
-#define _POS_INIT_Y     0.2
-#define _POS_INIT_A     45.
-*/
-#define _POS_INIT_X     0.2
-#define _POS_INIT_Y     0.2
+// Bleu
+#define _POS_INIT_X     0.195
+#define _POS_INIT_Y     0.185
 #define _POS_INIT_A     90.
+*/
+// Jaune
+#define _POS_INIT_X     2.70
+#define _POS_INIT_Y     0.19
+#define _POS_INIT_A     114.5
 #define _RAYON_ROUE     0.025
 #define _FREQ_CODER     (500./(2.*M_PI))
 #define _MOTOR_K        19.
@@ -75,8 +77,9 @@
 #define WC1_offsetY  -0.135     // en mètres: Décalage entre le centre de la webcam et le centre de l'objet porteur (ordonnée)
 #define WC1_offsetZ  0.07       // en mètres: Décalage entre le centre de la webcam et le centre de l'objet porteur (cote)
 #define WC1_dirX     1.         // Vecteur de direction: orientation de la webcam dans le référentiel de l'objet porteur (abscisse)
-#define WC1_dirY     -1.        // Vecteur de direction: orientation de la webcam dans le référentiel de l'objet porteur (ordonnée)
+#define WC1_dirY     -0.55      // Vecteur de direction: orientation de la webcam dans le référentiel de l'objet porteur (ordonnée)
 #define WC1_dirZ     0.         // Vecteur de direction: orientation de la webcam dans le référentiel de l'objet porteur (cote)
+#define WC1_Hfocal   18.8       // Angle de demi-focale
 
 // Webcam top
 #define WC2_resX     640        // Résolution (largeur) de l'image
@@ -86,6 +89,7 @@
 #define WC2_OffsetZ  0.33       // en mètres: Décalage entre le centre de la webcam et le centre de l'objet porteur (cote)
 #define WC2_DirX     1.         // Vecteur de direction: orientation de la webcam dans le référentiel de l'objet porteur (abscisse)
 #define WC2_DirY     0.         // Vecteur de direction: orientation de la webcam dans le référentiel de l'objet porteur (ordonnée)
-#define WC2_DirZ     0.         // Vecteur de direction: orientation de la webcam dans le référentiel de l'objet porteur (cote)
+#define WC2_DirZ     -0.2       // Vecteur de direction: orientation de la webcam dans le référentiel de l'objet porteur (cote)
+#define WC2_Hfocal   18.8       // Angle de demi-focale
 
 #endif
