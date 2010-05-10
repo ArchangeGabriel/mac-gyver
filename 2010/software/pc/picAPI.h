@@ -31,12 +31,13 @@ Avance ou recule le poussoir (voir ../../pic/protocole/proto.h)
 Renvoie 0 en cas de succès, un nombre non nul sinon
 */
 int pic_move_pusher(int position);
+int pic_move_door(int position);
 
 /*
 teste la position du poussoir
 */
 bool pic_where_pusher(int position);
-
+bool pic_where_door(int position);
 
 /*
 réinitialise les PIC
