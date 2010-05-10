@@ -239,15 +239,19 @@ int robot_t::pic_io(robot_t* robot,int captor_type, int captor_id, int value)
     case MSG_DIGIT:
     {
       int state = DIGIT_JACK;
-      if(robot->objects_pos[3].x == robot->pusher_minX) state |= DIGIT_PUSHER_BACK;
-      if(robot->objects_pos[3].x == robot->pusher_maxX) state |= DIGIT_PUSHER_FRONT;              
+      if(robot->objects_pos[3].x != robot->pusher_minX) state |= DIGIT_PUSHER_BACK;
+      if(robot->objects_pos[3].x != robot->pusher_maxX) state |= DIGIT_PUSHER_FRONT;       
+      state |= DIGIT_SWITCH_BACK_LEFT;
+      state |= DIGIT_SWITCH_BACK_RIGHT;
+      state |= DIGIT_DOOR_OPEN;
+      state |= DIGIT_DOOR_CLOSED;                         
       return state;
     }
     break;
     case MSG_ANALOG:
       return 0;
     case MSG_DCMOTOR:
-      if(captor_id == MOTOR_PUSHER)
+      if(captor_id == MOTOR_PUSHER_LEFT || captor_id == MOTOR_PUSHER_RIGHT)
         robot->motor_pusher = value;
       return 0;
     case MSG_SERVOMOTOR:

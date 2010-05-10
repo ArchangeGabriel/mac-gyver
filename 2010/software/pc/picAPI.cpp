@@ -89,17 +89,20 @@ int pic_MotorsPower(double pwleft, double pwright)
 //------------------------------------------------------------------------------
 int pic_move_pusher(int position)
 {
-  return (set_DC_motor(MOTOR_PUSHER, position) == 1) ? 0 : 1;
+  bool ok = false;
+  if(set_DC_motor(MOTOR_PUSHER_LEFT, position) == 1 && set_DC_motor(MOTOR_PUSHER_RIGHT, position) == 1)
+    ok = true;
+  return ok ? 0 : 1;
 }
 //------------------------------------------------------------------------------
 bool pic_where_pusher(int position)
 {
   if(position == MOTOR_PUSHER_FORWARD)
-    return get_digital_in() & DIGIT_PUSHER_FRONT;
+    return !(get_digital_in() & DIGIT_PUSHER_FRONT);
   else if(position == MOTOR_PUSHER_BACKWARD)
-    return get_digital_in() & DIGIT_PUSHER_BACK;
+    return !(get_digital_in() & DIGIT_PUSHER_BACK);
   else
-    return !(get_digital_in() & (DIGIT_PUSHER_FRONT | DIGIT_PUSHER_BACK));
+    throw(0);
 }
 //------------------------------------------------------------------------------
 int pic_move_door(int position)
@@ -110,9 +113,11 @@ int pic_move_door(int position)
 bool pic_where_door(int position)
 {
   if(position == MOTOR_DOOR_OPEN)
-    return get_digital_in() & DIGIT_DOOR_OPEN;
+    return !(get_digital_in() & DIGIT_DOOR_OPEN);
+  else if(position == MOTOR_DOOR_CLOSED)
+    return !(get_digital_in() & DIGIT_DOOR_CLOSED);
   else
-    return get_digital_in() & DIGIT_DOOR_CLOSED;
+    throw(0);    
 }
 //------------------------------------------------------------------------------
 void pic_Reset()

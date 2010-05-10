@@ -33,24 +33,27 @@
 #define NB_ANALOGS 4
 
 // Motors
-#define MOTOR_PUSHER 1
+#define MOTOR_PUSHER_LEFT  1
+#define MOTOR_PUSHER_RIGHT 2
 
-#define MOTOR_PUSHER_FORWARD   1
+#define MOTOR_PUSHER_FORWARD  -1
 #define MOTOR_PUSHER_STOP      0
-#define MOTOR_PUSHER_BACKWARD -1
+#define MOTOR_PUSHER_BACKWARD  1
 
 // Servo-motors
-#define SERVOM_DOOR  1
-#define MOTOR_DOOR_OPEN    1
-#define MOTOR_DOOR_CLOSED  255
+#define SERVOM_DOOR  2
+#define MOTOR_DOOR_OPEN    65
+#define MOTOR_DOOR_CLOSED  200
+#define MOTOR_DOOR_FREE    0
 
 // Capteurs digitaux
-#define DIGIT_PUSHER_BACK  1
-#define DIGIT_PUSHER_FRONT 2
-#define DIGIT_DOOR_OPEN    4
-#define DIGIT_DOOR_CLOSED  8
-#define DIGIT_JACK         16
-#define DIGIT_BUMPER_FRONT 32
-#define DIGIT_BUMPER_BACK  64
+#define DIGIT_PUSHER_BACK      1
+#define DIGIT_PUSHER_FRONT     2
+#define DIGIT_JACK             4
+#define DIGIT_SWITCH_BACK_RIGHT 8
+#define DIGIT_SWITCH_BACK_LEFT  16
+#define DIGIT_DOOR_OPEN        32
+#define DIGIT_DOOR_CLOSED      64
+  
 
 #endif // PROTO_H_
