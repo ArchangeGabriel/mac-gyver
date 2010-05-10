@@ -23,5 +23,7 @@ int setup_usb_connexions(); // Initialise les connexions usb avec la carte. Reto
 void shut_usb(); // Ferme proprement les connexions usb.
 int repare_usb(); // Tente de reparer les connexions usb cassees. Retourne 1 si tout fonctionne, un resultat negatif sinon.
 
+int get_debug();
+
 #endif // _PIC_INTERFACE_H
 

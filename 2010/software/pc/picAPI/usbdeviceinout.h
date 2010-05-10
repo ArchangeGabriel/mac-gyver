@@ -28,6 +28,7 @@ class USBDeviceInOut
         unsigned char init_analog_in(unsigned char number);
         unsigned char motors_last_order;
         int repare();
+        void get_debug();
     private:
         struct usb_dev_handle* dh;
         int repare_epout();

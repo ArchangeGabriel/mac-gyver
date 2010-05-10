@@ -129,6 +129,37 @@ int USBDeviceInOut::repare()
     return 1;
 }
 
+void USBDeviceInOut::get_debug()
+{
+    int c;
+    unsigned char buf[9];
+    buf[0] = DEBUGS;
+
+    c = usb_bulk_write(dh, EP_OUT, (char*)buf, 1, USB_TIMEOUT); 
+    if(c <= 0)
+    {
+        // Raise exception
+        throw "I/O error on DEBUGS command.";
+    }
+    c = usb_bulk_read(dh, EP_IN, (char*)buf, sizeof(buf), USB_TIMEOUT);
+    if(c <= 0)
+    {
+        throw "I/O error on DEBUGS command.";
+    }
+    if(buf[0] == DEBUGS)
+    {
+        cout << "Debugs : " << (int)buf[1];
+        for(c=2;c<9;c++)
+        {
+            cout << " ; " << (int)buf[c];
+        }
+        cout << endl;
+    }
+    else
+    {
+        throw "I/O error on DEBUGS command.";
+    }
+}
 
 void USBDeviceInOut::servo_order(unsigned char index, unsigned char position)
 { 
@@ -236,7 +267,7 @@ unsigned char USBDeviceInOut::get_analog_in(unsigned short *result, unsigned cha
     if((buffer[0] == ANALOG)&&(buffer[1] <= number))
     {
         resul = (unsigned char *) result;
-        for(c=0;c<buffer[1];c++)
+        for(c=0;c<2*buffer[1];c++)
         {
             resul[c] = buffer[c+2];
         }

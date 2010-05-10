@@ -140,12 +140,17 @@ int repare_usb()
     return 1;
 }
 
-void shut_usb(void)#include "../common/simul.h"
+void shut_usb(void)//#include "../common/simul.h"
 {
     if(devicemoteur != NULL) delete devicemoteur;
     if(deviceinout != NULL) delete deviceinout;
     devicemoteur = NULL;
     deviceinout = NULL;
+}
+
+int get_debug(void)
+{
+    catcherror(deviceinout->get_debug());
 }
 
 int get_codeuses(int *codeuse1, unsigned char *sens1, int *codeuse2, unsigned char *sens2)
