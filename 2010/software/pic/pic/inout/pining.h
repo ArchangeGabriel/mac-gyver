@@ -6,6 +6,7 @@
 #define PINING_H_
 
 #define PINALIM PORTDbits.RD1
+#define TRISALIM TRISDbits.TRISD1
 
 ///////////// MOTORS ///////////////////////////
 
@@ -45,17 +46,17 @@
 
 /////////////// ANALOGS ////////////////////////
 
-#define NB_ANALOGS 8 // AN0...7
+//#define NB_ANALOGS 8 // AN0...7
 
 #define set_antris() {\
 TRISAbits.TRISA0 = 1;\
 TRISAbits.TRISA1 = 1;\
 TRISAbits.TRISA2 = 1;\
 TRISAbits.TRISA3 = 1;\
-TRISAbits.TRISA5 = 1;\
+/*TRISAbits.TRISA5 = 1;\
 TRISEbits.TRISE0 = 1;\
 TRISEbits.TRISE1 = 1;\
-TRISEbits.TRISE2 = 1;\
+TRISEbits.TRISE2 = 1;*/\
 }
 
 ////////////////////////////////////////////////

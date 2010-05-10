@@ -20,7 +20,7 @@ void init_codeuses(void)
     TMR0H = 0;
     TMR0L = 0;
 
-    T0CON = 0x89; // TMR0ON, 16bits, CLKO, PSA on, 1:4
+    T0CON = 0x89; // 1 0 0 0 1 001 : TMR0ON, 16bits, CLKO, PSA on, 1:4
     INTCONbits.TMR0IE = 0; // Interrupt Timer 0
     INTCONbits.TMR0IF = 0; // Interrupt Timer 0
     INTCON2bits.INTEDG0 = 0;
@@ -30,8 +30,8 @@ void init_codeuses(void)
     mydata[0]=CODERS;
     mydata[1]=0;
     codeusepointer=(unsigned long*)(&mydata[2]);
-    codeusecnt[0] = 0x01020304;
-    codeusecnt[1] = 0x05060708;
+    codeusecnt[0] = 0x00000000;
+    codeusecnt[1] = 0x00000000;
 }
 
 void sendcodeuses()
