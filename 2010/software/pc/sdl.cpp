@@ -21,7 +21,6 @@ sdlWindow::sdlWindow(int width, int height, const char *title)
       exit(EXIT_FAILURE);
     }
     init_done = true;
-    printf"INIT!!!!!\n");
   }
  
   back_pixels = new Uint32[4*width*height];

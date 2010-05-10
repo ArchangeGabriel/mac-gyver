@@ -20,11 +20,6 @@
 webcam_t video_front(WEBCAM1,640,480);
 webcam_t video_top(WEBCAM2,640,480);
 
-#ifdef VISUALIZE
-sdlWindow output_wc1(640, 480, "Webcam1");
-sdlWindow output_wc2(640, 480, "Webcam2");
-#endif
-
 void webcam_init()
 {
   #ifndef SIMULATION
