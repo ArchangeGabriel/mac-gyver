@@ -78,16 +78,14 @@ void strat_init()
  
   // Initialise le suivit de position
   cine_init();
-  
-  // Initialise la webcam
-  webcam_init();
-  
+    
   // Vérifie la connection avec les pics
   while(!pic_is_ready())
     usleep(10000);
 	 
 	// Place les composants
   pic_move_pusher(MOTOR_PUSHER_BACKWARD);
+  pic_move_door(MOTOR_DOOR_OPEN);
   while(!pic_where_pusher(MOTOR_PUSHER_BACKWARD))
     usleep(10000);
 }

@@ -47,13 +47,11 @@
 #define MOTOR_DOOR_FREE    0
 
 // Capteurs digitaux
-#define DIGIT_PUSHER_BACK      1
-#define DIGIT_PUSHER_FRONT     2
-#define DIGIT_JACK             4
+#define DIGIT_PUSHER_BACK       1
+#define DIGIT_PUSHER_FRONT      2
+#define DIGIT_JACK              4
 #define DIGIT_SWITCH_BACK_RIGHT 8
 #define DIGIT_SWITCH_BACK_LEFT  16
-#define DIGIT_DOOR_OPEN        32
-#define DIGIT_DOOR_CLOSED      64
   
 
 #endif // PROTO_H_

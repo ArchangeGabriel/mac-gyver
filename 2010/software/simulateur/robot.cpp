@@ -242,9 +242,7 @@ int robot_t::pic_io(robot_t* robot,int captor_type, int captor_id, int value)
       if(robot->objects_pos[3].x != robot->pusher_minX) state |= DIGIT_PUSHER_BACK;
       if(robot->objects_pos[3].x != robot->pusher_maxX) state |= DIGIT_PUSHER_FRONT;       
       state |= DIGIT_SWITCH_BACK_LEFT;
-      state |= DIGIT_SWITCH_BACK_RIGHT;
-      state |= DIGIT_DOOR_OPEN;
-      state |= DIGIT_DOOR_CLOSED;                         
+      state |= DIGIT_SWITCH_BACK_RIGHT;                      
       return state;
     }
     break;

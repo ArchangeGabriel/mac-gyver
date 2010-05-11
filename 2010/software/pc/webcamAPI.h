@@ -1,17 +1,7 @@
 #ifndef WEBCAM_API
 #define WEBCAM_API
 
-#include "../common/simul.h"
-#include "common.h"
-#include <vector>
-
-struct palet_t
-{
-    position_t pos;
-    float surete;// 0:nul->1:super
-};
-
-void webcam_init();
+void* wc_MainLoop(void *);
 
 /*
 les différentes configuration possible pour les maïs: xyz : 
