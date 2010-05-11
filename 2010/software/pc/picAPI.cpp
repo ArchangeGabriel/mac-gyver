@@ -85,7 +85,7 @@ int pic_MotorsPower(double pwleft, double pwright)
 int pic_move_pusher(int position)
 {
   bool ok = false;
-  if(set_DC_motor(MOTOR_PUSHER_LEFT, position) == 1 && set_DC_motor(MOTOR_PUSHER_RIGHT, position) == 1)
+  if(set_DC_motor(MOTOR_PUSHER_LEFT, position) == 1 && set_DC_motor(MOTOR_PUSHER_RIGHT, -position) == 1)
     ok = true;
   return ok ? 0 : 1;
 }

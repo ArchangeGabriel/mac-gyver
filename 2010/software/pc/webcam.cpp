@@ -25,8 +25,8 @@
 #include <sys/ioctl.h>
 #include <asm/types.h> 
 
-webcam_t::webcam_t(const std::string& dev,size_t w,size_t h)
-    :m_width(w),m_height(h),m_image(image_t::yuv_format,0,0)
+webcam_t::webcam_t(const char*name, const std::string& dev,size_t w,size_t h)
+    :m_name(name),m_width(w),m_height(h),m_image(image_t::yuv_format,0,0)
 {
     open(dev);
     init();
@@ -57,6 +57,11 @@ size_t webcam_t::get_width()
 size_t webcam_t::get_height()
 {
     return m_height;
+}
+
+const char* webcam_t::get_name()
+{
+    return m_name;
 }
 
 void webcam_t::capture(image_t& img)

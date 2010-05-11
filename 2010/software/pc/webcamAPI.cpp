@@ -1,4 +1,7 @@
 #define PC_INCLUDE
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <errno.h>
 #include "webcamAPI.h"
 #include "webcam.hpp"
 #include "webcam_processing.hpp"
@@ -20,8 +23,8 @@
 #define WEBCAM2 "/dev/video1"
 #endif
 
-webcam_t video_front(WEBCAM1,WC1_resX,WC1_resY);
-webcam_t video_top(WEBCAM2,WC2_resX,WC2_resY);
+webcam_t *WC[2] = {new webcam_t("front",WEBCAM1,WC1_resX,WC1_resY), new webcam_t("top",WEBCAM1,WC1_resX,WC1_resY)};
+enum {FRONT, TOP, wc_count};
 
 /*---------------------------------------------------------------------------*/
 class orth_camera
@@ -165,23 +168,47 @@ void* wc_MainLoop(void* _path)
   init_utils();
   #endif
 
-  video_front.start();
-  video_top.start();
+  for(int i=0; i<wc_count; i++)
+    WC[i]->start();
   
   char *path = (char*)_path;
+  int img_num;
+  if(path)
+  {
+    if(mkdir(path, 766) && errno != EEXIST)
+    {
+      fprintf(stderr, "ECHEC DE LA CREATION DU REPERTOIRE DE SAUVEGARDE DES PHOTOS! (code erreur: %d)\n", errno);
+      exit(errno);
+    }
+    if(path[strlen(path)-1] == '/')
+      path[strlen(path)-1] = '\0';
+  }
   
   // Attend que le robot soit prêt
   while(!strat_is_ready()) usleep(10000);
 
-  while(true)
+  while(true) 
   {
-    
+    if(path && strat_is_started())
+    {
+      char file[400];
+      image_t img(image_t::yuv_format,0,0);
+      for(int i=0; i<wc_count; i++)
+      {
+        sprintf(file, "%s/%s_%d.bmp", path, WC[i]->get_name(), img_num);
+        WC[i]->capture(img);
+        convert_yuv_to_rgb(img);  
+        save_buff_to_bitmap(file, WC[i]->get_width(), WC[i]->get_height(), img.data);
+      }
+      img_num++;
+    }
+    sleep(2);
   }    
 }
 /*---------------------------------------------------------------------------*/
 int wc_reco_config()
 {
-  position_t robot_pos = cine_get_position();
+  /*position_t robot_pos = cine_get_position();
   point_t upper_left, lower_right, middle;  
 
   // *** Front ***  
@@ -190,8 +217,8 @@ int wc_reco_config()
                           robot_pos.a+atan(WC1_dirY/WC1_dirX));
   orth_camera wc_front(WC1_resX, WC1_resY, WC1_offsetZ, atan(WC1_dirZ/WC1_dirX), WC1_Hfocal/180.*M_PI); 
   wc_front.set_position(wc_front_pos);
-  video_front.do_capture();
-  image_t img1 = video_front.get_image2(); 
+  WC[FRONT]->do_capture();
+  image_t img1 = WC[FRONT]->get_image2(); 
   convert_yuv_to_rgb(img1);  
   save_buff_to_bitmap("imgFront.bmp", WC1_resX, WC1_resY, img1.data);
 
@@ -204,8 +231,8 @@ int wc_reco_config()
 
   
   // Retrieve picture
-  video_top.do_capture();
-  image_t img2 = video_top.get_image2();
+  WC[TOP]->do_capture();
+  image_t img2 = WC[TOP]->get_image2();
   
   // Retrieve the zone to look for
   vector_t cylinder(1.95,1.722);  // 3
@@ -221,7 +248,7 @@ int wc_reco_config()
   draw_rect(upper_left, lower_right, WC2_resX, WC2_resY, img2.data);  
   draw_rect(middle, middle, WC2_resX, WC2_resY, img2.data);  
   save_buff_to_bitmap("imgTop.bmp", WC2_resX, WC2_resY, img2.data);
-  
+  */
   return 52;
 }
 /*---------------------------------------------------------------------------*/

@@ -53,7 +53,7 @@ int main(int argc, char **argv)
   port=11111;
   robot_id=0;
     
-  while((i = getopt(argc, argv, "a:p:i:by")) > 0)
+  while((i = getopt(argc, argv, "a:p:i:bys:")) > 0)
     switch(i)
     {
       case 'a':
@@ -69,6 +69,7 @@ int main(int argc, char **argv)
       break;
       case 'b':
       case 'y':
+      case 's':
       break;
       default:
       printf("La syntaxe est la suivante: ./client -a adresse -p port -i robot_id [-r/-g]\n");
@@ -93,7 +94,7 @@ int main(int argc, char **argv)
       break;
       case 's':
       path_photo = new char[strlen(optarg)+1];
-      strcpy(addr,optarg);
+      strcpy(path_photo,optarg);
       break;
       default:
       break;

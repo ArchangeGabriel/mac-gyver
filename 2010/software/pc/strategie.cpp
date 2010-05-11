@@ -137,6 +137,7 @@ void strat_game_over()
   fflush(stdout);
   sleep(1000);
   game_over = true;  
+  started = false;
 }
 //------------------------------------------------------------------------------
 void strat_recallage()
