@@ -45,21 +45,21 @@ void refresh_U_safe(bool force = false);
 // Asservissement en vitesse
 void make_asserv(bool force = false);
 
-/*
+
 // Valeurs réelles 
 #define _KPH  0.004
 #define _KIH  0.000155
 #define _KPL  0.04
 #define _KIL  0.001
-*/
 
 
+/*
 // Valeurs simulation
 #define _KPH  0.008
 #define _KIH  0.0004
 #define _KPL  0.08
 #define _KIL  0.004
-
+*/
 
 #ifdef VISUALIZE
 int trace_X=0;

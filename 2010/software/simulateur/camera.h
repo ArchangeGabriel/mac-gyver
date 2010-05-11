@@ -9,14 +9,11 @@
 class camera_t : public params_t
 {
   private: 
-  GLfloat offset[3];
-  GLfloat direction[3];  
   vector_t *N;  
   vector_t *T;  
   vector_t *G;  
   vector_t *pos;
   double *z;
-  double h_focal;
   bool reshaped;
   bool capture;
   bool done;
@@ -24,6 +21,9 @@ class camera_t : public params_t
   static void make_scene();
     
   public:
+  GLfloat offset[3];
+  GLfloat direction[3]; 
+  double h_focal;     
   uint16_t *pixels;
   int W,H;  
   static simul_info_t* info;  

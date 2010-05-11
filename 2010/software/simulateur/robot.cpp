@@ -401,6 +401,27 @@ void robot_t::draw()
   }
   for(int i=0;i<nbr_color_captors;i++)
     color_captors[i].draw();   
+    
+  // Webcam
+  for(unsigned int i=0;i<webcams.size();i++)
+  {
+    vector_t pos = position - G_rot;
+    pos.x += webcams[i].offset[0]*N.x + webcams[i].offset[1]*T.x;
+    pos.y += webcams[i].offset[0]*N.y + webcams[i].offset[1]*T.y;
+    vector_t axis(1,0);
+    axis = axis.rotate(angle + atan(webcams[i].direction[1]/webcams[i].direction[0]));
+          
+    vector_t left = axis.rotate(webcams[i].h_focal / 180 * M_PI);
+    vector_t right = axis.rotate(-webcams[i].h_focal / 180 * M_PI);
+    
+    vector_t p1 = pos + left * 3;
+    vector_t p2 = pos + right * 3;
+   
+    LigneSDL(((int)(simul_info->scale*(pos.x))), ((int)(simul_info->scale*(pos.y))), 
+             ((int)(simul_info->scale*(p1.x))), ((int)(simul_info->scale*(p1.y))), clBlack);      
+    LigneSDL(((int)(simul_info->scale*(pos.x))), ((int)(simul_info->scale*(pos.y))), 
+             ((int)(simul_info->scale*(p2.x))), ((int)(simul_info->scale*(p2.y))), clBlack);      
+  }
 }
 
 //---------------------------------------------------------------------------

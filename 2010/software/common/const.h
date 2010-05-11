@@ -75,7 +75,7 @@
 #define WC1_resY     480        // Résolution (hauteur) de l'image
 #define WC1_offsetX  0.085      // en mètres: Décalage entre le centre de la webcam et le centre de l'objet porteur (abcisse)
 #define WC1_offsetY  -0.135     // en mètres: Décalage entre le centre de la webcam et le centre de l'objet porteur (ordonnée)
-#define WC1_offsetZ  0.07       // en mètres: Décalage entre le centre de la webcam et le centre de l'objet porteur (cote)
+#define WC1_offsetZ  0.07       // en mètres: Décalage entre le centre de la webcam et le sol
 #define WC1_dirX     1.         // Vecteur de direction: orientation de la webcam dans le référentiel de l'objet porteur (abscisse)
 #define WC1_dirY     -0.55      // Vecteur de direction: orientation de la webcam dans le référentiel de l'objet porteur (ordonnée)
 #define WC1_dirZ     0.         // Vecteur de direction: orientation de la webcam dans le référentiel de l'objet porteur (cote)
@@ -84,12 +84,12 @@
 // Webcam top
 #define WC2_resX     640        // Résolution (largeur) de l'image
 #define WC2_resY     480        // Résolution (hauteur) de l'image
-#define WC2_OffsetX  0.         // en mètres: Décalage entre le centre de la webcam et le centre de l'objet porteur (abcisse)
-#define WC2_OffsetY  0.         // en mètres: Décalage entre le centre de la webcam et le centre de l'objet porteur (ordonnée)
-#define WC2_OffsetZ  0.33       // en mètres: Décalage entre le centre de la webcam et le centre de l'objet porteur (cote)
-#define WC2_DirX     1.         // Vecteur de direction: orientation de la webcam dans le référentiel de l'objet porteur (abscisse)
-#define WC2_DirY     0.         // Vecteur de direction: orientation de la webcam dans le référentiel de l'objet porteur (ordonnée)
-#define WC2_DirZ     -0.2       // Vecteur de direction: orientation de la webcam dans le référentiel de l'objet porteur (cote)
+#define WC2_offsetX  0.         // en mètres: Décalage entre le centre de la webcam et le centre de l'objet porteur (abcisse)
+#define WC2_offsetY  0.         // en mètres: Décalage entre le centre de la webcam et le centre de l'objet porteur (ordonnée)
+#define WC2_offsetZ  0.33       // en mètres: Décalage entre le centre de la webcam et le sol
+#define WC2_dirX     1.         // Vecteur de direction: orientation de la webcam dans le référentiel de l'objet porteur (abscisse)
+#define WC2_dirY     0.         // Vecteur de direction: orientation de la webcam dans le référentiel de l'objet porteur (ordonnée)
+#define WC2_dirZ     -0.2       // Vecteur de direction: orientation de la webcam dans le référentiel de l'objet porteur (cote)
 #define WC2_Hfocal   18.8       // Angle de demi-focale
 
 #endif
