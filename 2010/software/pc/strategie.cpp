@@ -89,7 +89,7 @@ void strat_init()
     usleep(10000);
   
   #ifdef SIMULATION
-    SendInfo(MSG_POS_INFO);
+  SendInfo(MSG_POS_INFO);
   #endif
   	 
 	// Place les composants

@@ -21,6 +21,7 @@ extern "C" void sgetrf_(int*, int*, float*, int*, int*, int*);
 extern "C" void sgetri_(int*, float*, int*, int*, float*, int*, int*);
 
 // Resolutions
+#define PP_STEP_LENGTH    0.1      // Distance en mètres entre deux étapes du chemin discrétisé
 #define PP_SPATIAL_RESOL  0.005    // Résolution métrique pour la carte des distances
 #define PP_ANGLE_RESOL    8        // Résolution angulaire pour la carte des distances
 #define RAD_ANGLE_RESOL   (M_PI/double(PP_ANGLE_RESOL))
@@ -841,7 +842,7 @@ void pp_get_pix_energy_gradient(int x, int y, double a, pp_dist &dEdx, pp_dist &
 //------------------------------------------------------------------------------
 pp_path pp_build_path(pp_pix *current, double initial_angle, double final_angle)
 { 
-  int resol = 0.05 / PP_SPATIAL_RESOL;
+  int resol = PP_STEP_LENGTH / PP_SPATIAL_RESOL;
   if(resol<1) resol = 1;
   int count = resol;
   

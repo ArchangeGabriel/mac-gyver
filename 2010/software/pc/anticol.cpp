@@ -12,6 +12,9 @@
 //------------------------------------------------------------------------------
 void* ac_MainLoop(void*)
 {
+  // Attend que le robot soit prêt
+  while(!strat_is_ready()) usleep(10000);
+  
   while(true)
   {
     usleep(100000);
