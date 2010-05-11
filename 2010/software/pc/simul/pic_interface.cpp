@@ -31,7 +31,7 @@ void* pic2_handle_msg(void *);
 pthread_t picI_thread_pic2;
 
 // Pour visualiser la position supposée et la destination sur le simulateur
-int SendInfo();
+int SendInfo(int type = MSG_INFO);
                 
 // Mutex/valeur des messages
 map<int, pthread_mutex_t *> picI_digit_mutex;
@@ -377,12 +377,16 @@ pthread_mutex_t* picWebcam(int id, unsigned int *W, unsigned int *H, uint16_t *d
   }
 }
 //------------------------------------------------------------------------------
-int SendInfo()
+int SendInfo(int type)
 {
   picInfo_t info;
-  info.type = MSG_INFO;
+  info.type = type;
   info.msg_id = msg_id++;
-  position_t pos = cine_get_position();
+  position_t pos;
+  if(type == MSG_POS_INFO)
+    pos = cine_get_wheel_center_position();
+  else
+    pos = cine_get_position();
   position_t dest = pt_get_dest();  
   info.posX = pos.x;
   info.posY = pos.y;  

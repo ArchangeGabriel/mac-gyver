@@ -10,6 +10,7 @@ using namespace std;
 
 #define PC_INCLUDE
 #include "../common/const.h"
+#include "../common/simul.h"
 #include "picAPI.h"
 #include "webcamAPI.h"
 #include "cinematik.h"
@@ -20,6 +21,10 @@ using namespace std;
 #include "sdl.h"
 #include "../common/comm.h"
 #include "webcam.hpp"
+
+#ifdef SIMULATION
+int SendInfo(int type = MSG_INFO);  // pour envoyer la couleur au simu
+#endif
 
 // Strategie prête
 bool strat_ready = false;
@@ -82,7 +87,11 @@ void strat_init()
   // Vérifie la connection avec les pics
   while(!pic_is_ready())
     usleep(10000);
-	 
+  
+  #ifdef SIMULATION
+    SendInfo(MSG_POS_INFO);
+  #endif
+  	 
 	// Place les composants
   pic_move_pusher(MOTOR_PUSHER_BACKWARD);
   pic_move_door(MOTOR_DOOR_OPEN);
@@ -122,8 +131,7 @@ void strat_lets_go()
   started = true;
   
   // reset's position of the robot
-  position_t pos = symetrize(position_t(_POS_INIT_X,_POS_INIT_Y,_POS_INIT_A*M_PI/180.));
-  cine_set_position(pos);
+  cine_init();
 }
 //------------------------------------------------------------------------------
 bool strat_is_started()

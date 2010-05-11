@@ -253,13 +253,15 @@ void* pt_MainLoop(void*)
   while(true)
   {
     if(path.empty())
+    {
+      cine_motors(0,0);
       usleep(10000);
+    }
     else
     {
       position_t pos = cine_get_position();
       if(path.front().is_dest_reached(pos))
       {
-        cine_motors(0.,0.);
         if(path.front().mutex)
           pthread_mutex_unlock(path.front().mutex);
         path.pop_front();

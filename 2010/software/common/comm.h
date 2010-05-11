@@ -50,6 +50,7 @@ int get_msg_data_size(char *msg);
 #ifdef SIMULATION
 
 #define MSG_INFO 255               // QUERY MSG_INFO
+#define MSG_POS_INFO 256           // QUERY MSG_INFO
 #define MSG_WEBCAM   254           // QUERY WEBCAM
 #define MSG_RESTART  253           // ACK RESTART
 #define MSG_WEBCAM_QUERY   252     // QUERY WEBCAM

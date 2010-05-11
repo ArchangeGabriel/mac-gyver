@@ -17,3 +17,8 @@ clean:
 	make -s -C simulateur clean
 	make -s -C common clean
 
+yellow:
+	./client -y -s photos/match
+	
+blue:
+	./client -b -s photos/match
