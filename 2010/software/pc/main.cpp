@@ -163,6 +163,7 @@ void* console(void*)
       printf("- keycontrol: pilote le robot avec le clavier\n");                                              
       printf("- a: changer la constante pour l'asservissement\n");           
       printf("- b: changer la constante pour l'asservissement\n");                 
+      printf("- jack: équivalent à débrancher le jack\n");       
     }
     else if(!strcmp(Buff,"q"))
     {
