@@ -100,7 +100,7 @@ void camera_t::create(vector_t *_N, vector_t *_T, vector_t *_G, vector_t *_pos, 
   G = _G;
   pos = _pos; 
   z = _z;
-  offset[2] -= _h/2.;
+  //offset[2] -= _h/2.;
 }
 //------------------------------------------------------------------------------
 void camera_t::start()
@@ -134,7 +134,7 @@ void camera_t::reshape(int , int )
   glViewport(0,0,WC->W,WC->H);
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-  gluPerspective(WC->h_focal,float(WC->W)/float(WC->H),0.1,100); 	//Pour les explications, lire le tutorial sur OGL et win
+  gluPerspective(WC->h_focal*2./float(WC->W)*float(WC->H),float(WC->W)/float(WC->H),0.1,100); 	//Pour les explications, lire le tutorial sur OGL et win
   glMatrixMode(GL_MODELVIEW);	
   
   WC->reshaped = true; 
@@ -181,7 +181,7 @@ void camera_t::make_scene()
   
   GLfloat x = C.x + WC->offset[0]*WC->N->x + WC->offset[1]*WC->T->x;
   GLfloat y = C.y + WC->offset[0]*WC->N->y + WC->offset[1]*WC->T->y;
-  GLfloat z = -*WC->z - WC->offset[2];  
+  GLfloat z = -WC->offset[2]; // -*WC->z // distance au sol  
   GLfloat dx = WC->direction[0]*WC->N->x + WC->direction[1]*WC->T->x;
   GLfloat dy = WC->direction[0]*WC->N->y + WC->direction[1]*WC->T->y;
   GLfloat dz = -WC->direction[2];    
@@ -219,11 +219,11 @@ void camera_t::makePicture()
   
   GLfloat x = C.x + offset[0]*N->x + offset[1]*T->x;
   GLfloat y = C.y + offset[0]*N->y + offset[1]*T->y;
-  GLfloat z = -z - offset[2];  
+  GLfloat z = -offset[2]; // - z;  // distance au sol  
   GLfloat dx = direction[0]*N->x + direction[1]*T->x;
   GLfloat dy = direction[0]*N->y + direction[1]*T->y;
   GLfloat dz = -direction[2];    
-  
+    
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 	//Efface le frame buffer et le Z-buffer
   glMatrixMode(GL_MODELVIEW); 	                        //Choisit la matrice MODELVIEW
   glLoadIdentity(); 	                                  //Réinitialise la matrice

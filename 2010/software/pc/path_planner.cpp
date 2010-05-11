@@ -28,7 +28,7 @@ extern "C" void sgetri_(int*, float*, int*, int*, float*, int*, int*);
 
 // Marge de sécurité entre le pp_robot et les obstacles en mètres
 #define SECURITY_MARGIN  0.1
-#define PIX_COST         (1./3.)   // score corresponding to 2*SECURITY_MARGIN
+#define PIX_COST         (1./3.)   // score corresponding to 2*SECURITY_MARGIN = 1 / (1 + x)
 
 // Constants for optimisation
 #define ALPHA   0.005     // Weight for first derivative 
