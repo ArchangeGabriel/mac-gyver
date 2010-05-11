@@ -22,6 +22,7 @@ int get_msg_header_size(char *msg)
       return sizeof(int);
     break;    
     case MSG_INFO:
+    case MSG_POS_INFO:
       return sizeof(int);    
     break;
     #endif
@@ -59,6 +60,7 @@ int get_msg_data_size(char *msg)
       return sizeof(MSG_INT1_t) - 2*sizeof(int);
     break;
     case MSG_INFO:
+    case MSG_POS_INFO:
       return sizeof(picInfo_t) - 2*sizeof(int);
     break;
     #endif  

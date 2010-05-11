@@ -47,19 +47,19 @@ void make_asserv(bool force = false);
 
 
 // Valeurs réelles 
-#define _KPH  0.004
+/*#define _KPH  0.004
 #define _KIH  0.000155
 #define _KPL  0.04
 #define _KIL  0.001
+*/
 
 
-/*
 // Valeurs simulation
 #define _KPH  0.008
 #define _KIH  0.0004
 #define _KPL  0.08
 #define _KIL  0.004
-*/
+
 
 #ifdef VISUALIZE
 int trace_X=0;
@@ -70,7 +70,12 @@ int max_Y=180;
 //------------------------------------------------------------------------------
 void cine_init()
 {  
-  pos = symetrize(position_t(_POS_INIT_X,_POS_INIT_Y,_POS_INIT_A*M_PI/180.)); // position of the robot's center
+  // position of the center of the robot
+  if(get_color() == clYELLOW)
+    pos = position_t(_POS_INIT_X_YELLOW, _POS_INIT_Y_YELLOW, _POS_INIT_A_YELLOW*M_PI/180.); 
+  else
+    pos = position_t(_POS_INIT_X_BLUE,   _POS_INIT_Y_BLUE,   _POS_INIT_A_BLUE * M_PI/180.);
+    
   cine_set_position(pos);  // position of the wheels' center
   speed = vector_t(0., 0.);
   aspeed = 0;

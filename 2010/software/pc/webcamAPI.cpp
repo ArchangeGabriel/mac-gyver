@@ -2,6 +2,8 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <errno.h>
+#include <iostream>
+#include <fstream>
 #include "webcamAPI.h"
 #include "webcam.hpp"
 #include "webcam_processing.hpp"
@@ -15,6 +17,8 @@
 #include "../common/bitmap.h"
 #include "../common/simul.h"
 
+using namespace std;
+
 #ifdef SIMULATION
 #define WEBCAM1 "0"
 #define WEBCAM2 "1"
@@ -23,43 +27,63 @@
 #define WEBCAM2 "/dev/video1"
 #endif
 
-webcam_t *WC[2] = {new webcam_t("front",WEBCAM1,WC1_resX,WC1_resY), new webcam_t("top",WEBCAM2,WC2_resX,WC2_resY)};
-enum {FRONT, TOP, wc_count};
-
 /*---------------------------------------------------------------------------*/
-class orth_camera
+class orth_camera : public webcam_t
 {  
-	private:
-	int rX, rY;
+	protected:
 	double focal_length;
 	double z, vert_incl;  // négatif vers le bas	
+	double offX, offY, offA;
   position_t pos;
 	
 	public:
-  orth_camera(int resol_X, int resol_Y, double cam_z, double inclinaison_verticale, double demi_focale);
+  orth_camera(
+    const char *name, 
+    const std::string& dev, 
+    size_t w, 
+    size_t h, 
+    double dx, 
+    double dy, 
+    double da,
+    double cam_z, 
+    double inclinaison_verticale, 
+    double demi_focale
+  );
     
-  void set_position(const position_t &p);
-  position_t get_position() const;
+  void set_robot_pos(const position_t &p);
+  position_t get_pos() const;
   
   point_t    pos2point(const vector_t &P, const double &Pz) const;
   vector_t   point2pos(const point_t &P, const double &Pz) const;
 };
 /*---------------------------------------------------------------------------*/
-orth_camera::orth_camera(int resol_X, int resol_Y, double cam_z, double inclinaison_verticale, double demi_focale)
+orth_camera::orth_camera(
+    const char *name, 
+    const std::string& dev, 
+    size_t w, 
+    size_t h, 
+    double dx, 
+    double dy, 
+    double da,
+    double cam_z, 
+    double inclinaison_verticale, 
+    double demi_focale
+  ):webcam_t(name,dev,w,h),offX(dx),offY(dy),offA(da)
 {
-  rX = resol_X;
-  rY = resol_Y;
-  focal_length = rY / (2. * tan(demi_focale * double(rY) / double(rX)));
+  focal_length = m_height / (2. * tan(demi_focale * double(m_height) / double(m_width)));
 	vert_incl = inclinaison_verticale;
 	z = cam_z;
 }
 /*---------------------------------------------------------------------------*/
-void orth_camera::set_position(const position_t &p)
+void orth_camera::set_robot_pos(const position_t &p)
 {
 	pos = p;
+	pos.x += offX;
+	pos.y += offY;
+	pos.a += offA;		
 }
 /*---------------------------------------------------------------------------*/
-position_t orth_camera::get_position() const 
+position_t orth_camera::get_pos() const 
 {
 	return pos;
 }
@@ -93,8 +117,8 @@ point_t orth_camera::pos2point(const vector_t &P, const double &Pz) const
   p[2] = z2;
   
   // Image projection
-  res.x = rX/2 + p[1] * focal_length / p[0];
-  res.y = rY/2 - p[2] * focal_length / p[0];
+  res.x = m_width/2  + p[1] * focal_length / p[0];
+  res.y = m_height/2 - p[2] * focal_length / p[0];
   
   return res;
 }
@@ -116,7 +140,7 @@ vector_t orth_camera::point2pos(const point_t &, const double &) const
 */
 void get_cylinder_corner(const orth_camera &cam, const vector_t &cylindrer, double z, double half_height, double radius, point_t &upper_left, point_t &lower_right)
 {
-	const double angle = cam.get_position().a;
+	const double angle = cam.get_pos().a;
 
 	vector_t T(cos(angle-M_PI_2), sin(angle-M_PI_2));
 
@@ -162,6 +186,39 @@ void draw_rect(const point_t &upper_left, const point_t &lower_right, int w, int
 }
 
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
+
+
+
+
+orth_camera *WC[2] = {new orth_camera("front",
+                                WEBCAM1,
+                                WC1_resX,
+                                WC1_resY,
+                                WC1_offsetX,
+                                WC1_offsetY,
+                                atan(WC1_dirY/WC1_dirX),
+                                WC1_offsetZ,
+                                atan(WC1_dirZ/WC1_dirX),
+                                WC1_Hfocal/180.*M_PI
+                               ), 
+                   new orth_camera("top",
+                                WEBCAM2,
+                                WC2_resX,
+                                WC2_resY,
+                                WC2_offsetX,
+                                WC2_offsetY,
+                                atan(WC2_dirY/WC2_dirX),
+                                WC2_offsetZ,
+                                atan(WC2_dirZ/WC2_dirX),
+                                WC2_Hfocal/180.*M_PI
+                               )};
+enum {FRONT, TOP, wc_count};
+
+/*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
+
+
+
+
 void* wc_MainLoop(void* _path)
 {
   #ifndef SIMULATION
@@ -171,8 +228,10 @@ void* wc_MainLoop(void* _path)
   for(int i=0; i<wc_count; i++)
     WC[i]->start();
   
+  position_t pos;
   char *path = (char*)_path;
   int img_num;
+  
   if(path)
   {
     if(mkdir(path, 766) && errno != EEXIST)
@@ -197,8 +256,16 @@ void* wc_MainLoop(void* _path)
       {
         sprintf(file, "%s/%s_%03d.bmp", path, WC[i]->get_name(), img_num);
         WC[i]->capture(img);
+        WC[i]->set_robot_pos(cine_get_position());
+        pos = WC[i]->get_pos();
         convert_yuv_to_rgb(img);  
         save_buff_to_bitmap(file, WC[i]->get_width(), WC[i]->get_height(), img.data);
+        
+        sprintf(file, "%s/%s_%03d.info", path, WC[i]->get_name(), img_num);
+        ofstream f;
+        f.open(file);
+        f << pos.x << endl << pos.y << endl << pos.a;
+        f.close();
       }
       img_num++;
     }
@@ -208,8 +275,8 @@ void* wc_MainLoop(void* _path)
 /*---------------------------------------------------------------------------*/
 int wc_reco_config()
 {
-  position_t robot_pos = cine_get_position();
-  point_t upper_left, lower_right, middle;  
+  /*position_t robot_pos = cine_get_position();
+  point_t upper_left, lower_right;  
 
   // *** Front ***  
   position_t wc_front_pos(robot_pos.x+WC1_offsetX, 
@@ -238,17 +305,12 @@ int wc_reco_config()
   vector_t cylinder(1.95,1.722);  // 3
   //vector_t cylinder(1.95,1.222);  // 4
   get_cylinder_corner(wc_top, cylinder, 0.075, 0.075, 0.025, upper_left, lower_right);
-  middle = wc_top.pos2point(cylinder, 0.075);
-  printf("m %d %d\n", middle.x, middle.y);
-  printf("ul %d %d\n", upper_left.x, upper_left.y);
-  printf("lr %d %d\n", lower_right.x, lower_right.y);    
-  
+
   // Draw output
   convert_yuv_to_rgb(img2);
   draw_rect(upper_left, lower_right, WC2_resX, WC2_resY, img2.data);  
-  draw_rect(middle, middle, WC2_resX, WC2_resY, img2.data);  
   save_buff_to_bitmap("imgTop.bmp", WC2_resX, WC2_resY, img2.data);
- 
+ */
   return 52;
 }
 /*---------------------------------------------------------------------------*/

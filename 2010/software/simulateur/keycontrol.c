@@ -19,12 +19,12 @@ extern sem_t pic_sem;
   //<simulation>
   pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS,NULL);
   PIC_ARG *Simul=(PIC_ARG*)Args; 
-  Simul->robot->data[Simul->my_nbr].destX = _POS_INIT_X;
-  Simul->robot->data[Simul->my_nbr].destY = _POS_INIT_Y;
-  Simul->robot->data[Simul->my_nbr].destA = _POS_INIT_A;  
-  Simul->robot->data[Simul->my_nbr].posX =  _POS_INIT_X;      
-  Simul->robot->data[Simul->my_nbr].posY =  _POS_INIT_Y;       
-  Simul->robot->data[Simul->my_nbr].angle = _POS_INIT_A;       
+  Simul->robot->data[Simul->my_nbr].destX = _POS_INIT_X_BLUE;
+  Simul->robot->data[Simul->my_nbr].destY = _POS_INIT_Y_BLUE;
+  Simul->robot->data[Simul->my_nbr].destA = _POS_INIT_A_BLUE;  
+  Simul->robot->data[Simul->my_nbr].posX =  _POS_INIT_X_BLUE;      
+  Simul->robot->data[Simul->my_nbr].posY =  _POS_INIT_Y_BLUE;       
+  Simul->robot->data[Simul->my_nbr].angle = _POS_INIT_A_BLUE;       
   //</simulation> 
   
   double posX,posY,angle;     // la position
@@ -36,9 +36,9 @@ extern sem_t pic_sem;
   
   
   //Initialisation du calcul de la position
-  posX  = _POS_INIT_X;
-  posY  = _POS_INIT_Y;
-  angle = _POS_INIT_A;
+  posX  = _POS_INIT_X_BLUE;
+  posY  = _POS_INIT_Y_BLUE;
+  angle = _POS_INIT_A_BLUE;
   
   long codeuse[2];
   codeuse[0]=get_input(Simul,MSG_CODER,0);

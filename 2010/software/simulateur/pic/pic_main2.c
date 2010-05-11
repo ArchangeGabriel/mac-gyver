@@ -79,6 +79,14 @@ void* pic_main2(void *Args)
       {
         case MSG_EMPTY: break;
         #ifdef SIMULATION
+        case MSG_POS_INFO:
+        {
+          picInfo_t *msg = (picInfo_t*)_msg;
+          Simul->robot->position.x=msg->posX;
+          Simul->robot->position.y=msg->posY;
+          Simul->robot->angle=msg->posA;
+        }
+        break;
         case MSG_INFO:
         {
           picInfo_t *msg = (picInfo_t*)_msg;
