@@ -1,7 +1,7 @@
 #ifndef __webcam__
 #define __webcam__
 
-        
+#include <pthread.h>        
 #include <linux/videodev2.h>
 
 #include "webcam_common.hpp"
@@ -59,6 +59,7 @@ class webcam_t
     enum v4l2_colorspace m_video_colorspace;
     
     image_t m_image;
+    pthread_mutex_t mutex;
 };
 
 #endif // __webcam__

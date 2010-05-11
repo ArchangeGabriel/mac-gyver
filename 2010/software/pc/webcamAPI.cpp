@@ -23,7 +23,7 @@
 #define WEBCAM2 "/dev/video1"
 #endif
 
-webcam_t *WC[2] = {new webcam_t("front",WEBCAM1,WC1_resX,WC1_resY), new webcam_t("top",WEBCAM1,WC1_resX,WC1_resY)};
+webcam_t *WC[2] = {new webcam_t("front",WEBCAM1,WC1_resX,WC1_resY), new webcam_t("top",WEBCAM2,WC2_resX,WC2_resY)};
 enum {FRONT, TOP, wc_count};
 
 /*---------------------------------------------------------------------------*/
@@ -195,7 +195,7 @@ void* wc_MainLoop(void* _path)
       image_t img(image_t::yuv_format,0,0);
       for(int i=0; i<wc_count; i++)
       {
-        sprintf(file, "%s/%s_%d.bmp", path, WC[i]->get_name(), img_num);
+        sprintf(file, "%s/%s_%03d.bmp", path, WC[i]->get_name(), img_num);
         WC[i]->capture(img);
         convert_yuv_to_rgb(img);  
         save_buff_to_bitmap(file, WC[i]->get_width(), WC[i]->get_height(), img.data);
@@ -208,7 +208,7 @@ void* wc_MainLoop(void* _path)
 /*---------------------------------------------------------------------------*/
 int wc_reco_config()
 {
-  /*position_t robot_pos = cine_get_position();
+  position_t robot_pos = cine_get_position();
   point_t upper_left, lower_right, middle;  
 
   // *** Front ***  
@@ -248,7 +248,7 @@ int wc_reco_config()
   draw_rect(upper_left, lower_right, WC2_resX, WC2_resY, img2.data);  
   draw_rect(middle, middle, WC2_resX, WC2_resY, img2.data);  
   save_buff_to_bitmap("imgTop.bmp", WC2_resX, WC2_resY, img2.data);
-  */
+ 
   return 52;
 }
 /*---------------------------------------------------------------------------*/

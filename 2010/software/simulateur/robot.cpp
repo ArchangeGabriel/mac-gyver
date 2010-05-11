@@ -249,8 +249,10 @@ int robot_t::pic_io(robot_t* robot,int captor_type, int captor_id, int value)
     case MSG_ANALOG:
       return 0;
     case MSG_DCMOTOR:
-      if(captor_id == MOTOR_PUSHER_LEFT || captor_id == MOTOR_PUSHER_RIGHT)
+      if(captor_id == MOTOR_PUSHER_LEFT)
         robot->motor_pusher = value;
+      if(captor_id == MOTOR_PUSHER_RIGHT)  
+        robot->motor_pusher = -value;
       return 0;
     case MSG_SERVOMOTOR:
       return 0;

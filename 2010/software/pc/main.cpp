@@ -72,7 +72,7 @@ int main(int argc, char **argv)
       case 's':
       break;
       default:
-      printf("La syntaxe est la suivante: ./client -a adresse -p port -i robot_id [-r/-g]\n");
+      printf("La syntaxe est la suivante: ./client -a adresse -p port -i robot_id [-y/-b] -s photo_dir\n");
       return -1;
     }
   #endif
@@ -97,6 +97,7 @@ int main(int argc, char **argv)
       strcpy(path_photo,optarg);
       break;
       default:
+      printf("La syntaxe est la suivante: ./client [-y/-b] -s photo_dir\n");      
       break;
     }
   }

@@ -30,6 +30,7 @@ webcam_t::webcam_t(const char*name, const std::string& dev,size_t w,size_t h)
 {
     open(dev);
     init();
+    phtread_mutex_init(&mutex, NULL);
 }
 
 webcam_t::~webcam_t()
@@ -72,8 +73,10 @@ void webcam_t::capture(image_t& img)
 
 void webcam_t::do_capture()
 {
+    pthread_mutex_lock(&mutex);
     video_capture();
     process_capture_to_image(m_image);
+    pthread_mutex_unlock(&mutex);
 }
 
 void webcam_t::get_image(image_t& img)
