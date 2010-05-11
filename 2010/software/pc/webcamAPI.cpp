@@ -5,6 +5,7 @@
 #include "webcam_utils.hpp"
 #include "common.h"
 #include "cinematik.h"
+#include "strategie.h"
 #include "sdl.h"
 
 #include "../common/const.h"
@@ -158,14 +159,24 @@ void draw_rect(const point_t &upper_left, const point_t &lower_right, int w, int
 }
 
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-void webcam_init()
+void* wc_MainLoop(void* _path)
 {
   #ifndef SIMULATION
   init_utils();
   #endif
-    
+
   video_front.start();
   video_top.start();
+  
+  char *path = (char*)_path;
+  
+  // Attend que le robot soit prêt
+  while(!strat_is_ready()) usleep(10000);
+
+  while(true)
+  {
+    
+  }    
 }
 /*---------------------------------------------------------------------------*/
 int wc_reco_config()

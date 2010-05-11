@@ -21,12 +21,7 @@ void pic_MainLoop()
   // Initialize connections  
   fprintf(stderr,"Init USB...                 ");  
   fflush(stdout);
-  if(setup_usb_connexions() < 0)
-  {
-    fprintf(stderr,"SETUP USB FAILED !\n");
-    exit(1);
-  }
-  else if(init_analog_in(0) < 0)
+  if(init_analog_in(0) < 0)
   {
     fprintf(stderr,"INIT ANALOG FAILED !\n");
     exit(1);
@@ -108,16 +103,6 @@ bool pic_where_pusher(int position)
 int pic_move_door(int position)
 {
   return (set_servo(SERVOM_DOOR, position) == 1) ? 0 : 1;
-}
-//------------------------------------------------------------------------------
-bool pic_where_door(int position)
-{
-  if(position == MOTOR_DOOR_OPEN)
-    return !(get_digital_in() & DIGIT_DOOR_OPEN);
-  else if(position == MOTOR_DOOR_CLOSED)
-    return !(get_digital_in() & DIGIT_DOOR_CLOSED);
-  else
-    throw(0);    
 }
 //------------------------------------------------------------------------------
 void pic_Reset()

@@ -6,6 +6,7 @@
 #include "../common/simul.h"
 #include "../common/console.h"
 #include "picAPI.h"
+#include "webcamAPI.h"
 #include "strategie.h"
 #include "path_tracker.h"
 #include "cinematik.h"
@@ -52,7 +53,7 @@ int main(int argc, char **argv)
   port=11111;
   robot_id=0;
     
-  while((i = getopt(argc, argv, "a:p:i:rg")) > 0)
+  while((i = getopt(argc, argv, "a:p:i:by")) > 0)
     switch(i)
     {
       case 'a':
@@ -76,9 +77,9 @@ int main(int argc, char **argv)
   #endif
 
   int color = -1; 
-
+  char *path_photo = NULL;
   optind = 1;
-  while((i = getopt(argc, argv, "by")) > 0)
+  while((i = getopt(argc, argv, "bys:")) > 0)
   {
     switch(i)
     {
@@ -89,6 +90,10 @@ int main(int argc, char **argv)
       case 'y':
       color = clYELLOW;
       fprintf(stderr,"Je suis jaune!\n");
+      break;
+      case 's':
+      path_photo = new char[strlen(optarg)+1];
+      strcpy(addr,optarg);
       break;
       default:
       break;
@@ -116,12 +121,18 @@ int main(int argc, char **argv)
   pthread_create(&IAThread, NULL, strat_MainLoop, NULL);   // Intelligence Artificielle   
   pthread_create(&PPThread, NULL, pt_MainLoop   , NULL);   // Path Planner
   pthread_create(&ACThread, NULL, ac_MainLoop   , NULL);   // Anti Collision
+  pthread_create(&ACThread, NULL, wc_MainLoop   , (void*)path_photo);   // Webcam  
   
   #ifdef CONSOLE
   pthread_create(&ConsoleThread, NULL, console, NULL);   // Console
   #endif
   
-  atexit(exiting);
+  atexit(exiting);  
+  if(setup_usb_connexions() < 0)   // Il faut appeler shut_usb avec le même process ayant appelé setup_usb_connexions
+  {
+    fprintf(stderr,"SETUP USB FAILED !\n");
+    exit(1);
+  }
   pic_MainLoop();
   
   return 0;

@@ -37,7 +37,6 @@ int pic_move_door(int position);
 teste la position du poussoir
 */
 bool pic_where_pusher(int position);
-bool pic_where_door(int position);
 
 /*
 réinitialise les PIC
