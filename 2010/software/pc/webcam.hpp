@@ -9,7 +9,7 @@
 class webcam_t
 {
     public:
-    webcam_t(const std::string& dev,size_t width,size_t height);
+    webcam_t(const char *name,const std::string& dev,size_t width,size_t height);
     ~webcam_t();
     
     void start();
@@ -21,6 +21,7 @@ class webcam_t
     
     size_t get_width();
     size_t get_height();
+    const char* get_name();
     
     protected:
     int xioctl(int request,void *arg);
@@ -45,6 +46,7 @@ class webcam_t
     };
     
     int m_fd;
+    const char *m_name;
     size_t m_width,m_height;
     size_t m_video_bytes_per_line;
     size_t m_video_image_size;

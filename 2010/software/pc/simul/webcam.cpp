@@ -6,8 +6,8 @@ pthread_mutex_t* picWebcam(int id, unsigned int *W, unsigned int *H, uint16_t *d
 
 //------------------------------------------------------------------------------
 
-webcam_t::webcam_t(const std::string& dev, size_t w, size_t h)
-    :m_image(image_t::yuv_format,w,h)
+webcam_t::webcam_t(const char *name,const std::string& dev, size_t w, size_t h)
+    :m_name(name),m_image(image_t::yuv_format,w,h)
 {
   m_fd = atoi(dev.c_str());
   m_width = w;
@@ -34,6 +34,11 @@ size_t webcam_t::get_width()
 size_t webcam_t::get_height()
 {
   return m_height;
+}
+//------------------------------------------------------------------------------
+const char* webcam_t::get_name()
+{
+    return m_name;
 }
 //------------------------------------------------------------------------------
 void webcam_t::capture(image_t& img)
