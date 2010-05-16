@@ -15,7 +15,7 @@ using namespace std;
 
 /* In millisecond. Note that with libusb 0.11 on Linux, a timeout of 0 results
  * in a immediate return... */
-#define USB_TIMEOUT 5000
+#define USB_TIMEOUT 500
 
 USBDeviceInOut::USBDeviceInOut(struct usb_device *dev)
 {

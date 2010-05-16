@@ -27,9 +27,10 @@ void strat_lets_go();
 
 //------------------------------------------------------------------------------
 /*
-Renvoie vrai ssi le jeu a commencé (= jack retiré)
+Renvoie vrai ssi le jeu a commencé (= jack retiré) (ou fini)
 */
 bool strat_is_started();
+bool strat_is_game_over();
 
 //------------------------------------------------------------------------------
 /*

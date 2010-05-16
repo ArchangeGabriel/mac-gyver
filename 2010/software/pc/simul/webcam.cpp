@@ -1,7 +1,7 @@
 #include "../common.h"
 
 // Defined in pic_interface.cpp
-pthread_mutex_t* picWebcam(int id, unsigned int *W, unsigned int *H, uint16_t *data = NULL);
+int picWebcam(int id, unsigned int *W, unsigned int *H, uint16_t *data = NULL);
 
 //------------------------------------------------------------------------------
 
@@ -12,6 +12,7 @@ webcam_t::webcam_t(const char *name,const std::string& dev, size_t w, size_t h)
   m_width = w;
   m_height = h;
   pthread_mutex_init(&mutex, NULL);  
+  started = false;
 }
 //------------------------------------------------------------------------------
 webcam_t::~webcam_t()
@@ -23,18 +24,19 @@ webcam_t::~webcam_t()
 //------------------------------------------------------------------------------
 void webcam_t::start()
 {
+  started = true;
 }
 //------------------------------------------------------------------------------
 void webcam_t::stop()
 {
 }
 //------------------------------------------------------------------------------
-size_t webcam_t::get_width()
+size_t webcam_t::get_width() const
 {
   return m_width;
 }
 //------------------------------------------------------------------------------
-size_t webcam_t::get_height()
+size_t webcam_t::get_height() const
 {
   return m_height;
 }
@@ -55,14 +57,11 @@ void webcam_t::do_capture()
   unsigned int w,h; 
   pthread_mutex_lock(&mutex);  
 
-  pthread_mutex_t *wait = picWebcam(m_fd, &w, &h, m_image.data);
-     
-  if(wait == NULL) 
+  if(picWebcam(m_fd, &w, &h, m_image.data)) 
   {
   	printf("CAPTURE FAILED !!!!\n");
     return;
   }
-  wait_for_it(wait);    
   	
   if(w != m_width || h != m_height)
     printf("Webcam: dimension mismatch!\n");  

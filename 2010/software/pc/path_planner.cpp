@@ -42,10 +42,8 @@ class pp_zone
 { 
   friend void pp_fillZone(pp_zone *zone, int iAngle, int cx, int cy);
 
-  private:
-  void allocate();
-  
   protected:
+  void allocate();
   int pp_height;
   int *left;
   int *right;
@@ -80,7 +78,7 @@ class pp_zone_orientbox : public pp_zone
   inline void swap_int(int* x, int* y);
   
   public:
-  pp_zone_orientbox(int pp_width, int depth, double angle);
+  pp_zone_orientbox(int pp_width, int depth, double angle, double _cx = 0., double _cy = 0.);
 };
 
 //------------------------------------------------------------------------------
@@ -281,35 +279,44 @@ pp_zone_hbox::pp_zone_hbox(int w, int h) : pp_zone(h)
   }
 }
 //------------------------------------------------------------------------------
-pp_zone_orientbox::pp_zone_orientbox(int pp_width, int depth, double angle) : pp_zone(pp_width*fabs(cos(angle)) + depth*fabs(sin(angle)) + 1)
+pp_zone_orientbox::pp_zone_orientbox(int pp_width, int depth, double angle, double _cx, double _cy) : pp_zone(0)
 {
   const double C = cos(angle);
   const double S = sin(angle);
-  const double h_offset = (pp_width*fabs(cos(angle)) + depth*fabs(sin(angle))) / 2.;
   const double hw = double(pp_width)/2.;
   const double hd = double(depth)/2.;
 
-  double w[] = {hw, hw, -hw, -hw};
-  double d[] = {hd, -hd, -hd, hd};  
+  double w[] = {hw-_cy,  hw-_cy, -hw-_cy,-hw-_cy};
+  double d[] = {hd-_cx, -hd-_cx, -hd-_cx, hd-_cx};  
 
   int px[4];
   int py[4];
-
+  
+  int min = INT_MAX;
+  int max = INT_MIN;  
   for(int i=0; i<4; i++)
   {
     px[i] = d[i]*C-w[i]*S;
-    py[i] = d[i]*S+w[i]*C + h_offset;    
-  }
+    py[i] = d[i]*S+w[i]*C;    
+    if(py[i] < min) min = py[i];
+    if(py[i] > max) max = py[i];  
+  }  
   
+  delete[] left;
+  delete[] right;
+  cy = -min;
+  pp_height = max-min+1;
+  allocate();
+      
   const int i_top = (C > 0) ? ((S>0)?2:3) : ((S>0)?1:0);
   const int i_left = (i_top+3)%4;
   const int i_right = (i_top+1)%4;
   const int i_bottom = (i_top+2)%4;
-  
-  line(left,  px[i_bottom], py[i_bottom], px[i_left],   py[i_left]);
-  line(left,  px[i_left],   py[i_left],   px[i_top],    py[i_top]);
-  line(right, px[i_top],    py[i_top],    px[i_right],  py[i_right]);
-  line(right, px[i_right],  py[i_right],  px[i_bottom], py[i_bottom]);
+    
+  line(left,  px[i_bottom], py[i_bottom]-min, px[i_left],   py[i_left]-min);
+  line(left,  px[i_left],   py[i_left]-min,   px[i_top],    py[i_top]-min);
+  line(right, px[i_top],    py[i_top]-min,    px[i_right],  py[i_right]-min);
+  line(right, px[i_right],  py[i_right]-min,  px[i_bottom], py[i_bottom]-min);
 }
 //------------------------------------------------------------------------------
 void pp_zone_orientbox::line(int *array, int x1, int y1, int x2, int y2)
@@ -363,7 +370,7 @@ void pp_zone_orientbox::line(int *array, int x1, int y1, int x2, int y2)
         swap_int(&y1, &y2);
       }
 
-      yincr = y2 > y1 ? 1 : -1;
+      yincr = y2 > y1 ? 1 : -1;  
       dx = x2 - x1;
       dy = abs(y2 - y1);
       d = 2 * dy - dx;
@@ -420,7 +427,7 @@ void pp_init()
   pp_energy_gradY = new pp_dist*[PP_ANGLE_RESOL];
   for(int i=0; i<PP_ANGLE_RESOL; i++)
   {
-    pp_robot[i] = new pp_zone_orientbox(pp_robotW, pp_robotD, double(i)*M_PI/double(PP_ANGLE_RESOL));
+    pp_robot[i] = new pp_zone_orientbox(pp_robotW, pp_robotD, double(i)*M_PI/double(PP_ANGLE_RESOL), _ROUE_X/PP_SPATIAL_RESOL, 0);
     pp_energy[i] = new pp_dist[pp_width * pp_height];
     pp_energy_gradX[i] = new pp_dist[pp_width * pp_height];
     pp_energy_gradY[i] = new pp_dist[pp_width * pp_height];
@@ -634,6 +641,8 @@ void pp_fillZone(pp_zone *zone, int iAngle, int cx, int cy)
       break;
     x1 = cx + zone->left[i];
     x2 = cx + zone->right[i];
+    if(x1>=pp_width) continue;
+    if(x2<0) continue;    
     if(x1<0) x1 = 0;
     if(x2>=pp_width) x2 = pp_width-1;
     memset(&pp_energy[iAngle][y*pp_width+x1], 0, (x2-x1+1)*sizeof(pp_dist));

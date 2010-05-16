@@ -26,6 +26,7 @@ sdlWindow::sdlWindow(int width, int height, const char *title)
   back_pixels = new Uint32[4*width*height];
   
   affichage = SDL_SetVideoMode(width,height, 32, SDL_HWSURFACE|SDL_DOUBLEBUF/*|SDL_FULLSCREEN*/);
+  background = NULL;
 
   if (affichage == NULL || back_pixels == NULL) {
     fprintf(stderr, "Cannot activate the graphic mode : %s\n", SDL_GetError());
@@ -240,10 +241,11 @@ void sdlWindow::DisqueSDL(int cx, int cy, int rayon, Uint32 coul)
   }
 }
 //------------------------------------------------------------------------------
-void sdlWindow::Load_SDL_Background()
+void sdlWindow::Load_SDL_Background(bool from_back_pixel)
 {
   pthread_mutex_lock(&using_background);
-  memcpy(back_pixels,affichage->pixels,4*affichage->w*affichage->h);
+  if(!from_back_pixel)
+    memcpy(back_pixels,affichage->pixels,4*affichage->w*affichage->h);
   if(background) SDL_FreeSurface(background);
   background=SDL_CreateRGBSurfaceFrom(back_pixels,affichage->w,affichage->h,32,4*affichage->w,0,0,0,0);
   if(!background) {

@@ -3,6 +3,7 @@
 
 #include <pthread.h>
 #include "common.h"
+#include "path_planner.h"
 
 //------------------------------------------------------------------------------
 /*
@@ -23,14 +24,14 @@ Renvoie un mutex vérouillé qui sera dévérouillé à l'arrivée
 Si le robot n'a pas finit le chemin courant, celui-ci est annulé
 et remplacé par le nouveau.
 */
-enum{tpDEST,tpAPPROACH,tpLEAVE, tpWAYPOINT};
+enum{tpDEST, tpPREDEST, tpWAYPOINT, tpMOVE, tpTURN};
 pthread_mutex_t* pt_go_to(const position_t &pos, int type = tpDEST, bool append = false);
 
 //------------------------------------------------------------------------------
 /*
 Ajoute une étape au chemin en cours (de la destination actuelle à pos)
 */
-pthread_mutex_t* pt_add_step(const position_t &pos);
+pthread_mutex_t* pt_add_step(const position_t &pos, int type);
 
 //------------------------------------------------------------------------------
 /*
@@ -40,13 +41,21 @@ position_t pt_get_dest();
 
 //------------------------------------------------------------------------------
 /*
+Renvoie le chemin sous forme de liste des positions
+*/
+pp_path pt_get_path();
+
+//------------------------------------------------------------------------------
+/*
 Efface le chemin
 */
 void pt_clear_path();
 
 //------------------------------------------------------------------------------
 // Stop le robot 
-void pt_stop(int id);
+void pt_stop();
+void pt_resume();
+bool pt_is_stopped();
 
 
 #endif

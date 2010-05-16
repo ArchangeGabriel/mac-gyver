@@ -52,6 +52,12 @@
 #define DIGIT_JACK              4
 #define DIGIT_SWITCH_BACK_RIGHT 8
 #define DIGIT_SWITCH_BACK_LEFT  16
-  
+
+// Capteurs analogiques
+#define ANALO_DIST_FRONT_LEFT   0
+#define ANALO_DIST_FRONT_RIGHT  1
+#define ANALO_DIST_BACK_LEFT    3
+#define ANALO_DIST_BACK_RIGHT   2
+
 
 #endif // PROTO_H_

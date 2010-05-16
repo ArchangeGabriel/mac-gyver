@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <map>
@@ -17,7 +18,7 @@ using namespace std;
 int msg_id;
 
 // La webcam est gérée par le serveur dans le cas de la simulation
-pthread_mutex_t *mut_webcam = NULL;
+pthread_mutex_t mut_webcam;
 uint16_t *webcam_data;
 unsigned int *webcam_W;
 unsigned int *webcam_H;
@@ -31,7 +32,7 @@ void* pic2_handle_msg(void *);
 pthread_t picI_thread_pic2;
 
 // Pour visualiser la position supposée et la destination sur le simulateur
-int SendInfo(int type = MSG_INFO);
+int SendInfo(int type = MSG_INFO, int config = -1);
                 
 // Mutex/valeur des messages
 map<int, pthread_mutex_t *> picI_digit_mutex;
@@ -45,6 +46,9 @@ int last_coder_R = 0;
 int coder_L = 0;
 int coder_R = 0;    
 int coder_id = 0;         
+
+bool pic1OK;
+bool pic2OK;
 
 //------------------------------------------------------------------------------
 
@@ -78,7 +82,7 @@ int get_codeuses(int *codeuse1, unsigned char *sens1, int *codeuse2, unsigned ch
 // retourne de 0 à 127 (ie les 7 entrees numeriques) si ok, -1 sinon
 int get_digital_in(void)
 {
-  int id = msg_id++;
+  /*int id = msg_id++;
   
   MSG_INT1_t msg;
   msg.type   = MSG_QUERY;
@@ -102,7 +106,8 @@ int get_digital_in(void)
     picI_digit_value.erase(it2);
     
     return res;
-  }
+  }*/
+  return 255;
 }
 //------------------------------------------------------------------------------
 // defini le nombre NB_ANALOG d'entrees analogiques. Retourne min(number, NB max d'analogiques de la carte) si ok, -1 sinon. Doit etre appelee avant le premier get_analog_in.
@@ -114,7 +119,7 @@ int init_analog_in(unsigned char number)
 // rempli result des length (ou NB_ANALOG si length trop grand) premieres entrees analogiques. Retourne ne nombre de valeurs effectivement ecrites (ie min(length, NB_ANALOG)) si ok, -1 sinon
 int get_analog_in(unsigned short *result, unsigned char length)
 {
-  int id = msg_id++;
+  /*int id = msg_id++;
   
   MSG_INT1_t msg;
   msg.type   = MSG_QUERY;
@@ -135,6 +140,10 @@ int get_analog_in(unsigned short *result, unsigned char length)
   picI_analog_mutex.erase(it1);  
   map<int, int> :: iterator it2 = picI_analog_value.find(id);
   picI_analog_value.erase(it2);
+  */
+  
+  for(int i=0; i<length; i++)
+    result[i] = 0;
   
   return length;
 }
@@ -167,8 +176,15 @@ int set_servo(unsigned char number, unsigned char position)
 int setup_usb_connexions()
 {
   msg_id = 1;
+  pthread_mutex_init(&mut_webcam,NULL);
+  pic1OK = false;
+  pic2OK = false;  
   pthread_create(&picI_thread_pic1, NULL, &pic1_handle_msg, NULL);  
   pthread_create(&picI_thread_pic2, NULL, &pic2_handle_msg, NULL);    
+  
+  while(!pic1OK || !pic2OK)
+    usleep(10000);
+    
   return 1;
 }
 //------------------------------------------------------------------------------
@@ -183,9 +199,7 @@ void shut_usb()
 int repare_usb()
 {
   shut_usb();
-  bool f1 = connect_usb(PIC1)<0;
-  bool f2 = connect_usb(PIC2)<0;
-  return (f1 || f2)?-1:1;
+  return setup_usb_connexions();
 }
 //-------------------------------------------------------------------------------
 void* pic1_handle_msg(void *)
@@ -200,11 +214,12 @@ void* pic1_handle_msg(void *)
     if(connect_usb(PIC1)<0)
     {
       fprintf(stderr,"Connection failed PIC1, retrying...\n");
-      sleep(1);
-      continue;
+      exit(1);
     }     
     
     fprintf(stderr,"Listen to PIC1...\n");  fflush(stdout);  
+    
+    pic1OK = true;
     
     while((_msg=read_usb(PIC1)))
     {
@@ -217,6 +232,7 @@ void* pic1_handle_msg(void *)
         fprintf(stderr,"<picInterface.cpp> PIC1: Connexion réinitialisée.\n");
         fflush(stdout); 
         pic_Reset();
+        return NULL;
         break;      
         case MSG_CODER:
         {   
@@ -262,12 +278,13 @@ void* pic2_handle_msg(void *)
     if(connect_usb(PIC2)<0)
     {
       fprintf(stderr,"Connection failed PIC2, retrying...\n");
-      sleep(1);
-      continue;
+      exit(1);
     }
 
     fprintf(stderr,"Listen to PIC2...\n");  fflush(stdout); 
-            
+
+    pic2OK = true;
+                
     while((_msg=read_usb(PIC2)))
     {
       if(_msg==NULL)
@@ -279,7 +296,7 @@ void* pic2_handle_msg(void *)
         case MSG_EMPTY:       
         fprintf(stderr,"<picInterface.cpp> PIC2: Connexion réinitialisée.\n");
         fflush(stdout); 
-        pic_Reset();
+        return NULL;        
         break;
         case MSG_WEBCAM:
         {
@@ -290,23 +307,21 @@ void* pic2_handle_msg(void *)
           fread(webcam_H, sizeof(int), 1, file);
           if(webcam_data)
           {
-            fread(webcam_data, sizeof(uint16_t)*3*(*webcam_W)*(*webcam_H), 1, file);  
+            int size = 3*(*webcam_W)*(*webcam_H);
+            uint16_t *tmp = new uint16_t[size];
+            fread(tmp, sizeof(uint16_t)*size, 1, file);  
             // Convertit de RGB à YUV
-            for(unsigned int i=0; i<3*(*webcam_W)*(*webcam_H); i+=3)
+            for(int i=0; i<size; i+=3)
             {
-              const double R = webcam_data[i+0]&255;
-              const double G = webcam_data[i+1]&255;
-              const double B = webcam_data[i+2]&255;  
-              webcam_data[i+0] =  0.299  * R + 0.587  * G + 0.114 * B;          // Y 
-              webcam_data[i+1] = -0.1687 * R - 0.3313 * G + 0.5   * B + 128.;   // Cb
-              webcam_data[i+2] =  0.5   *  R - 0.4187 * G - 0.0813* B + 128.;   // Cr
+              const double R = tmp[i+0]&255;  // les webcams sont la tête en bas sur le robot
+              const double G = tmp[i+1]&255;
+              const double B = tmp[i+2]&255;  
+              webcam_data[(size-i)+0] =  0.299  * R + 0.587  * G + 0.114 * B;          // Y 
+              webcam_data[(size-i)+1] = -0.1687 * R - 0.3313 * G + 0.5   * B + 128.;   // Cb
+              webcam_data[(size-i)+2] =  0.5   *  R - 0.4187 * G - 0.0813* B + 128.;   // Cr
             }
-          }
-          
-          pthread_mutex_t *cpy = mut_webcam;
-          mut_webcam = NULL;                       
-          pthread_mutex_unlock(cpy);   
-          //save_buff_to_bitmap("img.bmp", *webcam_W, *webcam_H, webcam_data);           
+          }              
+          pthread_mutex_unlock(&mut_webcam);   
         }
         break;
         case MSG_DIGIT:
@@ -350,7 +365,7 @@ void* pic2_handle_msg(void *)
   return NULL;
 }
 //------------------------------------------------------------------------------
-pthread_mutex_t* picWebcam(int id, unsigned int *W, unsigned int *H, uint16_t *data)
+int picWebcam(int id, unsigned int *W, unsigned int *H, uint16_t *data)
 {
   MSG_INT1_t msg;
   msg.type   = MSG_WEBCAM_QUERY;
@@ -358,43 +373,42 @@ pthread_mutex_t* picWebcam(int id, unsigned int *W, unsigned int *H, uint16_t *d
   msg.value = id;
   
   if(write_usb(PIC2, &msg, sizeof(msg))<0)
-    return NULL;
+    return 1;
   else
   {
-    if(mut_webcam != NULL)
-    {
-      fprintf(stderr,"<picInterface.cpp> Webcam mutex already locked.\n");
-      fflush(stdout);
-      pthread_mutex_unlock(mut_webcam);
-    }
-    mut_webcam = new pthread_mutex_t;
-    pthread_mutex_init(mut_webcam,NULL);
-    pthread_mutex_lock(mut_webcam);        
+    pthread_mutex_lock(&mut_webcam);       
     webcam_data = data;
     webcam_W = W;
     webcam_H = H;
-    return mut_webcam;
+    pthread_mutex_lock(&mut_webcam);
+    pthread_mutex_unlock(&mut_webcam);       
+    return 0;
   }
 }
 //------------------------------------------------------------------------------
-int SendInfo(int type)
+int SendInfo(int type, int input_config)
 {
   picInfo_t info;
   info.type = type;
   info.msg_id = msg_id++;
   position_t pos;
   if(type == MSG_POS_INFO)
+  {
     pos = cine_get_wheel_center_position();
+    //info.destX = input_config;
+  }
   else
+  {
     pos = cine_get_position();
-  position_t dest = pt_get_dest();  
+    position_t dest = pt_get_dest();  
+    info.destX = dest.x;
+    info.destY = dest.y; 
+    info.destA = dest.a;  
+      
+  }
   info.posX = pos.x;
   info.posY = pos.y;  
   info.posA = pos.a;    
-  info.destX = dest.x;
-  info.destY = dest.y; 
-  info.destA = dest.a;  
-  
   return write_usb(PIC2, &info, sizeof(info));  
 }
 //------------------------------------------------------------------------------

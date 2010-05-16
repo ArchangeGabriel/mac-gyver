@@ -44,16 +44,23 @@ void exiting();
 void change_dest(position_t *d, int type=0);
 
 //------------------------------------------------------------------------------
+void reconnect()
+{
+  repare_usb();
+}
+//------------------------------------------------------------------------------
 int main(int argc, char **argv)
 { 
   int i;
+  int input_config = -1;
+  
   #ifdef SIMULATION
   addr = (char*)malloc(sizeof(char)*30);
   strcpy(addr,"127.0.0.1");
   port=11111;
   robot_id=0;
     
-  while((i = getopt(argc, argv, "a:p:i:bys:")) > 0)
+  while((i = getopt(argc, argv, "a:p:i:bys:c:")) > 0)
     switch(i)
     {
       case 'a':
@@ -66,6 +73,9 @@ int main(int argc, char **argv)
       break;
       case 'i':
       robot_id = strtol(optarg, NULL, 10);
+      break;
+      case 'c':
+      input_config = strtol(optarg, NULL, 10);
       break;
       case 'b':
       case 'y':
@@ -117,14 +127,15 @@ int main(int argc, char **argv)
   // Initialise les fonction de callback
   pic_OnRecvJack(strat_lets_go);
   pic_OnRecvCoder(cine_OnCoderRecv);  
-  pic_RecvReset(strat_init);
+  pic_OnRecvCaptors(ac_OnRecvCaptors);
+  pic_RecvReset(reconnect);
 
   // Lance les threads
-  pthread_create(&IAThread, NULL, strat_MainLoop, NULL);   // Intelligence Artificielle   
+  pthread_create(&IAThread, NULL, strat_MainLoop, &input_config);   // Intelligence Artificielle   
   pthread_create(&PPThread, NULL, pt_MainLoop   , NULL);   // Path Planner
   pthread_create(&ACThread, NULL, ac_MainLoop   , NULL);   // Anti Collision
-  pthread_create(&ACThread, NULL, wc_MainLoop   , (void*)path_photo);   // Webcam  
-  
+  //pthread_create(&ACThread, NULL, wc_MainLoop   , (void*)path_photo);   // Webcam  
+   
   #ifdef CONSOLE
   pthread_create(&ConsoleThread, NULL, console, NULL);   // Console
   #endif
@@ -136,6 +147,8 @@ int main(int argc, char **argv)
     exit(1);
   }
   pic_MainLoop();
+  shut_usb();
+  exit(pic_get_exit_value());
   
   return 0;
 }
@@ -163,11 +176,14 @@ void* console(void*)
       printf("- keycontrol: pilote le robot avec le clavier\n");                                              
       printf("- a: changer la constante pour l'asservissement\n");           
       printf("- b: changer la constante pour l'asservissement\n");                 
-      printf("- jack: équivalent à débrancher le jack\n");       
-    }
+      printf("- jack: équivalent à débrancher le jack\n");   
+      printf("- stop: arrête le robot\n");         
+      printf("- live(id): affiche la sortie de la webcam n°'id'\n");       
+      printf("- playground: affiche le terrain'\n");             
+    }    
     else if(!strcmp(Buff,"q"))
     {
-      exit(0);
+      pic_exit(0);
     }
     else if(!strcmp(Buff,"version"))
     {
@@ -202,6 +218,10 @@ void* console(void*)
 		    {
           pic_MotorsPower(0., 0.);        
 		    }
+		    if(c=='+')
+          pic_move_door(MOTOR_DOOR_OPEN);
+		    if(c=='-')
+          pic_move_door(MOTOR_DOOR_CLOSED);
 		    if(c=='8')
           pic_MotorsPower(1., 1.);        
 		    else if(c==27)     // échappement
@@ -214,19 +234,19 @@ void* console(void*)
 		        {
 		          case 'A':
 		          //haut
-              pic_MotorsPower(0.7, 0.7);
+              pic_MotorsPower(0.35, 0.35);
 		          break;
 		          case 'B': 
 		          //bas
-              pic_MotorsPower(-0.2, -0.2); 					          
+              pic_MotorsPower(-0.35, -0.35); 					          
 		          break;
 		          case 'C':
 		          //droite
-              pic_MotorsPower(0.3, -0.3); 	
+              pic_MotorsPower(0.35, -0.35); 	
 		          break;              				          
 		          case 'D':
 		          //gauche
-              pic_MotorsPower(-0.5, 0.5); 				          
+              pic_MotorsPower(-0.35, 0.35); 				          
 		          break;              
 		        } 
 		      }  
@@ -271,6 +291,43 @@ void* console(void*)
       if(error)
         printf("Erreur de format, exemple: goto(2.3,1.4,78)\n");
     }  
+    else if(!memcmp(Buff,"live(",5))
+    {
+      long id;
+      char *Ptr1,*Ptr2;
+      bool error=false;
+      Ptr1=&Buff[5];
+      Ptr2=&Buff[strlen(Buff)];
+      id=strtol(Ptr1,&Ptr2,10);
+      error=Ptr1==Ptr2;
+      if(!error)
+      {
+        if(id>=wc_nb_cam())
+          printf("Index de webcam invalide. Max. index = %d\n",wc_nb_cam()-1);
+        else
+        {
+          #ifdef VISUALIZE
+          visu_live_cam(id);
+          #endif
+        }
+      }
+      if(error)
+        printf("Erreur de format, exemple: cam(0,1)\n");    
+    }   
+    else if(!memcmp(Buff,"playg",5))
+    {
+      #ifdef VISUALIZE    
+      visu_live_cam(-1);    
+      #endif
+    }
+    else if(!memcmp(Buff,"stop",4))
+    {
+      pt_stop();
+    }
+    else if(!memcmp(Buff,"resume",6))
+    {
+      pt_resume();
+    }            
     else if(!memcmp(Buff,"gotoX(",6) || !memcmp(Buff,"gotoY(",6) || !memcmp(Buff,"gotoA(",6)) 
     {
       double c;
@@ -339,7 +396,6 @@ void change_dest(position_t *pos, int type)
 //------------------------------------------------------------------------------
 void exiting()
 {
-  shut_usb();
   #ifdef CONSOLE
   reset_console();
   #endif

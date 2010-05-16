@@ -7,8 +7,14 @@
 #include "anticol.h"
 #include "sdl.h"
 #include "visualizer.h"
+#include "strategie.h"
+#include "webcam_processing.hpp"
+#include "webcamAPI.h"
 
-pp_path path_planned;
+#ifdef VISUALIZE
+
+int webcam_live = -1;
+
 sdlWindow visu_window(_LONGUEUR_TER * _SCALE_SDL, _LARGEUR_TER * _SCALE_SDL, "Feed the world");
 
 //------------------------------------------------------------------------------
@@ -18,10 +24,8 @@ void visu_draw_background(int config_terrain)
   visu_window.FillRectSDL(0,0,int(_SCALE_SDL*_LONGUEUR_TER),int(_SCALE_SDL*_LARGEUR_TER),clGround);  
   // départ 1
   visu_window.FillRectSDL(0,0,int(_SCALE_SDL*0.5),int(_SCALE_SDL*0.5),clTeam1);
-  visu_window.FillRectSDL(int(_SCALE_SDL*(_LONGUEUR_TER-0.5)),int(_SCALE_SDL*(_LARGEUR_TER-0.522)),int(_SCALE_SDL*0.5),int(_SCALE_SDL*0.522),clDeposeTeam1);  
   // départ 2
   visu_window.FillRectSDL(int(_SCALE_SDL*(_LONGUEUR_TER-0.5)),0,int(_SCALE_SDL*0.5),int(_SCALE_SDL*0.5),clTeam2);
-  visu_window.FillRectSDL(0.,int(_SCALE_SDL*(_LARGEUR_TER-0.522)),int(_SCALE_SDL*0.5),int(_SCALE_SDL*0.522),clDeposeTeam2);  
   // Hors Terrain
   visu_window.FillRectSDL(int(_SCALE_SDL*0.5),int(_SCALE_SDL*2.122),int(_SCALE_SDL*2.),int(_SCALE_SDL*0.5),clBlack);
   // Mur Bas
@@ -91,77 +95,114 @@ void* visu_draw_robot(void*)
   vector_t N,T,u,v;
   point_t point[4];
 
+  bool first_live = true;
   position_t pos,dest;
+  image_t img(image_t::yuv_format,0,0);
   
   visu_draw_background(0);
   
   while(true)
   {
-    visu_window.Draw_SDL_Background();  
-    
-    // Draw path
-    for(unsigned int i=1; i<path_planned.size(); i++)
-      visu_window.LigneSDL((int)(_SCALE_SDL*path_planned[i-1].x), (int)(_SCALE_SDL*path_planned[i-1].y),
-               (int)(_SCALE_SDL*path_planned[i].x), (int)(_SCALE_SDL*path_planned[i].y), clBlack);//makeColorSDL(255,0,0));
-
-    // Draw
-    pos = cine_get_position();
-    dest = pt_get_dest();
-
-    // Robot supposé
-    N.x=cos(pos.a);
-    N.y=sin(pos.a);
-    T.x=-sin(pos.a);
-    T.y=cos(pos.a);
-    point[0].x=((int)((pos.x+N.x*_LONGUEUR_ROBOT/2.+T.x*_LARGEUR_ROBOT/2.)*_SCALE_SDL));     
-    point[0].y=((int)((pos.y+N.y*_LONGUEUR_ROBOT/2.+T.y*_LARGEUR_ROBOT/2.)*_SCALE_SDL));
-    point[1].x=((int)((pos.x+N.x*_LONGUEUR_ROBOT/2.-T.x*_LARGEUR_ROBOT/2.)*_SCALE_SDL));
-    point[1].y=((int)((pos.y+N.y*_LONGUEUR_ROBOT/2.-T.y*_LARGEUR_ROBOT/2.)*_SCALE_SDL));
-    point[2].x=((int)((pos.x-N.x*_LONGUEUR_ROBOT/2.-T.x*_LARGEUR_ROBOT/2.)*_SCALE_SDL));
-    point[2].y=((int)((pos.y-N.y*_LONGUEUR_ROBOT/2.-T.y*_LARGEUR_ROBOT/2.)*_SCALE_SDL));
-    point[3].x=((int)((pos.x-N.x*_LONGUEUR_ROBOT/2.+T.x*_LARGEUR_ROBOT/2.)*_SCALE_SDL));
-    point[3].y=((int)((pos.y-N.y*_LONGUEUR_ROBOT/2.+T.y*_LARGEUR_ROBOT/2.)*_SCALE_SDL)); 
-    visu_window.PolylineSDL(point, 4, clRobot);
-    visu_window.LigneSDL(point[2].x, point[2].y, ((int)(pos.x*_SCALE_SDL)), ((int)(pos.y*_SCALE_SDL)), clRobot); 
-    visu_window.LigneSDL(point[3].x, point[3].y, ((int)(pos.x*_SCALE_SDL)), ((int)(pos.y*_SCALE_SDL)), clRobot);
-
-    // Destination
-    N.x=cos(dest.a);
-    N.y=sin(dest.a);
-    T.x=-sin(dest.a)*0.03;
-    T.y=cos(dest.a)*0.03; 
-    visu_window.LigneSDL(((int)(_SCALE_SDL*dest.x)), ((int)(_SCALE_SDL*dest.y)), 
-             ((int)(_SCALE_SDL*(dest.x+N.x*0.1))), ((int)(_SCALE_SDL*(dest.y+N.y*0.1))), clBlack);
-    visu_window.LigneSDL(((int)(_SCALE_SDL*(dest.x+N.x*0.1))), ((int)(_SCALE_SDL*(dest.y+N.y*0.1))), 
-             ((int)(_SCALE_SDL*(dest.x+N.x*0.07+T.x))), ((int)(_SCALE_SDL*(dest.y+N.y*0.07+T.y))), clBlack);
-    visu_window.LigneSDL(((int)(_SCALE_SDL*(dest.x+N.x*0.1))), ((int)(_SCALE_SDL*(dest.y+N.y*0.1))), 
-             ((int)(_SCALE_SDL*(dest.x+N.x*0.07-T.x))), ((int)(_SCALE_SDL*(dest.y+N.y*0.07-T.y))), clBlack);
-    
-    // Captors
-    /*for(int i=0;i<4;i++)
+    if(webcam_live != -1)
     {
-      vector_t pos = captor_get_position(i);
-      Uint32 color;
-      switch(captor_get_status(i))
+      int w,h;
+      wc_capture(webcam_live,img,w,h);
+      convert_yuv_to_rgb(img);      
+      
+      if(first_live)
+        visu_window.change_dim(w, h);
+      first_live = false;
+            
+      for(int x=0; x<w; x++)
+        for(int y=0; y<h; y++)
+        {
+          int i_dest = (h-y-1)*w+x;
+          int i_src = 3*i_dest;
+          visu_window.back_pixels[i_dest] = (((img.data[i_src+0] << 8) + img.data[i_src+1]) << 8) + img.data[i_src+2];
+        }
+      
+      visu_window.Load_SDL_Background(true);
+      visu_window.Draw_SDL_Background();
+      visu_window.RefreshSDL();
+      usleep(10000);    
+    }
+    else
+    {
+      if(!first_live)
+        visu_window.change_dim(_LONGUEUR_TER * _SCALE_SDL, _LARGEUR_TER * _SCALE_SDL);
+      first_live = true;
+      
+      visu_window.Draw_SDL_Background();  
+      
+      // Draw path
+      pp_path path_planned = pt_get_path();
+      for(unsigned int i=1; i<path_planned.size(); i++)
       {
-        case 0: color = clBlack; break;
-        case 1: color = makeColorSDL(255, 0, 180); break;
-        case 2: color = makeColorSDL(255, 0, 0); break;
-        case 3: color = makeColorSDL(60, 60, 60); break;
+        visu_window.LigneSDL((int)(_SCALE_SDL*path_planned[i-1].x), (int)(_SCALE_SDL*path_planned[i-1].y),
+                 (int)(_SCALE_SDL*path_planned[i].x), (int)(_SCALE_SDL*path_planned[i].y), clBlack);//makeColorSDL(255,0,0));
       }
-      DisqueSDL(((int)(_SCALE_SDL*pos.x)),
-                ((int)(_SCALE_SDL*pos.y)),
-                ((int)(_SCALE_SDL*0.01)),color);        
-    } */ 
-    visu_window.RefreshSDL();             
-    usleep(40000);
+
+      // Draw
+      pos = cine_get_position();
+      dest = pt_get_dest();
+
+      // Robot supposé
+      N.x=cos(pos.a);
+      N.y=sin(pos.a);
+      T.x=-sin(pos.a);
+      T.y=cos(pos.a);
+      point[0].x=((int)((pos.x+N.x*_LONGUEUR_ROBOT/2.+T.x*_LARGEUR_ROBOT/2.)*_SCALE_SDL));     
+      point[0].y=((int)((pos.y+N.y*_LONGUEUR_ROBOT/2.+T.y*_LARGEUR_ROBOT/2.)*_SCALE_SDL));
+      point[1].x=((int)((pos.x+N.x*_LONGUEUR_ROBOT/2.-T.x*_LARGEUR_ROBOT/2.)*_SCALE_SDL));
+      point[1].y=((int)((pos.y+N.y*_LONGUEUR_ROBOT/2.-T.y*_LARGEUR_ROBOT/2.)*_SCALE_SDL));
+      point[2].x=((int)((pos.x-N.x*_LONGUEUR_ROBOT/2.-T.x*_LARGEUR_ROBOT/2.)*_SCALE_SDL));
+      point[2].y=((int)((pos.y-N.y*_LONGUEUR_ROBOT/2.-T.y*_LARGEUR_ROBOT/2.)*_SCALE_SDL));
+      point[3].x=((int)((pos.x-N.x*_LONGUEUR_ROBOT/2.+T.x*_LARGEUR_ROBOT/2.)*_SCALE_SDL));
+      point[3].y=((int)((pos.y-N.y*_LONGUEUR_ROBOT/2.+T.y*_LARGEUR_ROBOT/2.)*_SCALE_SDL)); 
+      visu_window.PolylineSDL(point, 4, clRobot);
+      visu_window.LigneSDL(point[2].x, point[2].y, ((int)(pos.x*_SCALE_SDL)), ((int)(pos.y*_SCALE_SDL)), clRobot); 
+      visu_window.LigneSDL(point[3].x, point[3].y, ((int)(pos.x*_SCALE_SDL)), ((int)(pos.y*_SCALE_SDL)), clRobot);
+
+      // Destination
+      N.x=cos(dest.a);
+      N.y=sin(dest.a);
+      T.x=-sin(dest.a)*0.03;
+      T.y=cos(dest.a)*0.03; 
+      visu_window.LigneSDL(((int)(_SCALE_SDL*dest.x)), ((int)(_SCALE_SDL*dest.y)), 
+               ((int)(_SCALE_SDL*(dest.x+N.x*0.1))), ((int)(_SCALE_SDL*(dest.y+N.y*0.1))), clBlack);
+      visu_window.LigneSDL(((int)(_SCALE_SDL*(dest.x+N.x*0.1))), ((int)(_SCALE_SDL*(dest.y+N.y*0.1))), 
+               ((int)(_SCALE_SDL*(dest.x+N.x*0.07+T.x))), ((int)(_SCALE_SDL*(dest.y+N.y*0.07+T.y))), clBlack);
+      visu_window.LigneSDL(((int)(_SCALE_SDL*(dest.x+N.x*0.1))), ((int)(_SCALE_SDL*(dest.y+N.y*0.1))), 
+               ((int)(_SCALE_SDL*(dest.x+N.x*0.07-T.x))), ((int)(_SCALE_SDL*(dest.y+N.y*0.07-T.y))), clBlack);
+      
+      // Captors
+      /*for(int i=0;i<4;i++)
+      {
+        vector_t pos = captor_get_position(i);
+        Uint32 color;
+        switch(captor_get_status(i))
+        {
+          case 0: color = clBlack; break;
+          case 1: color = makeColorSDL(255, 0, 180); break;
+          case 2: color = makeColorSDL(255, 0, 0); break;
+          case 3: color = makeColorSDL(60, 60, 60); break;
+        }
+        DisqueSDL(((int)(_SCALE_SDL*pos.x)),
+                  ((int)(_SCALE_SDL*pos.y)),
+                  ((int)(_SCALE_SDL*0.01)),color);        
+      } */ 
+      visu_window.RefreshSDL();             
+      usleep(40000);
+    }
   }
+  return NULL;  
 }
 //------------------------------------------------------------------------------
-void visu_draw_path(pp_path &p)
+void visu_live_cam(int id_cam)
 {
-  path_planned.resize(p.size());
-  for(unsigned int i=0; i<p.size(); i++)
-    path_planned[i] = p[i];    
+  webcam_live = id_cam;  
+  if(id_cam == -1)
+    visu_draw_background(strat_get_config_terrain());  
 }
 //------------------------------------------------------------------------------
+#endif

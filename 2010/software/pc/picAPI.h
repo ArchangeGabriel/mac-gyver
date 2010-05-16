@@ -1,8 +1,8 @@
 #ifndef PICAPI
 #define PICAPI
 
-#define PIC_FREQ  (1./45.7763671875)   // Fréquence d'horloge du PIC
-#define TIMER_CODER   20000            // Regarde les valeurs des codeuses toutes les TIMER_CODER µs (dans l'idéal un peu plus faible que PIC_FREQ)
+#define PIC_FREQ  (1./(45.7763671875*2.))  // Fréquence d'horloge du PIC
+#define TIMER_CODER   10000                // Regarde les valeurs des codeuses toutes les TIMER_CODER µs (dans l'idéal un peu plus faible que PIC_FREQ)
 
 #include "../pic/protocole/proto.h"
 
@@ -11,7 +11,8 @@ Boucle infinie gérant les connections
 */
 void pic_MainLoop();
 bool pic_is_ready();
-
+void pic_exit(int value);
+int pic_get_exit_value();
 
 /***************** PC --> PIC *****************/
 /*
@@ -39,6 +40,11 @@ teste la position du poussoir
 bool pic_where_pusher(int position);
 
 /*
+demande la valeur des capteurs de distance
+*/
+void pic_get_captors_values();
+
+/*
 réinitialise les PIC
 */
 void pic_Reset();
@@ -51,6 +57,11 @@ void pic_Reset();
 Appelé lorsque le jack est retiré
 */
 void pic_OnRecvJack(void (*fun)(void));
+
+/*
+Appelé lorsque les valeurs de capteurs est récupérée
+*/
+void pic_OnRecvCaptors(void (*fun)(int, double*));
 
 /*
 Réception de la valeur des codeuses

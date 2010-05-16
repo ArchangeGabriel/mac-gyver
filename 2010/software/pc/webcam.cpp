@@ -23,14 +23,17 @@
 #include <sys/time.h>
 #include <sys/mman.h>
 #include <sys/ioctl.h>
-#include <asm/types.h> 
+#include <asm/types.h>
+#include <pthread.h> 
+#include <pthread.h>
 
 webcam_t::webcam_t(const char*name, const std::string& dev,size_t w,size_t h)
     :m_name(name),m_width(w),m_height(h),m_image(image_t::yuv_format,0,0)
 {
     open(dev);
     init();
-    phtread_mutex_init(&mutex, NULL);
+    started = false;
+    pthread_mutex_init(&mutex, NULL);
 }
 
 webcam_t::~webcam_t()
@@ -40,9 +43,10 @@ webcam_t::~webcam_t()
 
 void webcam_t::start()
 {
-    start_capturing();
-    
-    m_image=image_t(image_t::yuv_format,m_width,m_height);
+    if(!start_capturing())
+      started = false;
+    else
+      m_image=image_t(image_t::yuv_format,m_width,m_height);
 }
 
 void webcam_t::stop()
@@ -50,12 +54,12 @@ void webcam_t::stop()
     stop_capturing();
 }
 
-size_t webcam_t::get_width()
+size_t webcam_t::get_width() const
 {
     return m_width;
 }
 
-size_t webcam_t::get_height()
+size_t webcam_t::get_height() const
 {
     return m_height;
 }
@@ -230,7 +234,7 @@ bool webcam_t::init()
             else
                 printf("[video] Error: could not allocate video buffer\n");
         }
-    }
+    }    
 
     // try memory mapping method
     {
@@ -277,7 +281,7 @@ bool webcam_t::init()
     return false;
 
     Ltry_end:
-
+    
     // setup cropping: reset if supported
     memset(&cropcap,0,sizeof(cropcap));
     cropcap.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;

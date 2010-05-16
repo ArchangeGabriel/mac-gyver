@@ -53,6 +53,11 @@ struct image_t
     {
         return &data[3*(y*w+x)];
     }
+    
+    inline pixel_type_t *my_pixel(size_t x,size_t y)
+    {
+        return &data[3*((h-1-y)*w+x)];
+    }
 
     inline const pixel_type_t *pixel(size_t x,size_t y) const
     {

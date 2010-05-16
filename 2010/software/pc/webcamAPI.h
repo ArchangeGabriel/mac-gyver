@@ -1,7 +1,11 @@
 #ifndef WEBCAM_API
 #define WEBCAM_API
 
+#include "webcam_common.hpp"
+
 void* wc_MainLoop(void *);
+int wc_nb_cam();
+void wc_capture(int id, image_t &img, int &w, int &h);
 
 /*
 les différentes configuration possible pour les maïs: xyz : 

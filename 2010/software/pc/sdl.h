@@ -2,6 +2,7 @@
 #define SDLH
 #include <SDL.h>
 #include <pthread.h>
+#include "common.h"
 
 #define _SCALE_SDL 200
 
@@ -35,20 +36,12 @@ class sdlWindow
   static bool init_done;
   SDL_Surface* affichage;
   SDL_Surface* background;
-  Uint32 *back_pixels;
 
   pthread_mutex_t using_background;  
   
   inline void setPixel(int x, int y, Uint32 coul)
   { 
     *((Uint32*)(affichage->pixels) + x + y * affichage->w) = coul; 
-  }
-
-  inline void setPixelVerif(int x, int y, Uint32 coul) 
-  {
-    if (x >= 0 && x < affichage->w &&
-        y >= 0 && y < affichage->h)
-      setPixel(x, y, coul);
   }
 
   inline void swapInts(int* x, int* y)
@@ -60,12 +53,20 @@ class sdlWindow
   
  
   public:
+  Uint32 *back_pixels;
+    
   sdlWindow(int width, int height, const char *title);
   void RefreshSDL(void);
   
   inline Uint32 makeColorSDL(char *color);
   inline Uint32 makeColorSDL(int R, int G, int B) { return SDL_MapRGB(affichage->format, R, G, B); }  
 
+  inline void setPixelVerif(int x, int y, Uint32 coul) 
+  {
+    if (x >= 0 && x < affichage->w &&
+        y >= 0 && y < affichage->h)
+      setPixel(x, y, coul);
+  }
   void LigneSDL(int x1, int y1, int x2, int y2, Uint32 coul);
   void LigneHorizontaleSDL(int x, int y, int w, Uint32 coul);
   void LigneVerticaleSDL(int x, int y, int w, Uint32 coul);
@@ -75,7 +76,13 @@ class sdlWindow
   void DisqueSDL(int cx, int cy, int rayon, Uint32 coul);
   
   
-  void Load_SDL_Background();
+  void Load_SDL_Background(bool from_back_pixel = false);
   void Draw_SDL_Background();
+  
+  void change_dim(int w, int h)
+  {
+    if(affichage) SDL_FreeSurface(affichage);    
+    affichage = SDL_SetVideoMode(w,h, 32, SDL_HWSURFACE|SDL_DOUBLEBUF);
+  }
 };
 #endif

@@ -3,11 +3,9 @@
 #include <unistd.h>
 #include "path_tracker.h"
 #include "strategie.h"
-#include "path_planner.h"
 #include "cinematik.h"
 #include "picAPI.h"
 #include "webcamAPI.h"
-#include "visualizer.h"
 #include <cstdio>
 
 #define PC_INCLUDE
@@ -17,23 +15,22 @@ using namespace std;
 
 pthread_mutex_t mutex_situ;
 
+bool pt_stopped;
+
 void calc_path(const position_t &from, const position_t &to, int type, bool append = false);
 
 //------------------------------------------------------------------------------
 
-#define MAX_SPEED    0.5    // Vitesse maximale atteignable
+#ifdef SIMULATION
+#define MAX_wheel_speed    0.25   // Vitesse maximale atteignable
+#define MIN_wheel_speed    0.10   // Vitesse minimal atteignable
+#else
+#define MAX_wheel_speed    0.3    // Vitesse maximale atteignable
+#define MIN_wheel_speed    0.25    // Vitesse minimal atteignable
+#endif
 
-//#define DEST_RADIUS  0.02   // distance minimum (en mètres) pour valider le waypoint
-//#define DEST_ORIENT  0.01  // écart de direction minimum (en radian) pour valider le waypoint
-
-#define DEST_RADIUS  0.05   // distance minimum (en mètres) pour valider le waypoint
-#define DEST_ORIENT  0.17   // écart de direction minimum
-
-#define APPROACH_RADIUS  0.01 // distance minimum (en mètres) pour valider le waypoint
-#define APPROACH_ORIENT  0.01 // écart de direction minimum (en radian) pour valider le waypoint
-
-#define LEAVE_RADIUS  0.05    // dist        map->save_to_bmp(file);ance minimum (en mètres) pour valider le waypoint
-#define LEAVE_ORIENT  1.5     // écart de direction minimum (en radian) pour valider le waypoint
+#define DEST_RADIUS  0.01    // distance minimum (en mètres) pour valider le waypoint
+#define DEST_ORIENT  0.003    // écart de direction minimum
 
 #define WAYPOINT_RADIUS  0.1  // distance minimum (en mètres) pour valider le waypoint
 #define WAYPOINT_ORIENT  1.5  // écart de direction minimum (en radian) pour valider le waypoint
@@ -52,38 +49,38 @@ class direct_path_t
   bool is_dest_reached_a(const position_t &pos);    // renvoie vrai si la destination est atteinte (à peu près) en angle
   
   public:
-  const position_t dest;      // destination de l'étape
+  position_t dest;      // destination de l'étape
   int type;             // destination ou étape?
-  
-  bool reached;         // destination déjà atteinte?
-  int iter;             // compte le nombre d'itération successives où le but est atteint
   
   pthread_mutex_t *mutex;
 
-  direct_path_t(const position_t &dest, int type):dest(dest),type(type){mutex = NULL; reached = false; iter = 0;} // constructeur de classe
+  direct_path_t(const position_t &dest, int type):dest(dest),type(type){mutex = NULL;} // constructeur de classe
   
   bool is_dest_reached(const position_t &pos);      // renvoie vrai si la destination est atteinte (à peu près)
-  tension_t get_tension(const position_t &pos);     // renvoie la tension des moteurs pour atteindre le but
+  wheel_speed_t get_wheel_speed(const position_t &pos);     // renvoie la wheel_speed des moteurs pour atteindre le but
 };
 
 list<direct_path_t> path;
+list<direct_path_t> resume;
 //------------------------------------------------------------------------------
 bool direct_path_t::is_dest_reached_xy(const position_t &pos)
 {
-  if(reached) return true;
-  
-  vector_t dist = vector_t(pos.x-dest.x, pos.y-dest.y);
+  vector_t dist = vector_t(dest.x-pos.x, dest.y-pos.y);
 
   switch(type)
   {
     case tpDEST:
+    case tpPREDEST:
     return (dist.norme()<DEST_RADIUS); 
-    case tpAPPROACH:
-    return (dist.norme()<APPROACH_RADIUS);    
-    case tpLEAVE:
-    return (dist.norme()<LEAVE_RADIUS);        
     case tpWAYPOINT:
     return (dist.norme()<WAYPOINT_RADIUS);    
+    case tpMOVE:
+    {
+      vector_t N(cos(dest.a), sin(dest.a)); 
+      return dist.norme()<0.01 || (dist|N) <= 0.;    
+    }    
+    case tpTURN:
+    return true;
     default:
     return true;
   }  
@@ -95,12 +92,14 @@ bool direct_path_t::is_dest_reached_a(const position_t &pos)
   {
     case tpDEST:
     return (fabsf(normalize(pos.a-dest.a))<DEST_ORIENT);   
-    case tpAPPROACH:
-    return (fabsf(normalize(pos.a-dest.a))<APPROACH_ORIENT);
-    case tpLEAVE:
-    return (fabsf(normalize(pos.a-dest.a))<LEAVE_ORIENT);    
+    case tpPREDEST:
+    return true;
     case tpWAYPOINT:
     return (fabsf(normalize(pos.a-dest.a))<WAYPOINT_ORIENT);   
+    case tpMOVE:
+    return true;
+    case tpTURN:
+    return (fabsf(normalize(pos.a-dest.a))< 3. * M_PI / 180.);   
     default:
     return true;
   }  
@@ -108,123 +107,133 @@ bool direct_path_t::is_dest_reached_a(const position_t &pos)
 //------------------------------------------------------------------------------
 bool direct_path_t::is_dest_reached(const position_t &pos)
 {
-  return is_dest_reached_xy(pos) && is_dest_reached_a(pos) && iter>5;
+  return is_dest_reached_xy(pos) && is_dest_reached_a(pos);
 }
 //------------------------------------------------------------------------------
-tension_t direct_path_t::get_tension(const position_t &pos)
+wheel_speed_t direct_path_t::get_wheel_speed(const position_t &pos)
 { 
   vector_t N = vector_t(cos(pos.a), sin(pos.a));
   
+  double max_pw = MAX_wheel_speed;
+  double min_pw = MIN_wheel_speed;
+  
   // on calcule l'angle vers la destination
   vector_t v = dest.v() - pos.v();
-   
-  float max_pw = MAX_SPEED;
+  
+  if(type == tpMOVE)
+  {
+    double dist = v.norme();
+    double da = normalize(pos.a-v.to_angle());   
+    double d = 1. - fabsf(da) / (M_PI/3.5);
+    double pw = (dist > 0.5) ? max_pw : max_pw * pow(dist / 0.5, 1);
+    pw = pw < min_pw ? min_pw : pw;    
+    d = d < 0.7 ? 0.7 : d;    
+        
+    if(da>=0)
+      return wheel_speed_t(d*pw,pw);
+    else
+      return wheel_speed_t(pw,d*pw);    
+  }
+  
+  if(type == tpTURN)
+  {
+    double da = normalize(pos.a-dest.a);
+    double pw = (fabs(da) > 60. * M_PI / 180.) ? max_pw : max_pw * pow(fabs(da) / (60 * M_PI / 180.), 1.2);
+    pw = pw < min_pw ? min_pw : pw;
     
+    if(da>=0)            // on tourne sur soi-même
+      return wheel_speed_t(-pw,pw);
+    else
+      return wheel_speed_t(pw,-pw);  
+  }
+  
+  return wheel_speed_t(0,0);  
+  /*
   if(is_dest_reached_xy(pos))    // on a déjà atteint la destination: on continue à tourner
-  {  
+  {    
     if(is_dest_reached_a(pos)) 
-    {
-      iter++;
-      return tension_t(0.,0.);      
-    }
+      return wheel_speed_t(0.,0.);      
     else
     {
-      iter = 0;
       float da = normalize(pos.a-dest.a);
       float pw;
       if(fabsf(da)>M_PI/3.)
-        pw = fabsf(da)/(1.2 * M_PI) * max_pw;
+        pw = 0.3*max_pw; //fabsf(da)/(1.2 * M_PI) * max_pw;
       else
-        pw = (fabsf(da)<M_PI/18.?0.04:0.08) + fabsf(da) / M_PI * max_pw;
-      
+        pw = 0.2*max_pw; //(fabsf(da)<M_PI/18.?0.04:0.08) + fabsf(da) / M_PI * max_pw;
+      pw = pw < min_pw ? min_pw : pw;   
+                  
       if(da>=0)            // on tourne sur soi-même
-        return tension_t(-pw,pw);
-      else   if(fabsf(da)>M_PI/3.)
-        pw = fabsf(da)/(1.2 * M_PI) * max_pw;
+        return wheel_speed_t(-pw,pw);
       else
-        pw = (fabsf(da)<M_PI/18.?0.04:0.08) + fabsf(da) / M_PI * max_pw;
-        return tension_t(pw,-pw);  
+        return wheel_speed_t(pw,-pw);  
     }     
   }   
   else
   {      
-    float da = normalize(pos.a-v.to_angle()); 
-    
-    if(fabs(da)>M_PI_2 && v.norme()<0.05)
+    double da = normalize(pos.a-v.to_angle());   
+    if(fabs(da)>M_PI_2 && v.norme()<0.05)  // on recule si la cible est pas loin derrière
     {
-      if(v.norme()<0.05)
-        return tension_t(-0.5,-0.5);
-      else
-        return tension_t(-max_pw,-max_pw);
+      float pw = 0.2*max_pw;
+      pw = pw < min_pw ? min_pw : pw;      
+      return wheel_speed_t(-pw,-pw);
     }
-    else if(fabsf(da)>M_PI/5.)   // Ecart d'angle trop grand
+      
+    double dist;
+    if(type != tpWAYPOINT)
+      dist = v.norme();
+    else
     {
-      float d;
-      float pw;
+      list<direct_path_t> :: iterator iter;
+      for(iter = path.begin(); iter != path.end(); ++iter)
+      {
+        vector_t v = (*iter).dest.v() - pos.v();
+        dist = v.norme();        
+        if((*iter).type != tpWAYPOINT)
+          break;
+      }
+    }      
+    double pw = (dist > 0.5) ? max_pw : max_pw * pow(dist / 0.5, 0.5);
+    pw = pw < min_pw ? min_pw : pw;
+    
+    if(fabsf(da)>M_PI/6.)   // Ecart d'angle trop grand
+    {
+      double d;
    
       if(fabsf(da)>M_PI/3.)
-      {
         d = 1;
-        pw = fabsf(da)/(1.2 * M_PI) * max_pw;
-      }
       else
-      {
-        d = fabsf(da) / M_PI/5.;      
-        pw = (fabsf(da)<M_PI/18.?0.04:0.08) + fabsf(da) / M_PI * max_pw;      
-      }
+        d = fabsf(da) / M_PI/6.;         
       
-      if(v.norme()<0.1)
+      if(dist<0.1)
       {
+        pw *= 0.3;
+        pw = pw < min_pw ? min_pw : pw;
         if(da>=0)            // on tourne sur soi-même
-          return tension_t(-pw,pw);
+          return wheel_speed_t(-pw,pw);
         else
-          return tension_t(pw,-pw);         
+          return wheel_speed_t(pw,-pw);         
       }
       else
       {
-        if(da>=0)            // on tourne sur soi-même
-          return tension_t(-d*pw,pw);
+        pw *= (d<0.3 ? 0.3 : pow(d,0.5));
+        pw = pw < min_pw ? min_pw : pw;        
+        if(da>=0)            // on dévie
+          return wheel_speed_t(-d*pw,pw);
         else
-          return tension_t(pw,-d*pw);    
+          return wheel_speed_t(pw,-d*pw);    
       }  
     }
     else                  // écart acceptable: on avance en ajustant
     {
-      float d = 1. - (fabsf(da) / (M_PI/5.) / (v.norme()<1.?1.2:1.6)) ;
-      float pw = max_pw;
-      float dist;
-      
-      if(type != tpWAYPOINT)
-        dist = v.norme();
-      else
-      {
-        list<direct_path_t> :: iterator iter;
-        for(iter = path.begin(); iter != path.end(); ++iter)
-          if((*iter).type != tpWAYPOINT)
-          {
-            vector_t v = (*iter).dest.v() - pos.v();
-            dist = v.norme();
-            break;
-          }
-      }
+      float d = 1. - (fabsf(da) / (M_PI/5.) / (v.norme()<1.?0.8:1.2)) ;      
         
-      
-      if(dist<0.5)
-      {
-        if(dist>0.4)
-          pw = pow(dist / 0.5, 0.8) * max_pw;
-        else
-          pw = (dist<0.04?0.02:0.04) + pow(dist / 1.5, 1.2) * max_pw;        
-      }
-                
-      if(pw > max_pw) pw = max_pw;
-      
       if(da>=0)
-        return tension_t(d*pw,pw);
+        return wheel_speed_t(d*pw,pw);
       else
-        return tension_t(pw,d*pw);
+        return wheel_speed_t(pw,d*pw);
     }
-  }
+  }*/
 }
 //------------------------------------------------------------------------------
 float direct_path_t::normalize(float angle)
@@ -239,6 +248,7 @@ float direct_path_t::normalize(float angle)
 //------------------------------------------------------------------------------
 void* pt_MainLoop(void*)
 {
+  bool first_empty = true;
   pthread_mutex_init(&mutex_situ, NULL);
   
   // Attend que le robot soit prêt
@@ -247,30 +257,36 @@ void* pt_MainLoop(void*)
   // Try to find configuration
   int config = wc_reco_config();
   pt_init(config);       
+  strat_set_config_terrain(config);  
   
-  strat_set_config_terrain(config);
-
   while(true)
   {
-    if(path.empty())
+    if(!pt_stopped)
     {
-      cine_motors(0,0);
-      usleep(10000);
-    }
-    else
-    {
-      position_t pos = cine_get_position();
-      if(path.front().is_dest_reached(pos))
+      if(path.empty())
       {
-        if(path.front().mutex)
-          pthread_mutex_unlock(path.front().mutex);
-        path.pop_front();
+        if(first_empty) cine_reset_asserv();
+        first_empty = false;
+        cine_motors(0,0);
+        usleep(10000);
       }
       else
       {
-        tension_t tension = path.front().get_tension(pos);
-        cine_motors(tension.left, tension.right);
-        usleep(10000);        
+        first_empty = true;
+        position_t pos = cine_get_wheel_center_position();
+        if(path.front().is_dest_reached(pos))
+        {
+          if(path.front().mutex)
+            pthread_mutex_unlock(path.front().mutex);
+          path.pop_front();
+          cine_reset_asserv();
+        }
+        else
+        {
+          wheel_speed_t wheel_speed = path.front().get_wheel_speed(pos);
+          cine_motors(wheel_speed.left, wheel_speed.right);
+          usleep(10000);        
+        }
       }
     }
   }
@@ -293,7 +309,37 @@ void pt_init(int config_terrain)
 //------------------------------------------------------------------------------
 pthread_mutex_t* pt_go_to(const position_t &pos, int type, bool append)
 {
-  calc_path(cine_get_position(), pos, type, append);
+  position_t p;
+  vector_t N(cos(pos.a), sin(pos.a));
+  if(type == tpWAYPOINT)
+    p = pos;
+  else
+  {
+    p.x = pos.x+_ROUE_X*cos(pos.a);
+    p.y = pos.y+_ROUE_X*sin(pos.a);
+    p.a = pos.a;
+  }
+
+  if(append && !path.empty())
+  {
+    if(type == tpDEST)
+    {
+      calc_path(path.back().dest, p, tpPREDEST, true);
+      path.push_back(direct_path_t(p, tpDEST));
+    }
+    else
+      calc_path(path.back().dest, p, type, true);
+  }
+  else
+  {
+    if(type == tpDEST)
+    {
+      calc_path(cine_get_wheel_center_position(), p, tpPREDEST, false);
+      path.push_back(direct_path_t(p, tpDEST));
+    }
+    else
+      calc_path(cine_get_wheel_center_position(), p, type, false);
+  }
 
   pthread_mutex_t *mutex = new pthread_mutex_t;
   pthread_mutex_init(mutex, NULL);
@@ -302,15 +348,31 @@ pthread_mutex_t* pt_go_to(const position_t &pos, int type, bool append)
   return mutex;
 }
 //------------------------------------------------------------------------------
-pthread_mutex_t* pt_add_step(const position_t &pos)
+pthread_mutex_t* pt_add_step(const position_t &pos, int type)
 {
-  return pt_go_to(pos, tpDEST, true);  
+  position_t p;
+/*  if(type == tpMOVE)
+  {
+    p.x = pos.x+_ROUE_X*cos(pos.a);
+    p.y = pos.y+_ROUE_X*sin(pos.a);
+    p.a = pos.a;
+  }
+  else
+    p = pos;*/
+  p=pos;
+    
+  path.push_back(direct_path_t(p, type));
+
+  pthread_mutex_t *mutex = new pthread_mutex_t;
+  pthread_mutex_init(mutex, NULL);
+  pthread_mutex_lock(mutex);
+  path.back().mutex = mutex;
+  return mutex;  
 }
 //------------------------------------------------------------------------------
 void calc_path(const position_t &from, const position_t &to, int type, bool append)
 {
   pp_path new_path = pp_find_path(from, to);
-  visu_draw_path(new_path);    
 
   if(!append)
     pt_clear_path(); 
@@ -322,7 +384,7 @@ void calc_path(const position_t &from, const position_t &to, int type, bool appe
 position_t pt_get_dest()
 {
   if(path.empty())
-    return cine_get_position();
+    return cine_get_wheel_center_position();
   else
    return path.front().dest;   
 }
@@ -332,13 +394,41 @@ void pt_clear_path()
   path.clear();
 }
 //------------------------------------------------------------------------------
-void pt_stop(int id)
+void pt_stop()
 {
-  pic_MotorsPower(0.,0.);
-  position_t pos = cine_get_position();
-  vector_t N = vector_t(cos(pos.a), sin(pos.a));
-  if(id == 0 || id == 1) N = -N;
-  pos.x += N.x * 0.03;
-  pos.y += N.y * 0.03;
-  path.push_front(direct_path_t(pos,tpDEST));
+  if(pt_stopped)
+    return;
+  resume = path;
+  pt_clear_path();  
+  cine_onoff(false);        
+  pic_MotorsPower(0.0,0.0); 
+  cine_motors(0.0,0.0);
+  pt_stopped = true;
 }
+//------------------------------------------------------------------------------
+void pt_resume()
+{
+  path = resume;
+  cine_onoff(true);         
+  pt_stopped = false;
+  printf("RESUME PATH!: %d steps remaining\n", path.size());
+}
+//-------------------------------------------------------------------------------
+bool pt_is_stopped()
+{
+  return pt_stopped;
+}
+//-------------------------------------------------------------------------------
+pp_path pt_get_path()
+{
+  list<direct_path_t> :: iterator iter = path.begin();
+  vector<position_t> res;
+  res.resize(path.size()+1);
+  
+  res[0] = cine_get_wheel_center_position();
+  for(int i=1; iter != path.end(); iter++, i++)
+    res[i] = iter->dest;
+
+  return res;
+}
+//------------------------------------------------------------------------------

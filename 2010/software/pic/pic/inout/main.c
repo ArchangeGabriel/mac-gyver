@@ -54,6 +54,7 @@ void application_main(void)
     }
     cutalim();
     PINDEBUG = 0;
+    verif_fdc(0);
 //    clear_device_remote_wakeup();
 }
 
