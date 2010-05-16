@@ -31,6 +31,7 @@ all:
 	$(COMPILE) -c debugs.c
 	$(COMPILE) -c findecourse.c
 	$(LINK) $(application_hex_OBJECTS)
+	rm -f *.cod *.asm *.lst *.map
 
 clean:
 	rm -f *.o *.lst *.rel *.cod *.map *.asm

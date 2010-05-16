@@ -1,4 +1,4 @@
-// pic_interface.cxx //
+ // pic_interface.cxx //
 #include "../../common/simul.h"
 #include "pic_interface.h"
 
@@ -142,7 +142,7 @@ int repare_usb()
 
 void shut_usb(void)//#include "../common/simul.h"
 {
-    if(devicemoteur != NULL) delete devicemoteur;
+    if(devicemoteur != NULL) {set_speed(128,128); delete devicemoteur;}
     if(deviceinout != NULL) delete deviceinout;
     devicemoteur = NULL;
     deviceinout = NULL;

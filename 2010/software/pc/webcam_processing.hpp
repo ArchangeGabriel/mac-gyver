@@ -98,6 +98,8 @@ struct unproject_result_t
 
 typedef bool (*filter_func_t)(const image_t::pixel_type_t *pix);
 
+bool filter_black(const image_t::pixel_type_t *pix);
+bool filter_white(const image_t::pixel_type_t *pix);
 bool filter_red(const image_t::pixel_type_t *pix);
 bool filter_green(const image_t::pixel_type_t *pix);
 

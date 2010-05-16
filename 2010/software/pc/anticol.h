@@ -11,7 +11,7 @@ void* ac_MainLoop(void*);
 /*
 CallBack pour les capteurs
 */
-void ac_OnRecvCaptors(int n, float *values);
+void ac_OnRecvCaptors(int n, double *values);
 
 
 #endif

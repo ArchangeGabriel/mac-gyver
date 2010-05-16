@@ -72,10 +72,12 @@ void setup_adconversion(void) // Configure AD...
 
 void init_adconversion(unsigned char number)
 {
+  if(number){
     number_an = number;
     ADCON0bits.GO = 1;  // Lance la convertion
   //  configured = 1;
     write_debug(0,17);
+  }
 }
 
 void maj_result(void)

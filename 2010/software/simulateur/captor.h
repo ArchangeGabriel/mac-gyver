@@ -13,7 +13,7 @@ class captor_t : public params_t
   simul_info_t *simul_info;      // pointeur vers le simulateur 
    
   virtual void init_params();
-  virtual int measure();
+  virtual double measure();
   virtual void draw();  
 };
 
@@ -23,7 +23,7 @@ class color_captor_t : public captor_t
 {
   public:
 
-  int measure();
+  double measure();
   void draw();
 };
 
@@ -35,7 +35,7 @@ class dist_captor_t : public captor_t
   public:
 
   void init_params();
-  int measure();
+  double measure();
   void draw();
 };
 

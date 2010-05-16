@@ -12,6 +12,8 @@ class webcam_t
     webcam_t(const char *name,const std::string& dev,size_t width,size_t height);
     ~webcam_t();
     
+    bool started;
+    
     void start();
     void capture(image_t& img);// image must already have the good size
     void do_capture();
@@ -19,8 +21,8 @@ class webcam_t
     const image_t& get_image2() const;
     void stop();
     
-    size_t get_width();
-    size_t get_height();
+    size_t get_width() const;
+    size_t get_height() const;
     const char* get_name();
     
     protected:

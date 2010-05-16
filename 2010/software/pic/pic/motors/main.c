@@ -20,7 +20,7 @@
 
 void init_pwm(void) // Configure CCP1, CCP2 et Timer2
 {
-    PR2 = 0xFF; //periode Timer2 = 256
+    PR2 = 0xFF; //periode Timer2 = 128
     CCPR1L = 0x80; // Rapport cyclique 1 = 1/2 (pour les bits de poids faibles, voir CCP1CON bits 4 et 5)
     CCPR2L = 0x80; // Rapport cyclique 2 = 1/2
     TRISC &= 0xF9; // 11111001 : CCP1, CCP2 = sorties

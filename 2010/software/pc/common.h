@@ -8,6 +8,8 @@ typedef struct point_t
 {
   int x;
   int y;
+  point_t():x(0),y(0) {}
+  point_t(int _x, int _y):x(_x),y(_y) {}
 } point_t;
 
 typedef struct position_t
@@ -19,12 +21,12 @@ typedef struct position_t
   vector_t v() const {return vector_t(x,y);}
 } position_t;
 
-typedef struct tension_t
+typedef struct wheel_speed_t
 {
   float left,right;
   
-  tension_t(float left,float right):left(left),right(right){}
-} tension_t;
+  wheel_speed_t(float left,float right):left(left),right(right){}
+} wheel_speed_t;
 
 
 //------------------------------------------------------------------------------

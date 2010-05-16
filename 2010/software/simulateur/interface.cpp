@@ -23,6 +23,7 @@ simulateur_t Simul;
 pthread_t ServeurThread;
 pthread_t ConsoleThread;
 extern pthread_mutex_t server_mutex;
+void reload_simul(int config = -1);
 void launch_simul();
 void cancel_simul();
 void simulation();
@@ -34,6 +35,7 @@ void monitor(long r);
 void exiting();
 
 bool simul_started = false;
+int force_reload_simul = -1;
 
 // Pour la synchronisation entre la vitesse de simulation et la vitesse réelle
 struct timeval Deb;
@@ -125,10 +127,7 @@ void console()
     }
     else if(!strcmp(buff,"re"))
     {
-      cancel_simul();
-      Simul.load_params("params.ini"); 
-      Simul.load_simul();
-      launch_simul();
+      reload_simul();
     }
     else if(!memcmp(buff,"mon(",4))
     {
@@ -273,6 +272,16 @@ void monitor(long r)
   endwin();
 }  
 //------------------------------------------------------------------------------
+void reload_simul(int config)
+{
+  cancel_simul();
+  Simul.load_params("params.ini"); 
+  if(config != -1)
+    Simul.params.config_terrain = config;
+  Simul.load_simul();
+  launch_simul();
+}
+//------------------------------------------------------------------------------
 void launch_simul()
 {
   Simul.draw_background();
@@ -342,7 +351,13 @@ void simulation()
     fps_count++;         
     RefreshSDL();    
   }
-  pthread_mutex_unlock(&Simul.mutex);      
+  pthread_mutex_unlock(&Simul.mutex);
+  
+  if(force_reload_simul != -1)
+  {
+    reload_simul(force_reload_simul);
+    force_reload_simul = -1;
+  }        
 }
 //------------------------------------------------------------------------------
 void* serveur_main(void *Args)

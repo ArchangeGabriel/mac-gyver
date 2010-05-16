@@ -93,7 +93,7 @@ void camera_t::init_scene(simul_info_t* _info)
   fflush(stdout);  
 }
 //------------------------------------------------------------------------------
-void camera_t::create(vector_t *_N, vector_t *_T, vector_t *_G, vector_t *_pos, double *_z, double _h)
+void camera_t::create(vector_t *_N, vector_t *_T, vector_t *_G, vector_t *_pos, double *_z, double /*_h*/)
 { 
   N = _N;
   T = _T;

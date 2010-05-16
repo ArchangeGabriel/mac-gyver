@@ -14,6 +14,7 @@ Donne/règle la position du centre du robot
 void cine_set_position(position_t &_pos);
 position_t cine_get_position();
 position_t cine_get_wheel_center_position();
+void cine_reset_asserv();
 
 /*
 Donne la vitesse (du robot et de la roue 0 gauche, 1 droite)
@@ -33,5 +34,10 @@ Règle la vitesse de consigne des moteurs (paramètre left et right: vitesses de
 -> Transmet au pic.
 */
 void cine_motors(double left, double right);
+
+/*
+Eteint ou allume l'asservissement
+*/
+void cine_onoff(bool onoff);
 
 #endif

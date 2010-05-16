@@ -8,7 +8,6 @@
 #include <sys/socket.h>
 #include <errno.h> 
 
-
 #include "../../common/comm.h"
 #include "../../common/simul.h"
 #include "usb.h"

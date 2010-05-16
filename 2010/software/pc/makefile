@@ -1,7 +1,7 @@
 include ../makeopt
 
 all: make_common make_picAPI main.o
-	$(CC) -o ../client ../common/console.o ../common/comm.o ../common/bitmap.o common.o usb.o picAPI/pic_interface.o picAPI/usbdeviceinout.o picAPI/usbdevicemoteurs.o cinematik.o webcamAPI.o path_planner.o picAPI.o anticol.o path_tracker.o strategie.o sdl.o visualizer.o main.o webcam_processing.o webcam_utils.o webcam_common.o webcam.o -f90lib -llapack -lblas $(LDFLAGS)
+	$(CC) -o ../client ../common/console.o ../common/comm.o ../common/bitmap.o visualizer.o common.o usb.o picAPI/pic_interface.o picAPI/usbdeviceinout.o picAPI/usbdevicemoteurs.o cinematik.o webcamAPI.o path_planner.o picAPI.o anticol.o path_tracker.o strategie.o sdl.o main.o webcam_processing.o webcam_utils.o webcam_common.o webcam.o -f90lib -llapack -lblas $(LDFLAGS)
 
 make_common:
 	make -C ../common
@@ -33,7 +33,7 @@ anticol.o: anticol.cpp anticol.h
 path_tracker.o: path_tracker.cpp path_tracker.h path_planner.o ../common/simul.h common.o cinematik.o
 	$(CC) -o path_tracker.o -c path_tracker.cpp $(CFLAGS)
 
-strategie.o: strategie.cpp strategie.h path_tracker.o picAPI.o ../common/simul.h common.o ../common/const.h
+strategie.o: strategie.cpp strategie.h path_tracker.o picAPI.o ../common/simul.h common.o ../common/const.h visualizer.o
 	$(CC) -o strategie.o -c strategie.cpp $(CFLAGS)
 		
 sdl.o: sdl.cpp sdl.h
@@ -45,7 +45,7 @@ visualizer.o: visualizer.cpp visualizer.h sdl.o
 main.o: main.cpp ../common/simul.h common.o picAPI.o strategie.o anticol.o visualizer.o webcamAPI.o
 	$(CC) -o main.o -c main.cpp $(CFLAGS)
 
-webcam.o: webcam.cpp webcam.hpp webcam_common.o
+webcam.o: webcam.cpp webcam.hpp webcam_common.o webcam_filter.o ./simul/webcam.cpp ../common/simul.h
 	$(CC) -o webcam.o -c webcam.cpp $(CFLAGS)
 
 webcam_processing.o: webcam_processing.cpp webcam_processing.hpp

@@ -123,11 +123,13 @@ void get_connection_id(int robot_id, int pic_id, int* comm_id)
   robot_list_t :: iterator iter_robot;  
   pthread_mutex_lock(&server_mutex);
   for(iter_robot = robot_list.begin(); iter_robot != robot_list.end(); iter_robot++)
+  {
     if((*iter_robot).first.first==robot_id && (*iter_robot).first.second==pic_id)
     {
       robot_list.erase(iter_robot);
       break;
-    }         
+    }
+  }         
   for(iter = connect_list.begin(); iter != connect_list.end(); iter++) 
     if((*iter).first.first==robot_id && (*iter).first.second==pic_id)   
     {

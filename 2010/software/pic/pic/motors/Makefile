@@ -23,6 +23,7 @@ all:
 	$(COMPILE) -c ep1.c
 	$(COMPILE) -c ep2.c
 	$(LINK) $(application_hex_OBJECTS)
+	rm -f *.cod *.asm *.lst *.map
 
 clean:
 	rm -f *.o *.lst *.rel *.cod *.map *.asm

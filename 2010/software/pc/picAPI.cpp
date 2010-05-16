@@ -2,84 +2,121 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/time.h>
+#include <time.h>
 
 #define PC_INCLUDE
 #include "strategie.h"
+#include "../common/simul.h"
 #include "picAPI.h"
 #include "picAPI/pic_interface.h"
 
 // Fonction de callack
 void (*callbackOnJack)(void) = NULL;
 void (*callbackRecvCoder)(double,int,int) = NULL;
+void (*callbackRecvCaptors)(int,double*) = NULL;
 void (*callbackRecvReset)(void) = NULL;
 
+int exit_value = 0;
+bool stop_loop = false;
 bool pic_ready = false;
 
 // Etat du robot
 int digital_output = 0;
 double power_left = 0;
 double power_right = 0;
+bool change_power = 0;
 bool move_pusher = false;
 int where_pusher; 
 bool move_door = false;
 int where_door;
+unsigned short captors[4];
 
 //------------------------------------------------------------------------------
 void pic_MainLoop()
-{    
+{     
   // Initialize connections  
   fprintf(stderr,"Init USB...                 ");  
   fflush(stdout);
-  if(init_analog_in(0) < 0)
+  if(init_analog_in(NB_ANALOGS) < 0)
   {
     fprintf(stderr,"INIT ANALOG FAILED !\n");
-    exit(1);
+    pic_exit(1);
+    return;
   }
   else
   {
     fprintf(stderr,"ok\n");  
     fflush(stdout);
     
-    while(true)
+    struct timeval time;
+    double curr_time;
+    double init_time = time.tv_sec + time.tv_usec*0.000001;
+    
+    gettimeofday(&time,NULL);
+    
+    while(!stop_loop)
     {
       pic_ready = true;
         
-      while(true)
+      while(!stop_loop)
       {
         digital_output = get_digital_in();
         
+        if(digital_output < 0)
+        {
+          fprintf(stderr,"Erreur get_digital_in\n");
+          break;
+        }
+
         // Jack
         if(!strat_is_started() && (digital_output & DIGIT_JACK))
           strat_lets_go();
 
         // Coders
-        if(callbackRecvCoder)
+        int coder_left, coder_right;
+        unsigned char dir_left, dir_right;
+        int iter = get_codeuses(&coder_left, &dir_left, &coder_right, &dir_right);
+        if(iter == -1)
         {
-          int coder_left, coder_right;
-          unsigned char dir_left, dir_right;
-          int iter = get_codeuses(&coder_left, &dir_left, &coder_right, &dir_right);
-          if(iter == -1)
-            break;
-          else
-            callbackRecvCoder(double(iter)*PIC_FREQ, coder_left, coder_right);        
-        }
-        
-        // Motors
-        if(set_speed(int(127.*power_left)+128, int(127.*power_right)+128) != 1)
+          fprintf(stderr,"Erreur get_codeuses\n");
           break;
+        }
+        else
+        {
+          gettimeofday(&time,NULL);
+          curr_time = time.tv_sec + time.tv_usec*0.000001;        
+          callbackRecvCoder(curr_time-init_time, -coder_left, coder_right);
+        }
+
+        // Motors
+        if(change_power)
+        {
+          change_power = 0;
+          if(set_speed(int(127.*power_left)+128, int(127.*power_right)+128) != 1)
+          {
+            fprintf(stderr,"Erreur set_speed\n");
+            break;
+          }
+        }
  
         // Pusher
         if(move_pusher)
         {
-          bool ok = false;
-          if(set_DC_motor(MOTOR_PUSHER_LEFT, where_pusher) == 1 && set_DC_motor(MOTOR_PUSHER_RIGHT, -where_pusher) == 1)
-            ok = true;
-          if(ok)
-            move_pusher = false;
+          if(set_DC_motor(MOTOR_PUSHER_LEFT, where_pusher) == 1)
+          {
+            if(set_DC_motor(MOTOR_PUSHER_RIGHT, where_pusher) == 1)
+              move_pusher = false;
+            else
+            {
+              set_DC_motor(MOTOR_PUSHER_LEFT, MOTOR_PUSHER_STOP);
+              break;
+            }
+          }
           else
             break;
         }
-               
+        
         // Door
         if(move_door)
         {
@@ -88,12 +125,20 @@ void pic_MainLoop()
           else
             break;
         }
-          
+        
+        // Distance captors
+        get_analog_in(captors, 4);        
+        
+        #ifdef SIMULATION  
         usleep(TIMER_CODER);
+        #endif
       }
       
-      pic_ready = false;
-      while(repare_usb() != 1) {}
+      if(!stop_loop)
+      {
+        pic_ready = false;
+        while(repare_usb() != 1) {}
+      }
     }
   }
 }
@@ -101,6 +146,17 @@ void pic_MainLoop()
 bool pic_is_ready()
 {
   return pic_ready;
+}
+//------------------------------------------------------------------------------
+void pic_exit(int value)
+{
+  exit_value = value;
+  stop_loop = true;
+}
+//------------------------------------------------------------------------------
+int pic_get_exit_value()
+{
+  return exit_value;
 }
 //------------------------------------------------------------------------------
 void pic_Jack()
@@ -118,6 +174,7 @@ int pic_MotorsPower(double pwleft, double pwright)
   
   power_left = pwleft;
   power_right = pwright;
+  change_power = true;
   return 0;
 }
 //------------------------------------------------------------------------------
@@ -151,9 +208,23 @@ void pic_Reset()
     callbackRecvReset();
 }
 //------------------------------------------------------------------------------
+void pic_get_captors_values()
+{
+  double captors_val[4];
+  for(int i=0; i<4; i++)
+    captors_val[i] = 1030.0952 * pow((double)captors[i], -0.95);  
+
+  callbackRecvCaptors(4, captors_val);
+}
+//------------------------------------------------------------------------------
 void pic_OnRecvJack(void (*fun)(void))
 {
   callbackOnJack = fun;
+}
+//------------------------------------------------------------------------------
+void pic_OnRecvCaptors(void (*fun)(int, double*))
+{
+  callbackRecvCaptors = fun;
 }
 //------------------------------------------------------------------------------
 void pic_OnRecvCoder(void (*fun)(double, int, int))

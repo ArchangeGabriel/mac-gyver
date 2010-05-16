@@ -1,13 +1,13 @@
 include makeopt
 
 all: do_simul do_pc
-	echo "done"
+#	echo "done"
 
 do_simul:
 	make -C simulateur
 	
 do_pc:
-	make -C pc
+	make -C pc && echo "done"
 
 clean:
 	rm -f *.c~ *.h~ *.cpp~ ini/*.ini~ *.o makefile~
@@ -18,7 +18,7 @@ clean:
 	make -s -C common clean
 
 yellow:
-	./client -y -s photos/match
+	sudo ./client -y -s photos/match
 	
 blue:
-	./client -b -s photos/match
+	sudo ./client -b -s photos/match

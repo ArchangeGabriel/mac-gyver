@@ -13,7 +13,7 @@ void captor_t::init_params()
   fflush(stdout);  
 }
 //----------------------------------------------------------------------------
-int captor_t::measure()
+double captor_t::measure()
 {
   return 0;
 }
@@ -29,7 +29,7 @@ void captor_t::draw()
 
 
 //----------------------------------------------------------------------------
-int color_captor_t::measure()
+double color_captor_t::measure()
 {
   vector_t p=pos.rotate_spec(robot->cosinus,robot->sinus)-robot->G_rot+robot->position;
   
@@ -91,9 +91,9 @@ void dist_captor_t::init_params()
   fflush(stdout);  
 }
 //----------------------------------------------------------------------------
-int dist_captor_t::measure()
+double dist_captor_t::measure()
 {
-/*  float dist = MAX_DIST_CAPT;
+  /*float dist = MAX_DIST_CAPT;
   float tmp;
   vector<object_t*> *obj = &robot->simul_info->objets;
   vector_t P,D;
@@ -108,8 +108,8 @@ int dist_captor_t::measure()
         dist = tmp;  
     }
     
-  return ((int)(logf(dist / COEFF_A_DIST) / logf(COEFF_B_DIST))) << 6;*/
-  return 1;
+  return exp(log(dist/103009.52)/-0.95);*/
+  return 0;
 } 
 //----------------------------------------------------------------------------
 void dist_captor_t::draw()
