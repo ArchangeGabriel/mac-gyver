@@ -1,0 +1,2306 @@
+# EESchema Netlist Version 1.1 created  mar. 18 mai 2010 19:38:43 CEST
+(
+ ( /4BF2CDD4 VCC  J1 USB_2 {Lib=USB_2}
+  (    1 /VDD )
+  (    2 /D- )
+  (    3 /D+ )
+  (    4 /moteurs1et2/GND )
+ )
+ ( /4BF2C7D2 $noname  K9 CONN_3 {Lib=CONN_3}
+  (    1 /AN7 )
+  (    2 /Alimentation/VCC )
+  (    3 /moteurs1et2/GND )
+ )
+ ( /4BF2C7C7 $noname  K8 CONN_3 {Lib=CONN_3}
+  (    1 /AN6 )
+  (    2 /Alimentation/VCC )
+  (    3 /moteurs1et2/GND )
+ )
+ ( /4BF2C7C4 $noname  K7 CONN_3 {Lib=CONN_3}
+  (    1 /AN5 )
+  (    2 /Alimentation/VCC )
+  (    3 /moteurs1et2/GND )
+ )
+ ( /4BF2C7C2 $noname  K6 CONN_3 {Lib=CONN_3}
+  (    1 /AN4 )
+  (    2 /Alimentation/VCC )
+  (    3 /moteurs1et2/GND )
+ )
+ ( /4BF2C7BF $noname  K5 CONN_3 {Lib=CONN_3}
+  (    1 /AN3 )
+  (    2 /Alimentation/VCC )
+  (    3 /moteurs1et2/GND )
+ )
+ ( /4BF2C7BE $noname  K4 CONN_3 {Lib=CONN_3}
+  (    1 /AN2 )
+  (    2 /Alimentation/VCC )
+  (    3 /moteurs1et2/GND )
+ )
+ ( /4BF2C7BC $noname  K3 CONN_3 {Lib=CONN_3}
+  (    1 /AN1 )
+  (    2 /Alimentation/VCC )
+  (    3 /moteurs1et2/GND )
+ )
+ ( /4BF2C7B0 $noname  K2 CONN_3 {Lib=CONN_3}
+  (    1 /AN0 )
+  (    2 /Alimentation/VCC )
+  (    3 /moteurs1et2/GND )
+ )
+ ( /4BF2C75F $noname  P12 CONN_5 {Lib=CONN_5}
+  (    1 /moteurs1et2/GND )
+  (    2 ? )
+  (    3 /COD2 )
+  (    4 /Alimentation/VCC )
+  (    5 /Roues_et_codeuses/B2 )
+ )
+ ( /4BF2C758 $noname  P11 CONN_5 {Lib=CONN_5}
+  (    1 /moteurs1et2/GND )
+  (    2 ? )
+  (    3 /COD1 )
+  (    4 /Alimentation/VCC )
+  (    5 /Roues_et_codeuses/B1 )
+ )
+ ( /4BF2C73B $noname  K13 CONN_3 {Lib=CONN_3}
+  (    1 /Sheet4BF1871A/PWR- )
+  (    2 /Sheet4BF1871A/PINSVO1+ )
+  (    3 /Sheet4BF1871A/PINSVO4SIG )
+ )
+ ( /4BF2C739 $noname  K12 CONN_3 {Lib=CONN_3}
+  (    1 /Sheet4BF1871A/PWR- )
+  (    2 /Sheet4BF1871A/PINSVO1+ )
+  (    3 /Sheet4BF1871A/PINSVO3SIG )
+ )
+ ( /4BF2C735 $noname  K11 CONN_3 {Lib=CONN_3}
+  (    1 /Sheet4BF1871A/PWR- )
+  (    2 /Sheet4BF1871A/PINSVO1+ )
+  (    3 /Sheet4BF1871A/PINSVO2SIG )
+ )
+ ( /4BF2C72E $noname  K10 CONN_3 {Lib=CONN_3}
+  (    1 /Sheet4BF1871A/PWR- )
+  (    2 /Sheet4BF1871A/PINSVO1+ )
+  (    3 /Sheet4BF1871A/PINSVO1SIG )
+ )
+ ( /4BF2C6C4 $noname  P10 CONN_2 {Lib=CONN_2}
+  (    1 /Roues_et_codeuses/ROUE2+ )
+  (    2 /Roues_et_codeuses/ROUE2- )
+ )
+ ( /4BF2C6BA $noname  P9 CONN_2 {Lib=CONN_2}
+  (    1 /Roues_et_codeuses/ROUE1+ )
+  (    2 /Roues_et_codeuses/ROUE1- )
+ )
+ ( /4BF2C6AC $noname  P8 CONN_2 {Lib=CONN_2}
+  (    1 /moteurs3et4/PINMOT2-1 )
+  (    2 /moteurs3et4/PINMOT2-2 )
+ )
+ ( /4BF2C6AA $noname  P7 CONN_2 {Lib=CONN_2}
+  (    1 /moteurs3et4/PINMOT1-1 )
+  (    2 /moteurs3et4/PINMOT1-2 )
+ )
+ ( /4BF2C69B $noname  P6 CONN_2 {Lib=CONN_2}
+  (    1 /moteurs1et2/PINMOT2-1 )
+  (    2 /moteurs1et2/PINMOT2-2 )
+ )
+ ( /4BF2C67B $noname  P5 CONN_2 {Lib=CONN_2}
+  (    1 /moteurs1et2/PINMOT1-1 )
+  (    2 /moteurs1et2/PINMOT1-2 )
+ )
+ ( /4BF2C614 $noname  P13 CONN_9X2 {Lib=CONN_9X2}
+  (    1 /moteurs1et2/GND )
+  (    2 /Multiplexage/DIN0 )
+  (    3 /moteurs1et2/GND )
+  (    4 /Multiplexage/DIN1 )
+  (    5 /moteurs1et2/GND )
+  (    6 /Multiplexage/DIN2 )
+  (    7 /moteurs1et2/GND )
+  (    8 /Multiplexage/DIN3 )
+  (    9 /moteurs1et2/GND )
+  (   10 /Multiplexage/DIN4 )
+  (   11 /moteurs1et2/GND )
+  (   12 /Multiplexage/DIN5 )
+  (   13 /moteurs1et2/GND )
+  (   14 /Multiplexage/DIN6 )
+  (   15 /moteurs1et2/GND )
+  (   16 /Multiplexage/DIN7 )
+  (   17 /moteurs1et2/GND )
+  (   18 /Multiplexage/DIN8 )
+ )
+ ( /4BF2C567 $noname  P1 CONN_2 {Lib=CONN_2}
+  (    1 N-000011 )
+  (    2 /Alimentation/PWRBATT+ )
+ )
+ ( /4BF2C55C $noname  P2 CONN_2 {Lib=CONN_2}
+  (    1 /Sheet4BF1871A/PWR- )
+  (    2 N-000011 )
+ )
+ ( /4BF2C4C8 $noname  P4 CONN_2 {Lib=CONN_2}
+  (    1 /moteurs1et2/GND )
+  (    2 /Alimentation/CMDBATT+ )
+ )
+ ( /4BF2C4AA $noname  P3 CONN_2 {Lib=CONN_2}
+  (    1 /Alimentation/URG2 )
+  (    2 /Alimentation/PWRBATT+ )
+ )
+ ( /4B607380 $noname  SW1 SW_PUSH {Lib=SW_PUSH}
+  (    1 /FORCEBL )
+  (    2 /moteurs1et2/GND )
+ )
+ ( /4B13C074 $noname  C9 10uF {Lib=CAPAPOL}
+  (    1 /VDD )
+  (    2 /moteurs1et2/GND )
+ )
+ ( /4B13A96D $noname  C1 100nF {Lib=C}
+  (    1 /moteurs1et2/GND )
+  (    2 /Vusb )
+ )
+ ( /4B13A96C $noname  R1 1.5ko {Lib=R}
+  (    1 /Vusb )
+  (    2 /D+ )
+ )
+ ( /4B12C59B $noname  C2 100nF {Lib=C}
+  (    1 /VDD )
+  (    2 /moteurs1et2/GND )
+ )
+ ( /4B12A192 $noname  C25 22pF {Lib=C}
+  (    1 /OSC1 )
+  (    2 /moteurs1et2/GND )
+ )
+ ( /4B12A191 $noname  C26 22pF {Lib=C}
+  (    1 /OSC2 )
+  (    2 /moteurs1et2/GND )
+ )
+ ( /4B12A190 $noname  X1 CRYSTAL {Lib=CRYSTAL}
+  (    1 /OSC1 )
+  (    2 /OSC2 )
+ )
+ ( /4B12A17B $noname  SW9 SW_PUSH_SMALL {Lib=SW_PUSH_SMALL}
+  (    1 /moteurs1et2/GND )
+  (    2 /MCLR\ )
+ )
+ ( /4B12A17A $noname  R3 10ko {Lib=R}
+  (    1 /VDD )
+  (    2 /MCLR\ )
+ )
+ ( /4B12A16C $noname  R2 10ko {Lib=R}
+  (    1 /FORCEBL )
+  (    2 /VDD )
+ )
+ ( /4B12A02F $noname  U8 PIC18F4550 {Lib=PIC18F4550}
+  (    1 /MCLR\ )
+  (    2 /AN0 )
+  (    3 /AN1 )
+  (    4 /AN2 )
+  (    5 /AN3 )
+  (    6 /COD1 )
+  (    7 /AN4 )
+  (    8 /AN5 )
+  (    9 /AN6 )
+  (   10 /AN7 )
+  (   11 /VDD )
+  (   12 /moteurs1et2/GND )
+  (   13 /OSC1 )
+  (   14 /OSC2 )
+  (   15 /COD2 )
+  (   16 /PWM2 )
+  (   17 /PWM1 )
+  (   18 /Vusb )
+  (   19 /Dcmd )
+  (   20 /Dpwr )
+  (   21 /Roues_et_codeuses/IN22 )
+  (   22 /Roues_et_codeuses/IN21 )
+  (   23 /D- )
+  (   24 /D+ )
+  (   25 /Roues_et_codeuses/IN12 )
+  (   26 /Roues_et_codeuses/IN11 )
+  (   27 /SigSVO4 )
+  (   28 /Sheet4BF1871A/SIGSVO3 )
+  (   29 /SigSVO2 )
+  (   30 /SigSVO1 )
+  (   31 /moteurs1et2/GND )
+  (   32 /VDD )
+  (   33 /Multiplexage/Q7 )
+  (   34 /CLK )
+  (   35 /PL )
+  (   36 /Alimentation/On )
+  (   37 /Multiplexage/Int )
+  (   38 /SENS1 )
+  (   39 /Roues_et_codeuses/SENS2 )
+  (   40 /FORCEBL )
+ )
+ ( /4BF19AC5/4BF2BAEB $noname  R33 1ko {Lib=R}
+  (    1 N-000159 )
+  (    2 /Alimentation/On )
+ )
+ ( /4BF19AC5/4BF2BA7A relay-PB  K14 PB114012 {Lib=PB114012}
+  (   A1 N-000160 )
+  (   A2 /Sheet4BF1871A/PWR- )
+  (   11 N-000162 )
+  (   12 ? )
+  (   14 /Alimentation/URG2 )
+ )
+ ( /4BF19AC5/4BF2B8AB relay-DIL08  K1 AQW21 {Lib=AQW21}
+  (    1 N-000146 )
+  (    2 /moteurs1et2/GND )
+  (    3 N-000159 )
+  (    4 /moteurs1et2/GND )
+  (    5 N-000160 )
+  (    6 /Alimentation/URG2 )
+  (    7 /Alimentation/CMD+ )
+  (    8 /Alimentation/V+ )
+ )
+ ( /4BF19AC5/4BF2B345 $noname  R36 1ko {Lib=R}
+  (    1 N-000154 )
+  (    2 /moteurs1et2/GND )
+ )
+ ( /4BF19AC5/4BF2B33E $noname  R52 4.7ko {Lib=R}
+  (    1 /Dpwr )
+  (    2 /moteurs1et2/GND )
+ )
+ ( /4BF19AC5/4BF2B236 $noname  R35 1ko {Lib=R}
+  (    1 N-000153 )
+  (    2 /Sheet4BF1871A/PWR- )
+ )
+ ( /4BF19AC5/4BF2B229 $noname  R51 4.7ko {Lib=R}
+  (    1 N-000155 )
+  (    2 /Sheet4BF1871A/PWR- )
+ )
+ ( /4BF19AC5/4BF2B1EA optocoupler-2-DIL16  OK5 PC847 {Lib=PC847}
+  (    1 /CLK )
+  (    2 N-000154 )
+  (    3 /Roues_et_codeuses/IN22 )
+  (    4 N-000143 )
+  (    5 /Roues_et_codeuses/IN21 )
+  (    6 N-000124 )
+  (    7 /PWM2 )
+  (    8 N-000123 )
+  (    9 /Roues_et_codeuses/PWRPWM2 )
+  (   10 /Roues_et_codeuses/SPWRVDD )
+  (   11 /Roues_et_codeuses/PWRIN21 )
+  (   12 /Roues_et_codeuses/SPWRVDD )
+  (   13 /Roues_et_codeuses/PWRIN22 )
+  (   14 /Roues_et_codeuses/SPWRVDD )
+  (   15 N-000155 )
+  (   16 /Alimentation/PWRVDD )
+ )
+ ( /4BF19AC5/4BF2B1DD optocoupler-2-DIL16  OK4 PC847 {Lib=PC847}
+  (    1 N-000157 )
+  (    2 N-000153 )
+  (    3 /Roues_et_codeuses/IN12 )
+  (    4 N-000140 )
+  (    5 /Roues_et_codeuses/IN11 )
+  (    6 N-000139 )
+  (    7 /PWM1 )
+  (    8 N-000137 )
+  (    9 /Roues_et_codeuses/PWRPWM1 )
+  (   10 /Roues_et_codeuses/SPWRVDD )
+  (   11 /Roues_et_codeuses/PWRIN11 )
+  (   12 /Roues_et_codeuses/SPWRVDD )
+  (   13 /Roues_et_codeuses/PWRIN12 )
+  (   14 /Roues_et_codeuses/SPWRVDD )
+  (   15 /Dpwr )
+  (   16 /Alimentation/VCC )
+ )
+ ( /4BF19AC5/4BF2B1C3 $noname  RV2 47ko {Lib=POT}
+  (    1 /moteurs1et2/PWR+ )
+  (    2 N-000158 )
+  (    3 /Sheet4BF1871A/PWR- )
+ )
+ ( /4BF19AC5/4BF2B1C2 $noname  U10 TLC549 {Lib=TLC549}
+  (    1 /Alimentation/PWRVDD )
+  (    2 N-000158 )
+  (    3 /Sheet4BF1871A/PWR- )
+  (    4 /Sheet4BF1871A/PWR- )
+  (    5 /Sheet4BF1871A/PWR- )
+  (    6 N-000157 )
+  (    7 N-000155 )
+  (    8 /Alimentation/PWRVDD )
+ )
+ ( /4BF19AC5/4BF2B0C8 $noname  U9 TLC549 {Lib=TLC549}
+  (    1 /Alimentation/VCC )
+  (    2 N-000150 )
+  (    3 /moteurs1et2/GND )
+  (    4 /moteurs1et2/GND )
+  (    5 /moteurs1et2/GND )
+  (    6 /Dcmd )
+  (    7 /CLK )
+  (    8 /Alimentation/VCC )
+ )
+ ( /4BF19AC5/4BF2B0C2 $noname  RV1 47ko {Lib=POT}
+  (    1 /Alimentation/CMD+ )
+  (    2 N-000150 )
+  (    3 /moteurs1et2/GND )
+ )
+ ( /4BF19AC5/4B606B67 $noname  R32 1ko {Lib=R}
+  (    1 N-000146 )
+  (    2 /Alimentation/On )
+ )
+ ( /4BF19AC5/4B13BDC4 $noname  R34 1ko {Lib=R}
+  (    1 N-000152 )
+  (    2 /Alimentation/V+ )
+ )
+ ( /4BF19AC5/4B13BDC3 $noname  D13 LED {Lib=LED}
+  (    1 N-000152 )
+  (    2 /moteurs1et2/GND )
+ )
+ ( /4BF19AC5/4B13B235 $noname  SWCMD1 SWITCH_INV {Lib=SWITCH_INV}
+  (    1 ? )
+  (    2 /Alimentation/CMDBATT+ )
+  (    3 N-000149 )
+ )
+ ( /4BF19AC5/4B13B114 $noname  C7 100nF {Lib=C}
+  (    1 /Alimentation/VCC )
+  (    2 /moteurs1et2/GND )
+ )
+ ( /4BF19AC5/4B13B113 $noname  C17 220nF {Lib=C}
+  (    1 /Alimentation/V+ )
+  (    2 /moteurs1et2/GND )
+ )
+ ( /4BF19AC5/4B13B112 $noname  U6 7805 {Lib=7805}
+  (   VI /Alimentation/V+ )
+  (   VO /Alimentation/VCC )
+  (  GND /moteurs1et2/GND )
+ )
+ ( /4BF19AC5/4B13B0E2 $noname  C8 100nF {Lib=C}
+  (    1 /Alimentation/PWRVDD )
+  (    2 /Sheet4BF1871A/PWR- )
+ )
+ ( /4BF19AC5/4B13B0E1 $noname  C18 220nF {Lib=C}
+  (    1 /moteurs1et2/PWR+ )
+  (    2 /Sheet4BF1871A/PWR- )
+ )
+ ( /4BF19AC5/4B13B0E0 $noname  U7 7805 {Lib=7805}
+  (   VI /moteurs1et2/PWR+ )
+  (   VO /Alimentation/PWRVDD )
+  (  GND /Sheet4BF1871A/PWR- )
+ )
+ ( /4BF19AC5/4B13B05E $noname  R30 1ko {Lib=R}
+  (    1 N-000149 )
+  (    2 N-000148 )
+ )
+ ( /4BF19AC5/4B13B05D $noname  D11 LED {Lib=LED}
+  (    1 N-000148 )
+  (    2 /moteurs1et2/GND )
+ )
+ ( /4BF19AC5/4B13B05C $noname  DAC1 DIODE {Lib=DIODE}
+  (    1 N-000149 )
+  (    2 /Alimentation/CMD+ )
+ )
+ ( /4BF19AC5/4B13AD58 $noname  R31 1ko {Lib=R}
+  (    1 N-000162 )
+  (    2 N-000151 )
+ )
+ ( /4BF19AC5/4B13AD57 $noname  D12 LED {Lib=LED}
+  (    1 N-000151 )
+  (    2 /Sheet4BF1871A/PWR- )
+ )
+ ( /4BF19AC5/4B13AD56 $noname  DAC2 DIODE {Lib=DIODE}
+  (    1 N-000162 )
+  (    2 /moteurs1et2/PWR+ )
+ )
+ ( /4BF29215/4BF292EF $noname  U3 74LS165 {Lib=74LS165}
+  (    1 /PL )
+  (    2 /CLK )
+  (    3 /Multiplexage/DIN5 )
+  (    4 /Multiplexage/DIN6 )
+  (    5 /Multiplexage/DIN7 )
+  (    6 /Multiplexage/DIN8 )
+  (    7 ? )
+  (    8 /moteurs1et2/GND )
+  (    9 /Multiplexage/Q7 )
+  (   10 /Multiplexage/DIN0 )
+  (   11 /Multiplexage/DIN1 )
+  (   12 /Multiplexage/DIN2 )
+  (   13 /Multiplexage/DIN3 )
+  (   14 /Multiplexage/DIN4 )
+  (   15 /moteurs1et2/GND )
+  (   16 /Alimentation/VCC )
+ )
+ ( /4BF29215/4BF292E2 $noname  U4 74LS280 {Lib=74LS280}
+  (    1 /Multiplexage/DIN6 )
+  (    2 /Multiplexage/DIN7 )
+  (    4 /Multiplexage/DIN8 )
+  (    5 /Multiplexage/Int )
+  (    6 ? )
+  (    7 /moteurs1et2/GND )
+  (    8 /Multiplexage/DIN0 )
+  (    9 /Multiplexage/DIN1 )
+  (   10 /Multiplexage/DIN2 )
+  (   11 /Multiplexage/DIN3 )
+  (   12 /Multiplexage/DIN4 )
+  (   13 /Multiplexage/DIN5 )
+  (   14 /Alimentation/VCC )
+ )
+ ( /4BF29215/4BF292D0 $noname  U1 74HC595 {Lib=74HC595}
+  (    1 /moteurs1et2/SIGMOT1-2 )
+  (    2 /moteurs1et2/SIGMOT2-1 )
+  (    3 /moteurs1et2/SIGMOT2-2 )
+  (    4 /moteurs3et4/SIGMOT1-1 )
+  (    5 /Multiplexage/SigMOT32 )
+  (    6 /moteurs3et4/SIGMOT2-1 )
+  (    7 /moteurs3et4/SIGMOT2-2 )
+  (    8 /moteurs1et2/GND )
+  (    9 ? )
+  (   10 /Alimentation/VCC )
+  (   11 /Multiplexage/MotClk )
+  (   12 /Multiplexage/MotClk )
+  (   13 /moteurs1et2/GND )
+  (   14 ? )
+  (   15 /Multiplexage/SigMOT11 )
+  (   16 /Alimentation/VCC )
+ )
+ ( /4BF188BA/4BF2A99F $noname  R24 1ko {Lib=R}
+  (    1 /moteurs1et2/GND )
+  (    2 N-000139 )
+ )
+ ( /4BF188BA/4BF2A99E $noname  R26 1ko {Lib=R}
+  (    1 /moteurs1et2/GND )
+  (    2 N-000140 )
+ )
+ ( /4BF188BA/4BF2A99D $noname  R45 4.7ko {Lib=R}
+  (    1 /Roues_et_codeuses/PWRIN12 )
+  (    2 /Sheet4BF1871A/PWR- )
+ )
+ ( /4BF188BA/4BF2A99C $noname  R47 4.7ko {Lib=R}
+  (    1 /Roues_et_codeuses/PWRIN11 )
+  (    2 /Sheet4BF1871A/PWR- )
+ )
+ ( /4BF188BA/4BF2A99A $noname  R49 4.7ko {Lib=R}
+  (    1 /Sheet4BF1871A/PWR- )
+  (    2 /Roues_et_codeuses/PWRPWM1 )
+ )
+ ( /4BF188BA/4BF2A999 $noname  R22 1ko {Lib=R}
+  (    1 /moteurs1et2/GND )
+  (    2 N-000137 )
+ )
+ ( /4BF188BA/4BF2A8C9 $noname  R23 1ko {Lib=R}
+  (    1 /moteurs1et2/GND )
+  (    2 N-000123 )
+ )
+ ( /4BF188BA/4BF2A85E $noname  R50 4.7ko {Lib=R}
+  (    1 /Sheet4BF1871A/PWR- )
+  (    2 /Roues_et_codeuses/PWRPWM2 )
+ )
+ ( /4BF188BA/4B1CD99F $noname  SW8 SW_PUSH {Lib=SW_PUSH}
+  (    1 /Alimentation/PWRVDD )
+  (    2 /Roues_et_codeuses/SPWRVDD )
+ )
+ ( /4BF188BA/4B1CD99E $noname  C6 100nF {Lib=C}
+  (    1 /Roues_et_codeuses/SPWRVDD )
+  (    2 /Sheet4BF1871A/PWR- )
+ )
+ ( /4BF188BA/4B13C239 $noname  SW7 SW_PUSH {Lib=SW_PUSH}
+  (    1 /moteurs1et2/PWR+ )
+  (    2 /Roues_et_codeuses/SPWR+ )
+ )
+ ( /4BF188BA/4B12AAE1 $noname  R48 4.7ko {Lib=R}
+  (    1 /Roues_et_codeuses/PWRIN21 )
+  (    2 /Sheet4BF1871A/PWR- )
+ )
+ ( /4BF188BA/4B12AADD $noname  R46 4.7ko {Lib=R}
+  (    1 /Roues_et_codeuses/PWRIN22 )
+  (    2 /Sheet4BF1871A/PWR- )
+ )
+ ( /4BF188BA/4B12A622 $noname  R38 3.3ko {Lib=R}
+  (    1 /Roues_et_codeuses/B2 )
+  (    2 /Alimentation/VCC )
+ )
+ ( /4BF188BA/4B12A620 $noname  R40 3.3ko {Lib=R}
+  (    1 /COD2 )
+  (    2 /Alimentation/VCC )
+ )
+ ( /4BF188BA/492710C6 $noname  U2 74HC74 {Lib=74HC74}
+  (    1 /Alimentation/VCC )
+  (    2 /COD1 )
+  (    3 /Roues_et_codeuses/B1 )
+  (    4 /Alimentation/VCC )
+  (    5 /SENS1 )
+  (    6 ? )
+  (    7 /moteurs1et2/GND )
+  (    8 ? )
+  (    9 /Roues_et_codeuses/SENS2 )
+  (   10 /Alimentation/VCC )
+  (   11 /Roues_et_codeuses/B2 )
+  (   12 /COD2 )
+  (   13 /Alimentation/VCC )
+  (   14 /Alimentation/VCC )
+ )
+ ( /4BF188BA/4915E397 $noname  R37 3.3ko {Lib=R}
+  (    1 /Roues_et_codeuses/B1 )
+  (    2 /Alimentation/VCC )
+ )
+ ( /4BF188BA/4915E382 $noname  R39 3.3ko {Lib=R}
+  (    1 /COD1 )
+  (    2 /Alimentation/VCC )
+ )
+ ( /4BF188BA/490A1800 $noname  R28 1ko {Lib=R}
+  (    1 /Roues_et_codeuses/ROUE1+ )
+  (    2 N-000129 )
+ )
+ ( /4BF188BA/490A17FF $noname  D9 LED {Lib=LED}
+  (    1 /Roues_et_codeuses/ROUE1- )
+  (    2 N-000129 )
+ )
+ ( /4BF188BA/490A175B $noname  R29 1ko {Lib=R}
+  (    1 /Roues_et_codeuses/ROUE2+ )
+  (    2 N-000130 )
+ )
+ ( /4BF188BA/490A16C4 $noname  D10 LED {Lib=LED}
+  (    1 /Roues_et_codeuses/ROUE2- )
+  (    2 N-000130 )
+ )
+ ( /4BF188BA/4909D354 $noname  R17 10o {Lib=R}
+  (    1 /Roues_et_codeuses/ROUE2- )
+  (    2 N-000131 )
+ )
+ ( /4BF188BA/4909D353 $noname  C24 22nF {Lib=C}
+  (    1 N-000131 )
+  (    2 /Roues_et_codeuses/ROUE2+ )
+ )
+ ( /4BF188BA/4909D351 $noname  C12 15nF {Lib=C}
+  (    1 N-000132 )
+  (    2 /Roues_et_codeuses/ROUE2+ )
+ )
+ ( /4BF188BA/4909D350 $noname  C13 15nF {Lib=C}
+  (    1 /Roues_et_codeuses/ROUE2- )
+  (    2 N-000134 )
+ )
+ ( /4BF188BA/4909D34F $noname  C16 220nF {Lib=C}
+  (    1 N-000135 )
+  (    2 /Sheet4BF1871A/PWR- )
+ )
+ ( /4BF188BA/4909D34E st-microelectronics-MULTIWATT-11  IC4 L6203 {Lib=L6203}
+  (    1 /Roues_et_codeuses/ROUE2- )
+  (    2 /Roues_et_codeuses/SPWR+ )
+  (    3 /Roues_et_codeuses/ROUE2+ )
+  (    4 N-000132 )
+  (    5 /Roues_et_codeuses/PWRIN21 )
+  (    6 /Sheet4BF1871A/PWR- )
+  (    7 /Roues_et_codeuses/PWRIN22 )
+  (    8 N-000134 )
+  (    9 N-000135 )
+  (   10 /Sheet4BF1871A/PWR- )
+  (   11 /Roues_et_codeuses/PWRPWM2 )
+ )
+ ( /4BF188BA/4909D324 $noname  R27 1ko {Lib=R}
+  (    1 /moteurs1et2/GND )
+  (    2 N-000143 )
+ )
+ ( /4BF188BA/4909D31C $noname  R25 1ko {Lib=R}
+  (    1 /moteurs1et2/GND )
+  (    2 N-000124 )
+ )
+ ( /4BF188BA/4908E6D6 $noname  R16 10o {Lib=R}
+  (    1 N-000125 )
+  (    2 /Roues_et_codeuses/ROUE1- )
+ )
+ ( /4BF188BA/4908E652 $noname  C23 22nF {Lib=C}
+  (    1 N-000125 )
+  (    2 /Roues_et_codeuses/ROUE1+ )
+ )
+ ( /4BF188BA/4908E259 $noname  C10 15nF {Lib=C}
+  (    1 N-000126 )
+  (    2 /Roues_et_codeuses/ROUE1+ )
+ )
+ ( /4BF188BA/4908E246 $noname  C11 15nF {Lib=C}
+  (    1 /Roues_et_codeuses/ROUE1- )
+  (    2 N-000127 )
+ )
+ ( /4BF188BA/4908DF30 $noname  C15 220nF {Lib=C}
+  (    1 N-000128 )
+  (    2 /Sheet4BF1871A/PWR- )
+ )
+ ( /4BF188BA/4908D7EA st-microelectronics-MULTIWATT-11  IC3 L6203 {Lib=L6203}
+  (    1 /Roues_et_codeuses/ROUE1- )
+  (    2 /Roues_et_codeuses/SPWR+ )
+  (    3 /Roues_et_codeuses/ROUE1+ )
+  (    4 N-000126 )
+  (    5 /Roues_et_codeuses/PWRIN11 )
+  (    6 /Sheet4BF1871A/PWR- )
+  (    7 /Roues_et_codeuses/PWRIN12 )
+  (    8 N-000127 )
+  (    9 N-000128 )
+  (   10 /Sheet4BF1871A/PWR- )
+  (   11 /Roues_et_codeuses/PWRPWM1 )
+ )
+ ( /4BF1871B/4BF29AE5 $noname  C5 100nF {Lib=C}
+  (    1 /Sheet4BF1871A/PINSVO1+ )
+  (    2 /Sheet4BF1871A/PWR- )
+ )
+ ( /4BF1871B/4BF29AD0 $noname  U5 7805 {Lib=7805}
+  (   VI N-000116 )
+  (   VO /Sheet4BF1871A/PINSVO1+ )
+  (  GND /Sheet4BF1871A/PWR- )
+ )
+ ( /4BF1871B/4BF29AC1 $noname  SW6 SW_PUSH {Lib=SW_PUSH}
+  (    1 /moteurs1et2/PWR+ )
+  (    2 N-000116 )
+ )
+ ( /4BF1871B/4B139C43 $noname  C14 220nF {Lib=C}
+  (    1 N-000116 )
+  (    2 /Sheet4BF1871A/PWR- )
+ )
+ ( /4BF1871B/4B139A7E $noname  R44 4.7ko {Lib=R}
+  (    1 /Sheet4BF1871A/PINSVO4SIG )
+  (    2 /Sheet4BF1871A/PWR- )
+ )
+ ( /4BF1871B/4B139A7D $noname  R43 4.7ko {Lib=R}
+  (    1 /Sheet4BF1871A/PINSVO3SIG )
+  (    2 /Sheet4BF1871A/PWR- )
+ )
+ ( /4BF1871B/4B139A76 $noname  R64 470o {Lib=R}
+  (    1 N-000115 )
+  (    2 /SigSVO4 )
+ )
+ ( /4BF1871B/4B139A75 $noname  R63 470o {Lib=R}
+  (    1 N-000119 )
+  (    2 /Sheet4BF1871A/SIGSVO3 )
+ )
+ ( /4BF1871B/4B139A24 $noname  R42 4.7ko {Lib=R}
+  (    1 /Sheet4BF1871A/PINSVO2SIG )
+  (    2 /Sheet4BF1871A/PWR- )
+ )
+ ( /4BF1871B/4B139A1A $noname  R62 470o {Lib=R}
+  (    1 N-000118 )
+  (    2 /SigSVO2 )
+ )
+ ( /4BF1871B/4B139928 $noname  R41 4.7ko {Lib=R}
+  (    1 /Sheet4BF1871A/PINSVO1SIG )
+  (    2 /Sheet4BF1871A/PWR- )
+ )
+ ( /4BF1871B/4B139853 $noname  R61 470o {Lib=R}
+  (    1 N-000117 )
+  (    2 /SigSVO1 )
+ )
+ ( /4BF1871B/4B1397B3 optocoupler-2-DIL16  OK3 PC847 {Lib=PC847}
+  (    1 N-000118 )
+  (    2 /moteurs1et2/GND )
+  (    3 N-000115 )
+  (    4 /moteurs1et2/GND )
+  (    5 N-000119 )
+  (    6 /moteurs1et2/GND )
+  (    7 N-000117 )
+  (    8 /moteurs1et2/GND )
+  (    9 /Sheet4BF1871A/PINSVO1SIG )
+  (   10 /Sheet4BF1871A/PINSVO1+ )
+  (   11 /Sheet4BF1871A/PINSVO3SIG )
+  (   12 /Sheet4BF1871A/PINSVO1+ )
+  (   13 /Sheet4BF1871A/PINSVO4SIG )
+  (   14 /Sheet4BF1871A/PINSVO1+ )
+  (   15 /Sheet4BF1871A/PINSVO2SIG )
+  (   16 /Sheet4BF1871A/PINSVO1+ )
+ )
+ ( /4BF185B6/4B13C382 $noname  R21 1ko {Lib=R}
+  (    1 /moteurs3et4/PINMOT2-1 )
+  (    2 N-000101 )
+ )
+ ( /4BF185B6/4B13C381 $noname  D8 LED {Lib=LED}
+  (    1 /moteurs3et4/PINMOT2-2 )
+  (    2 N-000101 )
+ )
+ ( /4BF185B6/4B13C380 $noname  R15 10o {Lib=R}
+  (    1 N-000103 )
+  (    2 /moteurs3et4/PINMOT2-2 )
+ )
+ ( /4BF185B6/4B13C37F $noname  C22 22nF {Lib=C}
+  (    1 N-000103 )
+  (    2 /moteurs3et4/PINMOT2-1 )
+ )
+ ( /4BF185B6/4B13C2DE $noname  R20 1ko {Lib=R}
+  (    1 N-000102 )
+  (    2 /moteurs3et4/PINMOT1-2 )
+ )
+ ( /4BF185B6/4B13C2DD $noname  D7 LED {Lib=LED}
+  (    1 N-000102 )
+  (    2 /moteurs3et4/PINMOT1-1 )
+ )
+ ( /4BF185B6/4B13C2DC $noname  R14 10o {Lib=R}
+  (    1 N-000114 )
+  (    2 /moteurs3et4/PINMOT1-1 )
+ )
+ ( /4BF185B6/4B13C2DB $noname  C21 22nF {Lib=C}
+  (    1 /moteurs3et4/PINMOT1-2 )
+  (    2 N-000114 )
+ )
+ ( /4BF185B6/4B13C147 $noname  SW5 SW_PUSH {Lib=SW_PUSH}
+  (    1 /Alimentation/PWRVDD )
+  (    2 N-000108 )
+ )
+ ( /4BF185B6/4B13C141 $noname  SW4 SW_PUSH {Lib=SW_PUSH}
+  (    1 /moteurs1et2/PWR+ )
+  (    2 N-000109 )
+ )
+ ( /4BF185B6/4B13A474 $noname  C4 100nF {Lib=C}
+  (    1 N-000108 )
+  (    2 /Sheet4BF1871A/PWR- )
+ )
+ ( /4BF185B6/4B13A0AF $noname  D4 BRIDGE {Lib=BRIDGE}
+  (    1 /Sheet4BF1871A/PWR- )
+  (    2 /moteurs3et4/PINMOT2-1 )
+  (    3 N-000109 )
+  (    4 /moteurs3et4/PINMOT2-2 )
+ )
+ ( /4BF185B6/4B139FFB $noname  D3 BRIDGE {Lib=BRIDGE}
+  (    1 /Sheet4BF1871A/PWR- )
+  (    2 /moteurs3et4/PINMOT1-2 )
+  (    3 N-000109 )
+  (    4 /moteurs3et4/PINMOT1-1 )
+ )
+ ( /4BF185B6/4B139D96 $noname  R11 10ko {Lib=R}
+  (    1 N-000106 )
+  (    2 N-000108 )
+ )
+ ( /4BF185B6/4B139D95 $noname  R10 10ko {Lib=R}
+  (    1 N-000111 )
+  (    2 N-000108 )
+ )
+ ( /4BF185B6/4B139D94 $noname  R60 470o {Lib=R}
+  (    1 N-000104 )
+  (    2 /moteurs3et4/SIGMOT2-2 )
+ )
+ ( /4BF185B6/4B139D93 $noname  R59 470o {Lib=R}
+  (    1 N-000113 )
+  (    2 /moteurs3et4/SIGMOT2-1 )
+ )
+ ( /4BF185B6/4B139D92 $noname  R9 10ko {Lib=R}
+  (    1 N-000107 )
+  (    2 N-000108 )
+ )
+ ( /4BF185B6/4B139D91 $noname  R58 470o {Lib=R}
+  (    1 N-000105 )
+  (    2 /Multiplexage/SigMOT32 )
+ )
+ ( /4BF185B6/4B139D90 $noname  R8 10ko {Lib=R}
+  (    1 N-000110 )
+  (    2 N-000108 )
+ )
+ ( /4BF185B6/4B139D8F $noname  R57 470o {Lib=R}
+  (    1 N-000112 )
+  (    2 /moteurs3et4/SIGMOT1-1 )
+ )
+ ( /4BF185B6/4B139D8E optocoupler-2-DIL16  OK2 PC847 {Lib=PC847}
+  (    1 N-000104 )
+  (    2 /moteurs1et2/GND )
+  (    3 N-000113 )
+  (    4 /moteurs1et2/GND )
+  (    5 N-000105 )
+  (    6 /moteurs1et2/GND )
+  (    7 N-000112 )
+  (    8 /moteurs1et2/GND )
+  (    9 /Sheet4BF1871A/PWR- )
+  (   10 N-000110 )
+  (   11 /Sheet4BF1871A/PWR- )
+  (   12 N-000107 )
+  (   13 /Sheet4BF1871A/PWR- )
+  (   14 N-000111 )
+  (   15 /Sheet4BF1871A/PWR- )
+  (   16 N-000106 )
+ )
+ ( /4BF185B6/4991D96E st-microelectronics-MULTIWATT-15  IC2 L298 {Lib=L298}
+  (    1 /Sheet4BF1871A/PWR- )
+  (    2 /moteurs3et4/PINMOT1-1 )
+  (    3 /moteurs3et4/PINMOT1-2 )
+  (    4 N-000109 )
+  (    5 N-000110 )
+  (    6 N-000108 )
+  (    7 N-000107 )
+  (    8 /Sheet4BF1871A/PWR- )
+  (    9 N-000108 )
+  (   10 N-000111 )
+  (   11 N-000108 )
+  (   12 N-000106 )
+  (   13 /moteurs3et4/PINMOT2-1 )
+  (   14 /moteurs3et4/PINMOT2-2 )
+  (   15 /Sheet4BF1871A/PWR- )
+ )
+ ( /4BF18533/4B13C382 $noname  R19 1ko {Lib=R}
+  (    1 /moteurs1et2/PINMOT2-1 )
+  (    2 N-000090 )
+ )
+ ( /4BF18533/4B13C381 $noname  D6 LED {Lib=LED}
+  (    1 /moteurs1et2/PINMOT2-2 )
+  (    2 N-000090 )
+ )
+ ( /4BF18533/4B13C380 $noname  R13 10o {Lib=R}
+  (    1 N-000097 )
+  (    2 /moteurs1et2/PINMOT2-2 )
+ )
+ ( /4BF18533/4B13C37F $noname  C20 22nF {Lib=C}
+  (    1 N-000097 )
+  (    2 /moteurs1et2/PINMOT2-1 )
+ )
+ ( /4BF18533/4B13C2DE $noname  R18 1ko {Lib=R}
+  (    1 N-000087 )
+  (    2 /moteurs1et2/PINMOT1-2 )
+ )
+ ( /4BF18533/4B13C2DD $noname  D5 LED {Lib=LED}
+  (    1 N-000087 )
+  (    2 /moteurs1et2/PINMOT1-1 )
+ )
+ ( /4BF18533/4B13C2DC $noname  R12 10o {Lib=R}
+  (    1 N-000098 )
+  (    2 /moteurs1et2/PINMOT1-1 )
+ )
+ ( /4BF18533/4B13C2DB $noname  C19 22nF {Lib=C}
+  (    1 /moteurs1et2/PINMOT1-2 )
+  (    2 N-000098 )
+ )
+ ( /4BF18533/4B13C147 $noname  SW3 SW_PUSH {Lib=SW_PUSH}
+  (    1 /Alimentation/PWRVDD )
+  (    2 N-000093 )
+ )
+ ( /4BF18533/4B13C141 $noname  SW2 SW_PUSH {Lib=SW_PUSH}
+  (    1 /moteurs1et2/PWR+ )
+  (    2 N-000091 )
+ )
+ ( /4BF18533/4B13A474 $noname  C3 100nF {Lib=C}
+  (    1 N-000093 )
+  (    2 /Sheet4BF1871A/PWR- )
+ )
+ ( /4BF18533/4B13A0AF $noname  D2 BRIDGE {Lib=BRIDGE}
+  (    1 /Sheet4BF1871A/PWR- )
+  (    2 /moteurs1et2/PINMOT2-1 )
+  (    3 N-000091 )
+  (    4 /moteurs1et2/PINMOT2-2 )
+ )
+ ( /4BF18533/4B139FFB $noname  D1 BRIDGE {Lib=BRIDGE}
+  (    1 /Sheet4BF1871A/PWR- )
+  (    2 /moteurs1et2/PINMOT1-2 )
+  (    3 N-000091 )
+  (    4 /moteurs1et2/PINMOT1-1 )
+ )
+ ( /4BF18533/4B139D96 $noname  R7 10ko {Lib=R}
+  (    1 N-000088 )
+  (    2 N-000093 )
+ )
+ ( /4BF18533/4B139D95 $noname  R6 10ko {Lib=R}
+  (    1 N-000094 )
+  (    2 N-000093 )
+ )
+ ( /4BF18533/4B139D94 $noname  R56 470o {Lib=R}
+  (    1 N-000099 )
+  (    2 /moteurs1et2/SIGMOT2-2 )
+ )
+ ( /4BF18533/4B139D93 $noname  R55 470o {Lib=R}
+  (    1 N-000096 )
+  (    2 /moteurs1et2/SIGMOT2-1 )
+ )
+ ( /4BF18533/4B139D92 $noname  R5 10ko {Lib=R}
+  (    1 N-000089 )
+  (    2 N-000093 )
+ )
+ ( /4BF18533/4B139D91 $noname  R54 470o {Lib=R}
+  (    1 N-000100 )
+  (    2 /moteurs1et2/SIGMOT1-2 )
+ )
+ ( /4BF18533/4B139D90 $noname  R4 10ko {Lib=R}
+  (    1 N-000092 )
+  (    2 N-000093 )
+ )
+ ( /4BF18533/4B139D8F $noname  R53 470o {Lib=R}
+  (    1 N-000095 )
+  (    2 /Multiplexage/SigMOT11 )
+ )
+ ( /4BF18533/4B139D8E optocoupler-2-DIL16  OK1 PC847 {Lib=PC847}
+  (    1 N-000099 )
+  (    2 /moteurs1et2/GND )
+  (    3 N-000096 )
+  (    4 /moteurs1et2/GND )
+  (    5 N-000100 )
+  (    6 /moteurs1et2/GND )
+  (    7 N-000095 )
+  (    8 /moteurs1et2/GND )
+  (    9 /Sheet4BF1871A/PWR- )
+  (   10 N-000092 )
+  (   11 /Sheet4BF1871A/PWR- )
+  (   12 N-000089 )
+  (   13 /Sheet4BF1871A/PWR- )
+  (   14 N-000094 )
+  (   15 /Sheet4BF1871A/PWR- )
+  (   16 N-000088 )
+ )
+ ( /4BF18533/4991D96E st-microelectronics-MULTIWATT-15  IC1 L298 {Lib=L298}
+  (    1 /Sheet4BF1871A/PWR- )
+  (    2 /moteurs1et2/PINMOT1-1 )
+  (    3 /moteurs1et2/PINMOT1-2 )
+  (    4 N-000091 )
+  (    5 N-000092 )
+  (    6 N-000093 )
+  (    7 N-000089 )
+  (    8 /Sheet4BF1871A/PWR- )
+  (    9 N-000093 )
+  (   10 N-000094 )
+  (   11 N-000093 )
+  (   12 N-000088 )
+  (   13 /moteurs1et2/PINMOT2-1 )
+  (   14 /moteurs1et2/PINMOT2-2 )
+  (   15 /Sheet4BF1871A/PWR- )
+ )
+)
+*
+{ Allowed footprints by component:
+$component C9
+ CP*
+ SM*
+$endlist
+$component C1
+ SM*
+ C?
+ C1-1
+$endlist
+$component R1
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component C2
+ SM*
+ C?
+ C1-1
+$endlist
+$component C25
+ SM*
+ C?
+ C1-1
+$endlist
+$component C26
+ SM*
+ C?
+ C1-1
+$endlist
+$component R3
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R2
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R33
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R36
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R52
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R35
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R51
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component U10
+ DIP8
+ SOIC8
+$endlist
+$component U9
+ DIP8
+ SOIC8
+$endlist
+$component R32
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R34
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component D13
+ LED-3MM
+ LED-5MM
+ LED-10MM
+ LED-0603
+ LED-0805
+ LED-1206
+ LEDV
+$endlist
+$component C7
+ SM*
+ C?
+ C1-1
+$endlist
+$component C17
+ SM*
+ C?
+ C1-1
+$endlist
+$component C8
+ SM*
+ C?
+ C1-1
+$endlist
+$component C18
+ SM*
+ C?
+ C1-1
+$endlist
+$component R30
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component D11
+ LED-3MM
+ LED-5MM
+ LED-10MM
+ LED-0603
+ LED-0805
+ LED-1206
+ LEDV
+$endlist
+$component DAC1
+ D?
+ S*
+$endlist
+$component R31
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component D12
+ LED-3MM
+ LED-5MM
+ LED-10MM
+ LED-0603
+ LED-0805
+ LED-1206
+ LEDV
+$endlist
+$component DAC2
+ D?
+ S*
+$endlist
+$component R24
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R26
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R45
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R47
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R49
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R22
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R23
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R50
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component C6
+ SM*
+ C?
+ C1-1
+$endlist
+$component R48
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R46
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R38
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R40
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R37
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R39
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R28
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component D9
+ LED-3MM
+ LED-5MM
+ LED-10MM
+ LED-0603
+ LED-0805
+ LED-1206
+ LEDV
+$endlist
+$component R29
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component D10
+ LED-3MM
+ LED-5MM
+ LED-10MM
+ LED-0603
+ LED-0805
+ LED-1206
+ LEDV
+$endlist
+$component R17
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component C24
+ SM*
+ C?
+ C1-1
+$endlist
+$component C12
+ SM*
+ C?
+ C1-1
+$endlist
+$component C13
+ SM*
+ C?
+ C1-1
+$endlist
+$component C16
+ SM*
+ C?
+ C1-1
+$endlist
+$component R27
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R25
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R16
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component C23
+ SM*
+ C?
+ C1-1
+$endlist
+$component C10
+ SM*
+ C?
+ C1-1
+$endlist
+$component C11
+ SM*
+ C?
+ C1-1
+$endlist
+$component C15
+ SM*
+ C?
+ C1-1
+$endlist
+$component C5
+ SM*
+ C?
+ C1-1
+$endlist
+$component C14
+ SM*
+ C?
+ C1-1
+$endlist
+$component R44
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R43
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R64
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R63
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R42
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R62
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R41
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R61
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R21
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component D8
+ LED-3MM
+ LED-5MM
+ LED-10MM
+ LED-0603
+ LED-0805
+ LED-1206
+ LEDV
+$endlist
+$component R15
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component C22
+ SM*
+ C?
+ C1-1
+$endlist
+$component R20
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component D7
+ LED-3MM
+ LED-5MM
+ LED-10MM
+ LED-0603
+ LED-0805
+ LED-1206
+ LEDV
+$endlist
+$component R14
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component C21
+ SM*
+ C?
+ C1-1
+$endlist
+$component C4
+ SM*
+ C?
+ C1-1
+$endlist
+$component R11
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R10
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R60
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R59
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R9
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R58
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R8
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R57
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R19
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component D6
+ LED-3MM
+ LED-5MM
+ LED-10MM
+ LED-0603
+ LED-0805
+ LED-1206
+ LEDV
+$endlist
+$component R13
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component C20
+ SM*
+ C?
+ C1-1
+$endlist
+$component R18
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component D5
+ LED-3MM
+ LED-5MM
+ LED-10MM
+ LED-0603
+ LED-0805
+ LED-1206
+ LEDV
+$endlist
+$component R12
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component C19
+ SM*
+ C?
+ C1-1
+$endlist
+$component C3
+ SM*
+ C?
+ C1-1
+$endlist
+$component R7
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R6
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R56
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R55
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R5
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R54
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R4
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R53
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$endfootprintlist
+}
+{ Pin List by Nets
+Net 1 "/Multiplexage/MotClk" "MotClk"
+ U1 12
+ U1 11
+Net 3 "/CLK" "CLK"
+ U8 34
+ U9 7
+ OK5 1
+ U3 2
+Net 4 "/PL" "PL"
+ U8 35
+ U3 1
+Net 5 "/Multiplexage/Q7" "Q7"
+ U3 9
+ U8 33
+Net 6 "/Multiplexage/DIN4" "DIN4"
+ P13 10
+ U3 14
+ U4 12
+Net 7 "/Multiplexage/DIN5" "DIN5"
+ U3 3
+ P13 12
+ U4 13
+Net 8 "/Multiplexage/DIN6" "DIN6"
+ U4 1
+ P13 14
+ U3 4
+Net 9 "/Multiplexage/DIN7" "DIN7"
+ U4 2
+ P13 16
+ U3 5
+Net 10 "/Multiplexage/DIN8" "DIN8"
+ P13 18
+ U4 4
+ U3 6
+Net 11 "" ""
+ P2 2
+ P1 1
+Net 12 "/Multiplexage/DIN0" "DIN0"
+ U3 10
+ P13 2
+ U4 8
+Net 13 "/Multiplexage/DIN1" "DIN1"
+ U3 11
+ U4 9
+ P13 4
+Net 14 "/Multiplexage/DIN2" "DIN2"
+ P13 6
+ U3 12
+ U4 10
+Net 15 "/Multiplexage/DIN3" "DIN3"
+ U4 11
+ U3 13
+ P13 8
+Net 16 "/Alimentation/CMDBATT+" "CMDBATT+"
+ P4 2
+ SWCMD1 2
+Net 17 "/Alimentation/PWRVDD" "PWRVDD"
+ U10 8
+ OK5 16
+ U10 1
+ C8 1
+ U7 VO
+ SW8 1
+ SW3 1
+ SW5 1
+Net 18 "/moteurs1et2/PWR+" "PWR+"
+ SW2 1
+ U7 VI
+ SW4 1
+ SW6 1
+ DAC2 2
+ RV2 1
+ SW7 1
+ C18 1
+Net 19 "/Alimentation/On" "On"
+ R33 2
+ R32 2
+ U8 36
+Net 20 "/Alimentation/URG2" "URG2"
+ P3 1
+ K14 14
+ K1 6
+Net 21 "/Alimentation/PWRBATT+" "PWRBATT+"
+ P3 2
+ P1 2
+Net 22 "/MCLR\" "MCLR\"
+ SW9 2
+ R3 2
+ U8 1
+Net 23 "/FORCEBL" "FORCEBL"
+ R2 1
+ SW1 1
+ U8 40
+Net 24 "/VDD" "VDD"
+ J1 1
+ R3 1
+ R2 2
+ U8 32
+ U8 11
+ C9 1
+ C2 1
+Net 25 "/OSC2" "OSC2"
+ X1 2
+ U8 14
+ C26 1
+Net 26 "/Roues et codeuses/IN12" "IN12"
+ U8 25
+ OK4 3
+Net 27 "/Multiplexage/Int" "Int"
+ U8 37
+ U4 5
+Net 28 "/Dcmd" "Dcmd"
+ U9 6
+ U8 19
+Net 29 "/AN0" "AN0"
+ U8 2
+ K2 1
+Net 30 "/AN1" "AN1"
+ K3 1
+ U8 3
+Net 31 "/AN2" "AN2"
+ U8 4
+ K4 1
+Net 32 "/AN3" "AN3"
+ U8 5
+ K5 1
+Net 33 "/AN4" "AN4"
+ U8 7
+ K6 1
+Net 34 "/AN5" "AN5"
+ U8 8
+ K7 1
+Net 35 "/AN6" "AN6"
+ U8 9
+ K8 1
+Net 36 "/AN7" "AN7"
+ K9 1
+ U8 10
+Net 37 "/Dpwr" "Dpwr"
+ OK4 15
+ R52 1
+ U8 20
+Net 38 "/Roues et codeuses/IN22" "IN22"
+ OK5 3
+ U8 21
+Net 39 "/Roues et codeuses/IN21" "IN21"
+ OK5 5
+ U8 22
+Net 40 "/OSC1" "OSC1"
+ U8 13
+ X1 1
+ C25 1
+Net 41 "/Sheet4BF1871A/PINSVO3SIG" "PINSVO3SIG"
+ R43 1
+ K12 3
+ OK3 11
+Net 42 "/Sheet4BF1871A/PINSVO4SIG" "PINSVO4SIG"
+ K13 3
+ R44 1
+ OK3 13
+Net 43 "/SigSVO4" "SigSVO4"
+ U8 27
+ R64 2
+Net 44 "/Sheet4BF1871A/SIGSVO3" "SIGSVO3"
+ R63 2
+ U8 28
+Net 45 "/SigSVO2" "SigSVO2"
+ R62 2
+ U8 29
+Net 46 "/Sheet4BF1871A/PWR-" "PWR-"
+ R44 2
+ IC4 10
+ R42 2
+ R43 2
+ R48 2
+ R46 2
+ C15 2
+ IC3 6
+ IC3 10
+ C16 2
+ IC4 6
+ IC1 8
+ IC1 15
+ IC2 1
+ OK2 15
+ OK2 11
+ OK2 9
+ OK2 13
+ IC2 15
+ D1 1
+ D2 1
+ OK1 9
+ OK1 11
+ C3 2
+ OK1 15
+ IC1 1
+ C5 2
+ U5 GND
+ C14 2
+ R41 2
+ IC2 8
+ C4 2
+ D4 1
+ OK1 13
+ D3 1
+ K10 1
+ K11 1
+ K12 1
+ K13 1
+ D12 2
+ R51 2
+ R35 2
+ K14 A2
+ U10 5
+ U10 3
+ U10 4
+ U7 GND
+ RV2 3
+ C18 2
+ C8 2
+ R47 2
+ R45 2
+ R49 1
+ P2 1
+ R50 1
+ C6 2
+Net 47 "/Sheet4BF1871A/PINSVO1SIG" "PINSVO1SIG"
+ OK3 9
+ K10 3
+ R41 1
+Net 48 "/SigSVO1" "SigSVO1"
+ R61 2
+ U8 30
+Net 49 "/Roues et codeuses/B2" "B2"
+ R38 1
+ U2 11
+ P12 5
+Net 50 "/Alimentation/VCC" "VCC"
+ C7 1
+ U9 1
+ U9 8
+ U4 14
+ OK4 16
+ U6 VO
+ R39 2
+ R37 2
+ U2 13
+ U3 16
+ U2 10
+ U2 14
+ U2 14
+ U2 1
+ U2 4
+ R40 2
+ R38 2
+ U1 10
+ U1 16
+ P11 4
+ K8 2
+ K7 2
+ K2 2
+ K3 2
+ K4 2
+ K5 2
+ K9 2
+ P12 4
+ K6 2
+Net 52 "/moteurs1et2/GND" "GND"
+ P11 1
+ K7 3
+ K6 3
+ K5 3
+ K4 3
+ OK2 8
+ OK2 4
+ J1 4
+ K9 3
+ K8 3
+ RV1 3
+ K1 2
+ R27 1
+ R25 1
+ OK3 6
+ OK3 8
+ OK3 2
+ OK3 4
+ U2 7
+ U2 7
+ OK1 4
+ R22 1
+ R23 1
+ R24 1
+ R26 1
+ P12 1
+ K2 3
+ K3 3
+ U1 8
+ U1 13
+ C2 2
+ C1 1
+ SW9 1
+ C26 2
+ C25 2
+ C7 2
+ D13 2
+ OK1 2
+ U8 12
+ U8 31
+ U4 7
+ U3 15
+ P13 11
+ OK1 6
+ U3 8
+ OK1 8
+ P13 9
+ P13 7
+ P13 5
+ P13 3
+ P13 1
+ P4 1
+ P13 17
+ P13 15
+ P13 13
+ OK2 6
+ OK2 2
+ K1 4
+ D11 2
+ C17 2
+ U6 GND
+ C9 2
+ SW1 2
+ R52 2
+ R36 2
+ U9 5
+ U9 3
+ U9 4
+Net 53 "/Roues et codeuses/ROUE1-" "ROUE1-"
+ D9 1
+ IC3 1
+ P9 2
+ C11 1
+ R16 2
+Net 54 "/Roues et codeuses/ROUE1+" "ROUE1+"
+ IC3 3
+ R28 1
+ C10 2
+ C23 2
+ P9 1
+Net 55 "/Roues et codeuses/ROUE2+" "ROUE2+"
+ R29 1
+ P10 1
+ C24 2
+ C12 2
+ IC4 3
+Net 56 "/COD2" "COD2"
+ U8 15
+ R40 1
+ U2 12
+ P12 3
+Net 57 "/SENS1" "SENS1"
+ U8 38
+ U2 5
+Net 58 "/Roues et codeuses/SENS2" "SENS2"
+ U2 9
+ U8 39
+Net 59 "/COD1" "COD1"
+ U2 2
+ R39 1
+ U8 6
+ P11 3
+Net 60 "/PWM2" "PWM2"
+ OK5 7
+ U8 16
+Net 61 "/PWM1" "PWM1"
+ U8 17
+ OK4 7
+Net 62 "/Roues et codeuses/IN11" "IN11"
+ U8 26
+ OK4 5
+Net 63 "/moteurs1et2/PINMOT1-2" "PINMOT1-2"
+ P5 2
+ IC1 3
+ D1 2
+ R18 2
+ C19 1
+Net 64 "/moteurs1et2/PINMOT1-1" "PINMOT1-1"
+ IC1 2
+ D5 2
+ R12 2
+ P5 1
+ D1 4
+Net 65 "/moteurs1et2/SIGMOT2-2" "SIGMOT2-2"
+ U1 3
+ R56 2
+Net 66 "/moteurs1et2/SIGMOT2-1" "SIGMOT2-1"
+ U1 2
+ R55 2
+Net 67 "/moteurs1et2/SIGMOT1-2" "SIGMOT1-2"
+ U1 1
+ R54 2
+Net 68 "/Multiplexage/SigMOT11" "SigMOT11"
+ U1 15
+ R53 2
+Net 69 "/D-" "D-"
+ J1 2
+ U8 23
+Net 70 "/Sheet4BF1871A/PINSVO1+" "PINSVO1+"
+ OK3 14
+ K11 2
+ OK3 16
+ OK3 12
+ OK3 10
+ U5 VO
+ C5 1
+ K13 2
+ K12 2
+ K10 2
+Net 71 "/moteurs3et4/PINMOT2-2" "PINMOT2-2"
+ R15 2
+ IC2 14
+ D4 4
+ D8 1
+ P8 2
+Net 72 "/moteurs3et4/PINMOT2-1" "PINMOT2-1"
+ D4 2
+ IC2 13
+ R21 1
+ C22 2
+ P8 1
+Net 73 "/moteurs3et4/PINMOT1-2" "PINMOT1-2"
+ D3 2
+ R20 2
+ P7 2
+ C21 1
+ IC2 3
+Net 74 "/moteurs3et4/PINMOT1-1" "PINMOT1-1"
+ D3 4
+ D7 2
+ R14 2
+ IC2 2
+ P7 1
+Net 75 "/moteurs3et4/SIGMOT2-2" "SIGMOT2-2"
+ R60 2
+ U1 7
+Net 76 "/moteurs3et4/SIGMOT2-1" "SIGMOT2-1"
+ U1 6
+ R59 2
+Net 77 "/Multiplexage/SigMOT32" "SigMOT32"
+ U1 5
+ R58 2
+Net 78 "/moteurs3et4/SIGMOT1-1" "SIGMOT1-1"
+ U1 4
+ R57 2
+Net 79 "/moteurs1et2/PINMOT2-2" "PINMOT2-2"
+ D2 4
+ D6 1
+ P6 2
+ IC1 14
+ R13 2
+Net 80 "/moteurs1et2/PINMOT2-1" "PINMOT2-1"
+ P6 1
+ C20 2
+ R19 1
+ IC1 13
+ D2 2
+Net 81 "/D+" "D+"
+ J1 3
+ R1 2
+ U8 24
+Net 83 "/Roues et codeuses/B1" "B1"
+ P11 5
+ U2 3
+ R37 1
+Net 84 "/Sheet4BF1871A/PINSVO2SIG" "PINSVO2SIG"
+ K11 3
+ R42 1
+ OK3 15
+Net 85 "/Roues et codeuses/ROUE2-" "ROUE2-"
+ D10 1
+ R17 1
+ P10 2
+ C13 1
+ IC4 1
+Net 86 "/Vusb" "Vusb"
+ R1 1
+ U8 18
+ C1 2
+Net 87 "" ""
+ R18 1
+ D5 1
+Net 88 "" ""
+ R7 1
+ OK1 16
+ IC1 12
+Net 89 "" ""
+ R5 1
+ IC1 7
+ OK1 12
+Net 90 "" ""
+ R19 2
+ D6 2
+Net 91 "" ""
+ D2 3
+ SW2 2
+ D1 3
+ IC1 4
+Net 92 "" ""
+ IC1 5
+ OK1 10
+ R4 1
+Net 93 "" ""
+ R7 2
+ R4 2
+ IC1 9
+ C3 1
+ IC1 11
+ SW3 2
+ R5 2
+ R6 2
+ IC1 6
+Net 94 "" ""
+ R6 1
+ IC1 10
+ OK1 14
+Net 95 "" ""
+ OK1 7
+ R53 1
+Net 96 "" ""
+ R55 1
+ OK1 3
+Net 97 "" ""
+ R13 1
+ C20 1
+Net 98 "" ""
+ R12 1
+ C19 2
+Net 99 "" ""
+ OK1 1
+ R56 1
+Net 100 "" ""
+ R54 1
+ OK1 5
+Net 101 "" ""
+ D8 2
+ R21 2
+Net 102 "" ""
+ D7 1
+ R20 1
+Net 103 "" ""
+ C22 1
+ R15 1
+Net 104 "" ""
+ R60 1
+ OK2 1
+Net 105 "" ""
+ R58 1
+ OK2 5
+Net 106 "" ""
+ IC2 12
+ R11 1
+ OK2 16
+Net 107 "" ""
+ R9 1
+ OK2 12
+ IC2 7
+Net 108 "" ""
+ SW5 2
+ R11 2
+ R9 2
+ R10 2
+ C4 1
+ IC2 6
+ R8 2
+ IC2 9
+ IC2 11
+Net 109 "" ""
+ SW4 2
+ IC2 4
+ D4 3
+ D3 3
+Net 110 "" ""
+ IC2 5
+ OK2 10
+ R8 1
+Net 111 "" ""
+ OK2 14
+ IC2 10
+ R10 1
+Net 112 "" ""
+ OK2 7
+ R57 1
+Net 113 "" ""
+ R59 1
+ OK2 3
+Net 114 "" ""
+ R14 1
+ C21 2
+Net 115 "" ""
+ OK3 3
+ R64 1
+Net 116 "" ""
+ C14 1
+ SW6 2
+ U5 VI
+Net 117 "" ""
+ OK3 7
+ R61 1
+Net 118 "" ""
+ OK3 1
+ R62 1
+Net 119 "" ""
+ R63 1
+ OK3 5
+Net 122 "/Roues et codeuses/PWRIN21" "PWRIN21"
+ IC4 5
+ OK5 11
+ R48 1
+Net 123 "" ""
+ R23 2
+ OK5 8
+Net 124 "" ""
+ R25 2
+ OK5 6
+Net 125 "" ""
+ C23 1
+ R16 1
+Net 126 "" ""
+ C10 1
+ IC3 4
+Net 127 "" ""
+ IC3 8
+ C11 2
+Net 128 "" ""
+ IC3 9
+ C15 1
+Net 129 "" ""
+ R28 2
+ D9 2
+Net 130 "" ""
+ R29 2
+ D10 2
+Net 131 "" ""
+ R17 2
+ C24 1
+Net 132 "" ""
+ C12 1
+ IC4 4
+Net 133 "/Roues et codeuses/SPWR+" "SPWR+"
+ SW7 2
+ IC4 2
+ IC3 2
+Net 134 "" ""
+ C13 2
+ IC4 8
+Net 135 "" ""
+ C16 1
+ IC4 9
+Net 136 "/Roues et codeuses/PWRPWM1" "PWRPWM1"
+ OK4 9
+ IC3 11
+ R49 2
+Net 137 "" ""
+ R22 2
+ OK4 8
+Net 138 "/Roues et codeuses/PWRIN22" "PWRIN22"
+ OK5 13
+ IC4 7
+ R46 1
+Net 139 "" ""
+ R24 2
+ OK4 6
+Net 140 "" ""
+ OK4 4
+ R26 2
+Net 141 "/Roues et codeuses/PWRIN12" "PWRIN12"
+ OK4 13
+ R45 1
+ IC3 7
+Net 142 "/Roues et codeuses/PWRPWM2" "PWRPWM2"
+ IC4 11
+ R50 2
+ OK5 9
+Net 143 "" ""
+ OK5 4
+ R27 2
+Net 144 "/Roues et codeuses/SPWRVDD" "SPWRVDD"
+ SW8 2
+ C6 1
+ OK5 14
+ OK4 10
+ OK4 12
+ OK5 10
+ OK5 12
+ OK4 14
+Net 145 "/Roues et codeuses/PWRIN11" "PWRIN11"
+ IC3 5
+ OK4 11
+ R47 1
+Net 146 "" ""
+ R32 1
+ K1 1
+Net 147 "/Alimentation/CMD+" "CMD+"
+ K1 7
+ RV1 1
+ DAC1 2
+Net 148 "" ""
+ R30 2
+ D11 1
+Net 149 "" ""
+ R30 1
+ SWCMD1 3
+ DAC1 1
+Net 150 "" ""
+ U9 2
+ RV1 2
+Net 151 "" ""
+ D12 1
+ R31 2
+Net 152 "" ""
+ D13 1
+ R34 1
+Net 153 "" ""
+ OK4 2
+ R35 1
+Net 154 "" ""
+ OK5 2
+ R36 1
+Net 155 "" ""
+ OK5 15
+ R51 1
+ U10 7
+Net 156 "/Alimentation/V+" "V+"
+ K1 8
+ R34 2
+ U6 VI
+ C17 1
+Net 157 "" ""
+ U10 6
+ OK4 1
+Net 158 "" ""
+ U10 2
+ RV2 2
+Net 159 "" ""
+ K1 3
+ R33 1
+Net 160 "" ""
+ K1 5
+ K14 A1
+Net 162 "" ""
+ K14 11
+ R31 1
+ DAC2 1
+}
+#End
