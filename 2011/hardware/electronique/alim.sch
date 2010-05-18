@@ -1,0 +1,642 @@
+EESchema Schematic File Version 2  date mar. 18 mai 2010 19:38:00 CEST
+LIBS:power
+LIBS:device
+LIBS:transistors
+LIBS:conn
+LIBS:linear
+LIBS:regul
+LIBS:74xx
+LIBS:cmos4000
+LIBS:adc-dac
+LIBS:memory
+LIBS:xilinx
+LIBS:special
+LIBS:microcontrollers
+LIBS:dsp
+LIBS:microchip
+LIBS:analog_switches
+LIBS:motorola
+LIBS:texas
+LIBS:intel
+LIBS:audio
+LIBS:interface
+LIBS:digital-audio
+LIBS:philips
+LIBS:display
+LIBS:cypress
+LIBS:siliconi
+LIBS:opto
+LIBS:atmel
+LIBS:contrib
+LIBS:valves
+LIBS:st-microelectronics
+LIBS:18f4550
+LIBS:optocoupler-2
+LIBS:relay
+LIBS:tlc549
+LIBS:master-cache
+EELAYER 24  0
+EELAYER END
+$Descr A4 11700 8267
+Sheet 2 7
+Title ""
+Date "18 may 2010"
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+Wire Wire Line
+	3050 1350 2600 1350
+Wire Wire Line
+	3950 950  3250 950 
+Wire Wire Line
+	8350 2750 7900 2750
+Connection ~ 10350 2400
+Wire Wire Line
+	10700 2400 10200 2400
+Wire Wire Line
+	8350 3550 8050 3550
+Wire Wire Line
+	8050 3550 8050 3450
+Wire Wire Line
+	10700 1550 10100 1550
+Connection ~ 10200 1750
+Wire Wire Line
+	10200 1850 10200 1750
+Wire Wire Line
+	10550 1100 10100 1100
+Connection ~ 7950 1100
+Wire Wire Line
+	9400 1100 7200 1100
+Wire Wire Line
+	8850 1450 8650 1450
+Wire Wire Line
+	9000 2350 9000 2400
+Wire Wire Line
+	8850 2350 8850 2400
+Connection ~ 8850 1450
+Wire Wire Line
+	6950 6650 7350 6650
+Wire Wire Line
+	6250 6250 6250 6200
+Wire Wire Line
+	6250 6200 5500 6200
+Wire Wire Line
+	5500 6200 5500 6550
+Wire Wire Line
+	5500 6550 5550 6550
+Wire Wire Line
+	5450 6650 5550 6650
+Wire Wire Line
+	6250 7050 6250 7000
+Wire Wire Line
+	5300 6900 5300 7050
+Wire Wire Line
+	5300 6400 5300 6050
+Wire Wire Line
+	6100 5450 6250 5450
+Wire Wire Line
+	4400 5850 4850 5850
+Connection ~ 5350 1300
+Wire Wire Line
+	5000 1300 5400 1300
+Wire Wire Line
+	6450 1300 6200 1300
+Wire Wire Line
+	2650 2150 4950 2150
+Wire Wire Line
+	8350 5250 8600 5250
+Wire Wire Line
+	7350 5250 7250 5250
+Wire Wire Line
+	7250 5250 7250 5450
+Wire Wire Line
+	7850 5250 7950 5250
+Wire Wire Line
+	2600 1450 2700 1450
+Wire Wire Line
+	2700 1450 2700 1600
+Wire Wire Line
+	2700 1600 2600 1600
+Connection ~ 2300 5450
+Wire Wire Line
+	2400 5450 2200 5450
+Connection ~ 3850 950 
+Wire Wire Line
+	3850 2050 3850 2150
+Wire Wire Line
+	3850 950  3850 1050
+Wire Wire Line
+	3850 1550 3850 1650
+Connection ~ 3850 2150
+Wire Wire Line
+	2300 6550 2300 6650
+Wire Wire Line
+	2300 5550 2300 5450
+Wire Wire Line
+	2300 6050 2300 6150
+Wire Wire Line
+	2800 5450 3150 5450
+Connection ~ 2300 6650
+Connection ~ 5350 1800
+Wire Wire Line
+	5350 1350 5350 1300
+Wire Wire Line
+	5350 1800 5350 1750
+Wire Wire Line
+	6250 1750 6250 1800
+Wire Wire Line
+	6250 1350 6250 1300
+Connection ~ 6250 1300
+Wire Wire Line
+	6250 1800 5000 1800
+Wire Wire Line
+	3000 5850 3600 5850
+Connection ~ 3550 6350
+Wire Wire Line
+	4000 6350 4000 6150
+Wire Wire Line
+	3550 5900 3550 5850
+Wire Wire Line
+	3550 6300 3550 6350
+Connection ~ 4000 6350
+Connection ~ 3550 5850
+Wire Wire Line
+	1100 5350 1200 5350
+Wire Wire Line
+	3150 6650 1100 6650
+Connection ~ 4450 6350
+Wire Wire Line
+	4450 6350 4450 6300
+Connection ~ 4450 5850
+Wire Wire Line
+	4450 5900 4450 5850
+Wire Wire Line
+	4650 6350 3000 6350
+Connection ~ 7250 5450
+Wire Wire Line
+	4950 950  4350 950 
+Wire Wire Line
+	5800 1800 5800 1600
+Connection ~ 5800 1800
+Wire Wire Line
+	5300 5650 6250 5650
+Wire Wire Line
+	5300 5450 5600 5450
+Wire Wire Line
+	7050 5650 7500 5650
+Wire Wire Line
+	5300 7050 7000 7050
+Wire Wire Line
+	7000 7050 7000 6750
+Wire Wire Line
+	7000 6750 6950 6750
+Connection ~ 6250 7050
+Wire Wire Line
+	5550 6750 5500 6750
+Wire Wire Line
+	5500 6750 5500 7050
+Connection ~ 5500 7050
+Wire Wire Line
+	5300 6050 5950 6050
+Wire Wire Line
+	6950 6550 7350 6550
+Wire Wire Line
+	7650 950  7000 950 
+Connection ~ 7200 1950
+Wire Wire Line
+	7200 1950 7200 1650
+Wire Wire Line
+	7200 1650 7250 1650
+Connection ~ 7950 1950
+Wire Wire Line
+	8650 1650 8700 1650
+Wire Wire Line
+	8700 1950 7000 1950
+Wire Wire Line
+	7000 950  7000 1300
+Wire Wire Line
+	7000 1950 7000 1800
+Wire Wire Line
+	7950 1950 7950 1900
+Wire Wire Line
+	7150 1550 7250 1550
+Wire Wire Line
+	7250 1450 7200 1450
+Wire Wire Line
+	7200 1450 7200 1100
+Wire Wire Line
+	7950 1150 7950 1100
+Wire Wire Line
+	9400 1550 8650 1550
+Wire Wire Line
+	9000 1850 9000 1750
+Wire Wire Line
+	9000 1750 9400 1750
+Wire Wire Line
+	9000 2400 8700 2400
+Wire Wire Line
+	8700 2400 8700 1650
+Connection ~ 8700 1950
+Connection ~ 8850 2400
+Wire Wire Line
+	9400 1300 8850 1300
+Wire Wire Line
+	8850 1300 8850 1850
+Wire Wire Line
+	10100 1750 10550 1750
+Wire Wire Line
+	10350 1850 10350 1300
+Wire Wire Line
+	10350 1300 10100 1300
+Wire Wire Line
+	8600 5450 7050 5450
+Wire Wire Line
+	6150 2750 6450 2750
+Wire Wire Line
+	6150 2950 7100 2950
+Wire Wire Line
+	6950 2750 7100 2750
+Wire Wire Line
+	7900 2950 8050 2950
+Wire Wire Line
+	8050 2950 8050 3050
+Wire Wire Line
+	10200 2400 10200 2350
+Wire Wire Line
+	10350 2400 10350 2350
+Wire Wire Line
+	3250 950  3250 1050
+Text Label 2900 1350 2    60   ~ 0
+URG2
+Text Label 10700 2400 2    60   ~ 0
+GND
+Text Label 8350 2750 2    60   ~ 0
+URG2
+Text Label 8350 3550 2    60   ~ 0
+PWR-
+Text HLabel 6150 2750 0    60   Input ~ 0
+On
+Text Label 6150 2950 0    60   ~ 0
+GND
+$Comp
+L R R33
+U 1 1 4BF2BAEB
+P 6700 2750
+F 0 "R33" V 6780 2750 50  0000 C CNN
+F 1 "1ko" V 6700 2750 50  0000 C CNN
+	1    6700 2750
+	0    1    1    0   
+$EndComp
+$Comp
+L PB114012 K14
+U 2 1 4BF2BA7A
+P 3250 1150
+F 0 "K14" H 3250 1150 50  0000 L BNN
+F 1 "PB114012" H 3350 1250 50  0000 L BNN
+F 2 "relay-PB" H 3250 1300 50  0001 C CNN
+	2    3250 1150
+	1    0    0    1   
+$EndComp
+$Comp
+L PB114012 K14
+U 1 1 4BF2BA6C
+P 8050 3250
+F 0 "K14" H 8050 3250 50  0000 L BNN
+F 1 "PB114012" H 8100 3365 50  0000 L BNN
+F 2 "relay-PB" H 8050 3400 50  0001 C CNN
+	1    8050 3250
+	1    0    0    -1  
+$EndComp
+$Comp
+L AQW21 K1
+U 2 1 4BF2B8AB
+P 7500 2850
+F 0 "K1" H 7200 3100 50  0000 L BNN
+F 1 "AQW21" H 7200 2530 50  0000 L BNN
+F 2 "relay-DIL08" H 7500 3000 50  0001 C CNN
+	2    7500 2850
+	1    0    0    -1  
+$EndComp
+Text Label 10700 1550 2    60   ~ 0
+VCC
+$Comp
+L R R36
+U 1 1 4BF2B345
+P 10350 2100
+F 0 "R36" V 10430 2100 50  0000 C CNN
+F 1 "1ko" V 10350 2100 50  0000 C CNN
+	1    10350 2100
+	1    0    0    -1  
+$EndComp
+$Comp
+L R R52
+U 1 1 4BF2B33E
+P 10200 2100
+F 0 "R52" V 10280 2100 50  0000 C CNN
+F 1 "4.7ko" V 10200 2100 50  0000 C CNN
+	1    10200 2100
+	1    0    0    -1  
+$EndComp
+Text HLabel 10550 1750 2    60   Output ~ 0
+Dpwr
+Text HLabel 10550 1100 2    60   Input ~ 0
+CLK
+$Comp
+L R R35
+U 1 1 4BF2B236
+P 9000 2100
+F 0 "R35" V 9080 2100 50  0000 C CNN
+F 1 "1ko" V 9000 2100 50  0000 C CNN
+	1    9000 2100
+	1    0    0    -1  
+$EndComp
+$Comp
+L R R51
+U 1 1 4BF2B229
+P 8850 2100
+F 0 "R51" V 8930 2100 50  0000 C CNN
+F 1 "4.7ko" V 8850 2100 50  0000 C CNN
+	1    8850 2100
+	1    0    0    -1  
+$EndComp
+$Comp
+L PC847 OK5
+U 1 1 4BF2B1EA
+P 9700 1200
+F 0 "OK5" H 9425 1425 50  0000 L BNN
+F 1 "PC847" H 9425 900 50  0000 L BNN
+F 2 "optocoupler-2-DIL16" H 9700 1350 50  0001 C CNN
+	1    9700 1200
+	-1   0    0    -1  
+$EndComp
+$Comp
+L PC847 OK4
+U 1 1 4BF2B1DD
+P 9800 1650
+F 0 "OK4" H 9850 1350 50  0000 L BNN
+F 1 "PC847" H 9525 1350 50  0000 L BNN
+F 2 "optocoupler-2-DIL16" H 9800 1800 50  0001 C CNN
+	1    9800 1650
+	1    0    0    -1  
+$EndComp
+$Comp
+L POT RV2
+U 1 1 4BF2B1C3
+P 7000 1550
+F 0 "RV2" H 7000 1450 50  0000 C CNN
+F 1 "47ko" H 7000 1550 50  0000 C CNN
+	1    7000 1550
+	0    1    1    0   
+$EndComp
+$Comp
+L TLC549 U10
+U 1 1 4BF2B1C2
+P 7950 1550
+F 0 "U10" H 8050 1850 60  0000 L CNN
+F 1 "TLC549" H 8050 1300 60  0000 L CNN
+	1    7950 1550
+	1    0    0    -1  
+$EndComp
+Text Label 7650 1100 2    60   ~ 0
+PWRVDD
+Text Label 7650 1950 2    60   ~ 0
+PWR-
+Text Label 7650 950  2    60   ~ 0
+PWR+
+Text HLabel 7350 6550 2    60   Input ~ 0
+CLK
+Text HLabel 7350 6650 2    60   Output ~ 0
+Dcmd
+Text Label 5950 6050 2    60   ~ 0
+CMD+
+Text Label 5950 7050 2    60   ~ 0
+GND
+Text Label 8600 5450 2    60   ~ 0
+V+
+Text Label 5950 6200 2    60   ~ 0
+VCC
+$Comp
+L TLC549 U9
+U 1 1 4BF2B0C8
+P 6250 6650
+F 0 "U9" H 6350 6950 60  0000 L CNN
+F 1 "TLC549" H 6350 6400 60  0000 L CNN
+	1    6250 6650
+	1    0    0    -1  
+$EndComp
+$Comp
+L POT RV1
+U 1 1 4BF2B0C2
+P 5300 6650
+F 0 "RV1" H 5300 6550 50  0000 C CNN
+F 1 "47ko" H 5300 6650 50  0000 C CNN
+	1    5300 6650
+	0    1    1    0   
+$EndComp
+Text Label 7500 5650 2    60   ~ 0
+CMD+
+$Comp
+L R R32
+U 1 1 4B606B67
+P 5850 5450
+F 0 "R32" V 5930 5450 50  0000 C CNN
+F 1 "1ko" V 5850 5450 50  0000 C CNN
+	1    5850 5450
+	0    1    1    0   
+$EndComp
+Text Label 5300 5650 0    60   ~ 0
+GND
+Text HLabel 5300 5450 0    60   Input ~ 0
+On
+$Comp
+L AQW21 K1
+U 1 1 4B60645E
+P 6650 5550
+F 0 "K1" H 6400 5800 50  0000 L BNN
+F 1 "AQW21" H 6350 5230 50  0000 L BNN
+F 2 "relay-DIL08" H 6650 5700 50  0001 C CNN
+	1    6650 5550
+	1    0    0    -1  
+$EndComp
+Text Label 4700 5850 2    60   ~ 0
+VCC
+Text HLabel 4950 2150 2    60   Output ~ 0
+PWR-
+Text HLabel 4950 950  2    60   Output ~ 0
+PWR+
+Text Label 8600 5250 2    60   ~ 0
+GND
+Text HLabel 4850 5850 2    60   Output ~ 0
+VCC
+$Comp
+L R R34
+U 1 1 4B13BDC4
+P 7600 5250
+F 0 "R34" V 7680 5250 50  0000 C CNN
+F 1 "1ko" V 7600 5250 50  0000 C CNN
+	1    7600 5250
+	0    1    1    0   
+$EndComp
+$Comp
+L LED D13
+U 1 1 4B13BDC3
+P 8150 5250
+F 0 "D13" H 8150 5350 50  0000 C CNN
+F 1 "LED" H 8150 5150 50  0000 C CNN
+	1    8150 5250
+	1    0    0    -1  
+$EndComp
+Text HLabel 4650 6350 2    60   Output ~ 0
+GND
+Text HLabel 2600 1350 0    60   Input ~ 0
+URG2
+Text HLabel 2600 1450 0    60   Output ~ 0
+URG1
+$Comp
+L SWITCH_INV SWCMD1
+U 1 1 4B13B235
+P 1700 5350
+F 0 "SWCMD1" H 1500 5500 50  0000 C CNN
+F 1 "SWITCH_INV" H 1550 5200 50  0000 C CNN
+	1    1700 5350
+	1    0    0    -1  
+$EndComp
+Text Label 3000 6350 0    60   ~ 0
+GND
+Text Label 3000 5850 0    60   ~ 0
+V+
+$Comp
+L C C7
+U 1 1 4B13B114
+P 4450 6100
+F 0 "C7" H 4500 6200 50  0000 L CNN
+F 1 "100nF" H 4500 6000 50  0000 L CNN
+	1    4450 6100
+	-1   0    0    -1  
+$EndComp
+$Comp
+L C C17
+U 1 1 4B13B113
+P 3550 6100
+F 0 "C17" H 3600 6200 50  0000 L CNN
+F 1 "220nF" H 3600 6000 50  0000 L CNN
+	1    3550 6100
+	1    0    0    -1  
+$EndComp
+$Comp
+L 7805 U6
+U 1 1 4B13B112
+P 4000 5900
+F 0 "U6" H 4150 5704 60  0000 C CNN
+F 1 "7805" H 4000 6100 60  0000 C CNN
+	1    4000 5900
+	1    0    0    -1  
+$EndComp
+Text HLabel 6450 1300 2    60   Output ~ 0
+PWRVDD
+Text Label 5000 1800 0    60   ~ 0
+PWR-
+Text Label 5000 1300 0    60   ~ 0
+PWR+
+$Comp
+L C C8
+U 1 1 4B13B0E2
+P 6250 1550
+F 0 "C8" H 6300 1650 50  0000 L CNN
+F 1 "100nF" H 6300 1450 50  0000 L CNN
+	1    6250 1550
+	-1   0    0    -1  
+$EndComp
+$Comp
+L C C18
+U 1 1 4B13B0E1
+P 5350 1550
+F 0 "C18" H 5400 1650 50  0000 L CNN
+F 1 "220nF" H 5400 1450 50  0000 L CNN
+	1    5350 1550
+	1    0    0    -1  
+$EndComp
+$Comp
+L 7805 U7
+U 1 1 4B13B0E0
+P 5800 1350
+F 0 "U7" H 5950 1154 60  0000 C CNN
+F 1 "7805" H 5800 1550 60  0000 C CNN
+	1    5800 1350
+	1    0    0    -1  
+$EndComp
+Text Label 3150 6650 2    60   ~ 0
+GND
+Text Label 3150 5450 2    60   ~ 0
+CMD+
+Text HLabel 1100 6650 0    60   Input ~ 0
+CMDBATT-
+Text HLabel 1100 5350 0    60   Input ~ 0
+CMDBATT+
+$Comp
+L R R30
+U 1 1 4B13B05E
+P 2300 5800
+F 0 "R30" V 2380 5800 50  0000 C CNN
+F 1 "1ko" V 2300 5800 50  0000 C CNN
+	1    2300 5800
+	1    0    0    -1  
+$EndComp
+$Comp
+L LED D11
+U 1 1 4B13B05D
+P 2300 6350
+F 0 "D11" H 2300 6450 50  0000 C CNN
+F 1 "LED" H 2300 6250 50  0000 C CNN
+	1    2300 6350
+	0    1    1    0   
+$EndComp
+$Comp
+L DIODE DAC1
+U 1 1 4B13B05C
+P 2600 5450
+F 0 "DAC1" H 2600 5550 40  0000 C CNN
+F 1 "DIODE" H 2600 5350 40  0000 C CNN
+	1    2600 5450
+	1    0    0    -1  
+$EndComp
+Text Label 4700 2150 2    60   ~ 0
+PWR-
+Text Label 4700 950  2    60   ~ 0
+PWR+
+Text HLabel 2650 2150 0    60   Input ~ 0
+PWRBATT-
+Text HLabel 2600 1600 0    60   Input ~ 0
+PWRBATT+
+$Comp
+L R R31
+U 1 1 4B13AD58
+P 3850 1300
+F 0 "R31" V 3930 1300 50  0000 C CNN
+F 1 "1ko" V 3850 1300 50  0000 C CNN
+	1    3850 1300
+	1    0    0    -1  
+$EndComp
+$Comp
+L LED D12
+U 1 1 4B13AD57
+P 3850 1850
+F 0 "D12" H 3850 1950 50  0000 C CNN
+F 1 "LED" H 3850 1750 50  0000 C CNN
+	1    3850 1850
+	0    1    1    0   
+$EndComp
+$Comp
+L DIODE DAC2
+U 1 1 4B13AD56
+P 4150 950
+F 0 "DAC2" H 4150 1050 40  0000 C CNN
+F 1 "DIODE" H 4150 850 40  0000 C CNN
+	1    4150 950 
+	1    0    0    -1  
+$EndComp
+$EndSCHEMATC
