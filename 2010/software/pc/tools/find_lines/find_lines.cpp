@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <vector>
 #include <string.h>
+#include <limits>
 #include "../../common.h"
 #include "../../webcam_common.hpp"
 #include "../../webcam_filter.hpp"
@@ -17,7 +18,8 @@ class gray_img
   public:  
   typedef double pixel_t;  
   pixel_t **pix;
-  
+
+//-----------------------------------------------------------------------------  
   void make(int w, int h)
   {
     width = w;
@@ -29,23 +31,37 @@ class gray_img
       memset(pix[i], 0, sizeof(pixel_t)*h);
     }
   }  
-  
+
+//-----------------------------------------------------------------------------  
   gray_img() {}
   gray_img(int w, int h) {make(w,h);}
-  gray_img(const image_t &img, int compo) {load_from(img, compo);}
-    
+  gray_img(const image_t &img, double *weights = NULL) {load_from(img, weights);}
+
+//-----------------------------------------------------------------------------    
   inline int get_width()  const {return width;} 
   inline int get_height() const {return height;}
-  
-  void load_from(const image_t &img, int compo)
+
+//-----------------------------------------------------------------------------  
+  void load_from(const image_t &img, double *weights = NULL)
   {
     make(img.w, img.h);
     
+    if(!weights)
+    {
+      weights = new double[3];
+      weights[0] = 1.;
+      weights[1] = 1.;
+      weights[2] = 1.;            
+    }
+    
     for(int x=0; x<width; x++) 
       for(int y=0; y<height; y++)    
-        pix[x][y] = img.pixel(x,height-y-1)[compo];
+        pix[x][y] = double(img.pixel(x,height-y-1)[0]&255) * weights[0] +
+						        double(img.pixel(x,height-y-1)[1]&255) * weights[1] +
+						        double(img.pixel(x,height-y-1)[2]&255) * weights[2];						        
   }
-  
+
+//-----------------------------------------------------------------------------  
   double interpolate(double x, double y) const
   {
     if(x<0. || y<0. || x>width-1 || y>height-1) return 0;
@@ -66,22 +82,32 @@ class gray_img
       return pix[_x][_y]*wx*wy + pix[_x+1][_y]*(1.-wx)*wy + pix[_x][_y+1]*wx*(1.-wy) + pix[_x+1][_y+1]*(1.-wx)*(1.-wy);
   }
   
+//-----------------------------------------------------------------------------
   void save_to_file(const char *file)
   {
     FILE *F= fopen(file,"w+");
     save_bitmap_header(F, width, height);
 
-    int max = 0;
+    double max = -numeric_limits<double>::infinity();
+    double min = +numeric_limits<double>::infinity();    
     for(int y=0; y<height; y++)
       for(int x=0; x<width; x++)
+      {
         if(pix[x][height-1-y] > max)
-          max = pix[x][height-1-y];    
+          max = pix[x][height-1-y];
+        if(pix[x][height-1-y] < min)
+          min = pix[x][height-1-y];            
+      }            
           
     for(int y=0; y<height; y++)
     {
       for(int x=0; x<width; x++)
       {
-        unsigned char p= pix[x][height-1-y]*255./max;
+        unsigned char p;
+        if(max == min)
+          p = 0;
+        else
+          p = (pix[x][height-1-y]-min)*255./(max - min);
         fwrite(&p,1,1,F);   // 2
         fwrite(&p,1,1,F);   // 1
         fwrite(&p,1,1,F);   // 0
@@ -107,7 +133,7 @@ void follow_level_line(const gray_img &source, gray_img &dest, double threshold,
 void compute_lines(const gray_img &source, const gray_img &dest);
 
 
-#define SMALL_TH  10.
+#define SMALL_TH 10.
 #define HIGH_TH  40.
 
 /*----------------------------------------------------------------------------*/
@@ -125,7 +151,8 @@ int main(int , char**)
   image_t blurred_img(image_t::rgb_format, img.w, img.h);  
   filter_image(img,blurred_img, blur_filter);  
 
-  gray_img blurred(blurred_img,1);
+	double weights[] = {0., 1., 0.};
+  gray_img blurred(blurred_img, weights);
   blurred.save_to_file("blurred.bmp");
   
   gray_img grad_x, grad_y, grad_norm;
@@ -159,11 +186,11 @@ void compute_gradient(const gray_img &from, gray_img &grad_x, gray_img &grad_y, 
     {
       int x1 = x<(w-1) ? x+1 : w-1;
       int x2 = x>0     ? x-1 : 0;
-      int dx = from.pix[x1][y] - from.pix[x2][y];
+      double dx = (from.pix[x1][y] - from.pix[x2][y]) / (x1-x2);
       
       int y1 = y<(h-1) ? y+1 : y-1;
       int y2 = y>0     ? y-1 : 0;
-      int dy = from.pix[x][y1] - from.pix[x][y2];
+      double dy = (from.pix[x][y1] - from.pix[x][y2]) / (y1-y2);
       
       grad_x.pix[x][y] = dx;
       grad_y.pix[x][y] = dy;      
@@ -284,11 +311,14 @@ point_t get_hough_coord(int a, int b, int maxA, int minB, int maxB)
   point_t c;
   c.x = double(a+maxA)/double(2*maxA)*double(resolA-1);
   c.y = double(b-minB)/(2.*double(maxA))*double(resolA-1);
+  
+  return point_t(0,0);
 }
 
 /*----------------------------------------------------------------------------*/
-void compute_lines(const gray_img &source, const gray_img &dest)
+void compute_lines(const gray_img &source, gray_img &dest)
 {
+/*
   const int w = source.get_width();
   const int h = source.get_height(); 
   const int maxA = ceil(tan(maxTHETA));
@@ -302,6 +332,6 @@ void compute_lines(const gray_img &source, const gray_img &dest)
       if(source.pix[x][y])
       {
         int b = (-x)*(-maxA)
-      }
+      }*/
 }
 /*----------------------------------------------------------------------------*/
