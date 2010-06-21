@@ -1,6 +1,6 @@
 include ../../makeopt
 
-all: make_common energyMap view_wc_tool
+all: make_common energyMap find_lines_tool view_wc_tool
 
 make_common:
 	make -C ../../common
